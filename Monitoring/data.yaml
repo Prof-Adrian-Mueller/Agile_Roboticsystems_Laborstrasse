@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['0', 'doobot', 'staender', 'tube']
+
+roboflow:
+  workspace: mirko-mettendorf-ikq1a
+  project: test-ez6lp
+  version: 7
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/mirko-mettendorf-ikq1a/test-ez6lp/dataset/7
