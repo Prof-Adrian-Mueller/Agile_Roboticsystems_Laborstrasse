@@ -9,7 +9,7 @@ from Monitoring.tracker_utils import VideoCapture, berechne_mittelpunkt, send_to
 
 import pyboof as pb
 
-import erkennen.calibrate_Camera as calibrate_Camera
+import Erkennen.calibrate_Camera as calibrate_Camera
 
 # Lese Config Datei
 config_object = ConfigParser()

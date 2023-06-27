@@ -14,8 +14,8 @@ import supervision as sv
 from supervision import VideoSink, VideoInfo
 from ultralytics import YOLO
 
-from erkennen import calibrate_Camera
-from erkennen.microqr_reader import microqr_reader
+from Erkennen import calibrate_Camera
+from Erkennen.microqr_reader import microqr_reader
 from tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
 
 # Lese Config Datei
