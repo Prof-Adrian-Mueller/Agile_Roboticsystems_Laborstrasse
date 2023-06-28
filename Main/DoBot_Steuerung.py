@@ -45,9 +45,9 @@ while True:
         offset_y = 0
         for i in range(anzahl_tubes):
             # DoBot fährt auf HOME-Position
-            dobot.move_to(34.9336, -212.3015, 134.8012,  )
-            # DoBot fährt auf Position des Tubes
-            dobot.move_to(x+offset_x, y+offset_y, z, 0.0, MODE_PTP.MOVL_XYZ)#
+            dobot.move_to(34.9336, -212.3015, 134.8012, -80.6559, MODE_PTP.MOVL_XYZ )
+            # DoBot fährt auf Position des Tubes (Position des 1. Tubes + Offset)
+            dobot.move_to(97.5212+offset_x, -221.1407+offset_y, 63.6053, -66.2029, MODE_PTP.MOVL_XYZ)
             # DoBot verrechnet offset -> geht 3 Reihen à 4 Tubes durch
             offset_x += 21.6
             if i == 3 or i == 7:
