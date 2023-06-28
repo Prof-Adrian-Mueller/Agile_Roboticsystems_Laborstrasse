@@ -1,13 +1,15 @@
 import dobotapi
 
 # Dobot initialisieren und einer Variable zuweisen
-dobot = dobotapi.Dobot
+bot = dobotapi.Dobot()
+
+
 # Verbindung aufbauen
-dobot.ConnectDobot()
+bot.connect()
 # Lade .playback File
 playback_file = "./Testablauf.playback"
-dobot.SetPlaybackCmd(playback_file)
+bot.SetPlaybackCmd(playback_file)
 # Starte das Playback
-dobot.Playback()
+bot.Playback()
 # Verbindung trennen
-dobot.DisconnectDobot()
+bot.close()

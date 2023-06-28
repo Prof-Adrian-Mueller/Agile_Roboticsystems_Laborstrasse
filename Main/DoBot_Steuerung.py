@@ -21,7 +21,7 @@ while invalid_input:
 # Dobot initialisieren und einer Variable zuweisen
 dobot = dobotapi.Dobot
 # Verbindung aufbauen
-dobot.ConnectDobot()
+dobot.connect()
 # Interface initialisieren
 dobot.SetIOMultiplexing(14, 0, 1)  # Set the user interface I/O to an input
 
