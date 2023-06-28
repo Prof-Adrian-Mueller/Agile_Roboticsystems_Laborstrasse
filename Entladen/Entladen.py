@@ -104,10 +104,11 @@ def unload(tubeNr):
     ctrlBot.moveArmXYZ(unloadPosition[0],unloadPosition[1],unloadPosition[2]+20)
     ctrlBot.moveSnailXYZ(unloadPosition[0],unloadPosition[1],unloadPosition[2])
     ctrlBot.toggleSuction()
-    ctrlBot.moveArmXYZ(unloadPosition[0],unloadPosition[1],unloadPosition[2]+20)
-    ctrlBot.moveHome()
+    ctrlBot.moveArmXYZ(currentX,currentY,currentZ+20)
+    ctrlBot.moveSnailXYZ(currentX,currentY,currentZ)
     ctrlBot.toggleSuction()
-    ctrlBot.moveArmXYZ(currentX,currentY,currentZ)
+    ctrlBot.moveHome()
+    
     
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
