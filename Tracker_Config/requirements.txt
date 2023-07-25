@@ -1,0 +1,6 @@
+numpy==1.24.3
+opencv_contrib_python==4.7.0.72
+PyBoof==0.41
+Requests==2.31.0
+supervision==0.10.0
+ultralytics==8.0.120

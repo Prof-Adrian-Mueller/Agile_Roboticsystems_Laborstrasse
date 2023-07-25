@@ -1,22 +1,42 @@
 """ Beinhaltet den Tracker, das Lesen der notwendigen Konfigwerte und die Klassen für die Tube, Station und das Log"""
 
+""" Inhaltsverzeichnis:
 
+    Konfiguration 34-79
+    Station Klasse 87-105
+    TrackingLogEntry Klasse 110-148
+    Tube Klasse 152-170
+    Tracker 176-470
+    Start_Tracker 476-484
+        
+    
+"""
+
+__author__ = 'Mirko Mettendorf'
+__date__ = '20/05/2023'
+__version__ = '1.0'
+__last_changed__ = '13/07/2023'
+
+import math
 import os
+import threading
 from threading import Thread
 
 import cv2
 import pyboof as pb
 from configparser import ConfigParser
+import requests
 import datetime
 import csv
+
+
 
 import supervision as sv
 from supervision import VideoSink, VideoInfo
 from ultralytics import YOLO
 
-from Erkennen import calibrate_Camera
-from Erkennen.microqr_reader import microqr_reader
-from tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
+import Tracker_Config.calibrate_Camera as calibrate_Camera
+from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
 
 # Lese Config Datei
 config_object = ConfigParser()
@@ -26,7 +46,7 @@ trackerConf = config_object["Tracker"]
 telegramConf = config_object["Telegram"]
 
 # Lese Camera Ips aus der Config Datei und fügt sie in die URLS des Videostreams ein
-RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp2"] + ':554/11'
+RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp"] + ':554/11'
 
 # Lese Tracking Config Werte aus
 STATION_NAMES = trackerConf["station_names"]
@@ -38,9 +58,8 @@ TRACKING_WEIGHTS_PATH = trackerConf["tracker_weights_path"]
 TRACKING_FOLDER = trackerConf["zielpfad_log"]
 TUBE_COUNT = int(trackerConf["tube_count"])
 # Erzeuge Ordner
-DIRECTORY = TRACKING_FOLDER + "tracking_" + datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+DIRECTORY = TRACKING_FOLDER + "tracking_" + str(datetime.datetime.now())
 TARGET_VIDEO_PATH = DIRECTORY + "\\video.mp4"
-print(TARGET_VIDEO_PATH)
 os.makedirs(DIRECTORY)
 
 # Einstellung um rtsp stream zu lesen
@@ -169,13 +188,13 @@ def tracker(tube_ids):
     live_tracking = []
 
     # Lade Yolo Weights
-    model = YOLO(TRACKING_WEIGHTS_PATH)
+    model = YOLO(os.getcwd()+TRACKING_WEIGHTS_PATH)
 
     # Lade Kalibrierdaten
     mtx, dist = calibrate_Camera.load_coefficients('calibration_charuco.yml')
 
     # Bereite Kamera vor
-    cap = VideoCapture(RTSP_URL)  ##todo get videoinfo
+    cap = VideoCapture(RTSP_URL)
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -193,15 +212,15 @@ def tracker(tube_ids):
     Tracker_Start_Time = datetime.datetime.now()
 
     # zum Speichern der Log.csv Datei
-    with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
+    with open(os.getcwd()+DIRECTORY + '\\log.csv', 'w', newline='') as f:
         writer = csv.writer(f)
 
         # zum Speichern der log_detail.csv Datei
-        with open(DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
+        with open(os.getcwd()+DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
             writer2 = csv.writer(f)
 
             # zum Speichern des Videos
-            with VideoSink(TARGET_VIDEO_PATH, videoinfo) as sink:
+            with VideoSink(os.getcwd()+TARGET_VIDEO_PATH, videoinfo) as sink:
 
                 # für jeden Frame
                 while True:
@@ -221,8 +240,11 @@ def tracker(tube_ids):
                     # nach erstem Frame und live tracking ist noch leer
                     if not start and len(live_tracking) == 0:
 
-                        # Merge die Ids des QR-Codereaders und des Trackers
+                        # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
                         mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
+                        if mergedIDs ==0:
+                            print("not equal")
+                            break
 
                         # für jede Tube
                         for index in mergedIDs:
@@ -234,7 +256,6 @@ def tracker(tube_ids):
                     for result in model.track(source=img, conf=0.5, iou=0.5, tracker="botsort.yaml", stream=False,
                                               show=True,
                                               device=0, save=True, save_txt=True):
-
                         # frame
                         frame = result.orig_img
 
@@ -250,7 +271,9 @@ def tracker(tube_ids):
                             # speichern der Id
                             detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
 
-                            # im ersten Frame werden die tracking ids zwischengespeichert und die station Objekte erzeugt
+                            # im ersten Frame werden die tracking ids zwischengespeichert und die station Objekte
+                            # erzeugt, da Tube Objekte erst nach dem Erkennen aller Tubes Objekte und der Verknüpfung
+                            # mit den QR-Code IDs erzeugt werden können.
                             if start:
 
                                 # erkanntes Objekt ist tube
@@ -285,8 +308,14 @@ def tracker(tube_ids):
                                             stations.append(
                                                 Station(name, result.boxes.xywh, detections.tracker_id[0], index))
 
-                            # ab zweitem frame
+                            # ab zweitem frame, sind alle Tracking Objekte erzeugt
                             else:
+                                # es wird geprüft ob das Tube aktuell in der Station eingetragen ist, wenn nein und
+                                # es ist aber jetzt in der Station, wird der Logeintrag beendet und das Tube wird in
+                                # der Station vermerkt. Es hat eine Fahrt von einer Station zur nächsten beendet. Ist
+                                # es nicht in der Station, es stand aber in der Liste der Station, dann hat es soeben
+                                # die Station verlassen und es wird ein neuer Logeintrag erzeugt und das Tube aus der
+                                # Stationliste gelöscht.
 
                                 # erkanntes Objekt ist tube
                                 if model.model.names[detections.class_id[0]] == "tube":
@@ -322,7 +351,7 @@ def tracker(tube_ids):
                                                                 writer.writerow([entry.tubeID, entry.startStation,
                                                                                  entry.startStationTime,
                                                                                  entry.endStation,
-                                                                                 entry.endStationTime, entry.duration])
+                                                                                 entry.endStationTime, entry.duration,entry.videoTimestamp])
 
                                                         # aktualisiert tube werte
                                                         tube.leftStation = False
@@ -386,7 +415,7 @@ def tracker(tube_ids):
 
                                             # schreibe log_detail.csv
                                             writer2.writerow(
-                                                [tube.tubeID, tube.trackingID, tube.lastStation, tube.leftStation,
+                                                [tube.tubeID, tube.lastStation, tube.leftStation,
                                                  tube.nextStation, tube.nextStationDistance])
 
                                 # objekt ist Station, Koordinaten aktualisieren
@@ -458,16 +487,9 @@ def start_tracking(tube_ids):
     """ Erzeugt einen eigenen Thread in dem die Methode tracking() läuft
 
     Args:
-        tube_ids ([int]): Die IDs aller Tubes, die getrackt werden sollen
+        tube_ids ([(int,(int,int)]): Die IDs und Koordinaten aller Tubes, die getrackt werden sollen
 
     """
     thread = Thread(target=tracker(tube_ids))
     thread.start()
 
-
-# starte Prototyp
-if __name__ == '__main__':
-    # starte QR Reader
-    count, tube_ids = microqr_reader(TUBE_COUNT)
-    # starte Tracker
-    start_tracking(tube_ids)

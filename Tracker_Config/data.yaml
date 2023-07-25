@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Deckelstation', 'Thymio', 'Tube']
+
+roboflow:
+  workspace: mirko-mettendorf-ikq1a
+  project: tracking-prototyp-final
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/mirko-mettendorf-ikq1a/tracking-prototyp-final/dataset/1

@@ -1,3 +1,10 @@
+"""Micro Qr Reader, erkennt alle Micro-QR-Codes aus dem Video und prüft die Anzahl"""
+
+__author__ = 'Mirko Mettendorf'
+__date__ = '20/05/2023'
+__version__ = '1.0'
+__last_changed__ = '13/07/2023'
+
 import datetime
 import time
 from configparser import ConfigParser
@@ -5,11 +12,11 @@ from configparser import ConfigParser
 import cv2
 import numpy as np
 
-from Monitoring.tracker_utils import VideoCapture, berechne_mittelpunkt, send_to_telegram
+from Tracker_Config.tracker_utils import VideoCapture, berechne_mittelpunkt, send_to_telegram
 
 import pyboof as pb
 
-import Erkennen.calibrate_Camera as calibrate_Camera
+
 
 # Lese Config Datei
 config_object = ConfigParser()
@@ -19,8 +26,6 @@ telegramConf = config_object["Telegram"]
 trackerConf = config_object["Tracker"]
 
 
-# Lese Camera Ips aus der Config Datei und fügt sie in die URLS des Videostreams ein
-RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp1"] + ':554/11'
 
 # Lese Tracking Config Werte aus
 MAX_QR_WAIT_TIME = int(trackerConf["wait_qr_time"])
@@ -46,7 +51,8 @@ def microqr_reader(count):
     print("QR Reader gestartet")
 
     # Bereite Kamera vor
-    cap = VideoCapture(RTSP_URL)
+    cap = cv2.VideoCapture(1)
+    cv2.waitKey(1)
 
     # Erzeuge QRReader Objekt
     factory = pb.FactoryFiducial(np.uint8)
@@ -54,12 +60,13 @@ def microqr_reader(count):
 
     # Erzeuge Fenster
     cv2.namedWindow('Erkannte Marker', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('Erkannte Marker', 1920, 1080)
+    # cv2.resizeWindow('Erkannte Marker', 1920, 1080)
 
-    # Berechne Kameramatrix mit Kalibrierdaten
-    mtx, dist = calibrate_Camera.load_coefficients('calibration_charuco.yml')
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (1920, 1080))
-    mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (1920, 1080), 5)
+    # Berechne Kameramatrix mit Kalibrierdaten/ für ubs webcam eigentlich nicht notwendig
+    # bei Bedarf Kalibrierung dieser erst durchführen
+    #mtx, dist = calibrate_Camera.load_coefficients('calibration_charuco.yml')
+    #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (1920, 1080))
+    #mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (1920, 1080), 5)
 
     # Stoppe Zeit
     start_time = datetime.datetime.now()
@@ -77,10 +84,10 @@ def microqr_reader(count):
         if img is None:
             break
 
-        # Entzerre Kamera
-        dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-        x, y, w, h = roi
-        dst = dst[y:y + h, x:x + w]
+        # Entzerre Kamera (optional)
+        #dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+        #x, y, w, h = roi
+        #dst = dst[y:y + h, x:x + w]
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         image = pb.ndarray_to_boof(gray)
 
@@ -93,7 +100,6 @@ def microqr_reader(count):
         # Liste mit den IDs und Koordinaten der QR-Codes
         tube_ids = []
 
-
         # für jede Erkennung
         for qr in detector.detections:
             print("message: '" + qr.message + "'")
@@ -102,7 +108,9 @@ def microqr_reader(count):
             points = np.array([tuple(c) for c in qr.bounds.convert_tuple()], dtype=np.int32)
 
             # erzeuge Bounding-box
-            cv2.rectangle(output_image, points[3], points[1], (0, 255, 0), 2)
+            cv2.rectangle(output_image, points[3], points[1], (0, 0, 255), 8)
+            cv2.putText(output_image, qr.message, (points[1][0], points[1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 3,
+                        (0, 0, 255), 4)
 
             # berechne Mittelpunkt
             xy = berechne_mittelpunkt(points[3], points[1])
@@ -123,7 +131,7 @@ def microqr_reader(count):
             cv2.destroyAllWindows()
             return count, tube_ids
 
-        # Tube Anzahl ist falsch, nach Ablauf der Zeit Warnung rausschicken und nach 30 Sekunden wiederholen
+        # Tube Anzahl ist falsch, nach Ablauf der Zeit Warnung herausschicken und nach 30 Sekunden wiederholen
         else:
             print("Nicht korrekte Anzahl an Tubes erkannt")
             if past_time.seconds > MAX_QR_WAIT_TIME:
@@ -136,3 +144,6 @@ def microqr_reader(count):
 
     # beende alle Fenster
     cv2.destroyAllWindows()
+
+
+microqr_reader(4)
