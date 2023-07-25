@@ -14,7 +14,7 @@ import requests
 
 # Lese Config Datei
 config_object = ConfigParser()
-config_object.read("tracker_config.ini")
+config_object.read("..\\Tracker_Config\\tracker_config.ini")
 trackerConf = config_object["Tracker"]
 telegramConf = config_object["Telegram"]
 

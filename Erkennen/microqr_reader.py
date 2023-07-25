@@ -20,7 +20,7 @@ import pyboof as pb
 
 # Lese Config Datei
 config_object = ConfigParser()
-config_object.read("tracker_config.ini")
+config_object.read("..\\Tracker_Config\\tracker_config.ini")
 cameraConf = config_object["Camera"]
 telegramConf = config_object["Telegram"]
 trackerConf = config_object["Tracker"]
