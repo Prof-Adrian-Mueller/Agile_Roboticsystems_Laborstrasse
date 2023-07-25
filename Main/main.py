@@ -1,3 +1,3 @@
-from DoBot_Steuerung import steuerung
+from doBot_Steuerung import steuerung
 
 steuerung()

@@ -2,7 +2,7 @@
 
 import sys
 sys.path.insert(1,'./DLL')
-import DobotDllType as dType
+from DLL import DobotDllType as dType
 from time import sleep
 
 

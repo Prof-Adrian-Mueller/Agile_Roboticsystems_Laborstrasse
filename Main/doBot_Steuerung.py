@@ -2,11 +2,10 @@
 # Autor: David Weyer
 # Dokumentation: https://stax124.github.io/DobotAPI/
 # Importiere DoBot API
-import dobotapi
-import Entladen.entladen as entladen
+#import dobotapi
+
 import Erkennen.microqr_reader as erkennen
-import Monitoring.monitoring as monitoring
-import Entladen.DobotDllType as dType
+import DLL.DobotDllType as dType
 
 
 def steuerung():
@@ -32,7 +31,7 @@ def steuerung():
     dType.SetIOMultiplexing(api, 14, 0, 1)  # Set the user interface I/O to an input
 
     # Code von Papyshew wird aufgerufen
-    # entladen.main(anzahl_tubes)
+    #entladen.main(anzahl_tubes)
 
     # EventListener = wartet auf einen Input auf Pin 14 vom DoBot-Interface
     while True:
