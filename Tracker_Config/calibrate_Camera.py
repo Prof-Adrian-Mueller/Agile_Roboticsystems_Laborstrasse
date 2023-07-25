@@ -15,7 +15,7 @@ from cv2 import aruco
 
 # Lese Config Datei
 config_object = ConfigParser()
-config_object.read("tracker_config.ini")
+config_object.read("..\\Tracker_Config\\tracker_config.ini")
 calibConf = config_object["Calibration"]
 
 # Parameter

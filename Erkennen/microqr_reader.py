@@ -51,7 +51,7 @@ def microqr_reader(count):
     print("QR Reader gestartet")
 
     # Bereite Kamera vor
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     cv2.waitKey(1)
 
     # Erzeuge QRReader Objekt
@@ -108,9 +108,9 @@ def microqr_reader(count):
             points = np.array([tuple(c) for c in qr.bounds.convert_tuple()], dtype=np.int32)
 
             # erzeuge Bounding-box
-            cv2.rectangle(output_image, points[3], points[1], (0, 0, 255), 8)
-            cv2.putText(output_image, qr.message, (points[1][0], points[1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 3,
-                        (0, 0, 255), 4)
+            cv2.rectangle(output_image, points[3], points[1], (0, 0, 255), 3)
+            #cv2.putText(output_image, qr.message, (points[1][0], points[1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 3,
+            #            (0, 0, 255), 4)
 
             # berechne Mittelpunkt
             xy = berechne_mittelpunkt(points[3], points[1])
@@ -128,7 +128,7 @@ def microqr_reader(count):
         if len(detector.detections) >= count:
             print("Richtige Anzahl an Tubes erkannt")
             cap.release()
-            cv2.destroyAllWindows()
+            #cv2.destroyAllWindows()
             return count, tube_ids
 
         # Tube Anzahl ist falsch, nach Ablauf der Zeit Warnung herausschicken und nach 30 Sekunden wiederholen

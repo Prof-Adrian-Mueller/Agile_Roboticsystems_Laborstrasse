@@ -40,7 +40,7 @@ from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_dista
 
 # Lese Config Datei
 config_object = ConfigParser()
-config_object.read("tracker_config.ini")
+config_object.read("..\\Tracker_Config\\tracker_config.ini")
 cameraConf = config_object["Camera"]
 trackerConf = config_object["Tracker"]
 telegramConf = config_object["Telegram"]
@@ -56,9 +56,8 @@ ERROR_WAIT_TIME = int(trackerConf["error_wait_time"])
 STATION_LENGTH = int(trackerConf["length_station1"])
 TRACKING_WEIGHTS_PATH = trackerConf["tracker_weights_path"]
 TRACKING_FOLDER = trackerConf["zielpfad_log"]
-TUBE_COUNT = int(trackerConf["tube_count"])
 # Erzeuge Ordner
-DIRECTORY = TRACKING_FOLDER + "tracking_" + str(datetime.datetime.now())
+DIRECTORY = TRACKING_FOLDER + "\\tracking_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 TARGET_VIDEO_PATH = DIRECTORY + "\\video.mp4"
 os.makedirs(DIRECTORY)
 
@@ -188,6 +187,7 @@ def tracker(tube_ids):
     live_tracking = []
 
     # Lade Yolo Weights
+    print(os.getcwd()+TRACKING_WEIGHTS_PATH)
     model = YOLO(os.getcwd()+TRACKING_WEIGHTS_PATH)
 
     # Lade Kalibrierdaten
@@ -493,3 +493,4 @@ def start_tracking(tube_ids):
     thread = Thread(target=tracker(tube_ids))
     thread.start()
 
+start_tracking([(1,(30,40))])
