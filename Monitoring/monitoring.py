@@ -187,11 +187,10 @@ def tracker(tube_ids):
     live_tracking = []
 
     # Lade Yolo Weights
-    print(os.getcwd()+TRACKING_WEIGHTS_PATH)
     model = YOLO(os.getcwd()+TRACKING_WEIGHTS_PATH)
 
     # Lade Kalibrierdaten
-    mtx, dist = calibrate_Camera.load_coefficients('calibration_charuco.yml')
+    mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
 
     # Bereite Kamera vor
     cap = VideoCapture(RTSP_URL)
@@ -492,5 +491,7 @@ def start_tracking(tube_ids):
     """
     thread = Thread(target=tracker(tube_ids))
     thread.start()
+
+
 
 start_tracking([(1,(30,40))])

@@ -2,7 +2,7 @@
 # Auflösung ist 640x480, für die Kallibrierung Tube and der Entnahmeposition x=320 and y=240 positionieren
 # Verwenden Sie zum Kallibrieren calibration.py
 
-import Entladen.DoBotArm as Dbt
+import DoBotArm as Dbt
 import threading
 import cv2
 import numpy as np
@@ -71,11 +71,11 @@ def movePlate():
         ctrlBot.moveArmXYZ(point1[0], point1[1], point1[2]+20)
         ctrlBot.moveSnailXYZ(point1[0], point1[1], point1[2])
         ctrlBot.moveInARCMode(point2,point3)
-
+       
         if found:
             ctrlBot.forceStop()
             break
-
+        
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #Funktion zum entladen der Zentrifuge
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -108,8 +108,8 @@ def unload(tubeNr):
     ctrlBot.moveSnailXYZ(currentX,currentY,currentZ)
     ctrlBot.toggleSuction()
     ctrlBot.moveHome()
-
-
+    
+    
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #Funktion zur Erkennung der Tube Positionen
@@ -138,7 +138,7 @@ def searchForTubes():
         # Verschwimmen der Bilder mit 3 * 3 kernel um Rauschen zu entfernen.
         gray_blurred = cv2.GaussianBlur(gray, (3, 3),0)
 
-        # Sucht nach Kreisen mit dem Hough Gradianten
+        # Sucht nach Kreisen mit dem Hough Gradianten 
         # HoughCircles(Image,method,dp,minDist,param1,param2,minRadius,maxRadius)
         # image:	    8-bit, single-channel, grayscale input image.
         # circles:	    output vector of found circles(cv.CV_32FC3 type). Each vector is encoded as a 3-element floating-point vector (x,y,radius) .
@@ -153,20 +153,20 @@ def searchForTubes():
         detected_circles = cv2.HoughCircles(gray_blurred, cv2.HOUGH_GRADIENT, 1, 30, param1 = 50, param2 = 50, minRadius = minRad, maxRadius = maxRad)
 
         if detected_circles is not None:
-            for x in detected_circles[0,:]:
+             for x in detected_circles[0,:]:
                 a, b, r = x[0], x[1], x[2]
 
                 # Falls x +- Toleranze und y +- Toleranze passt -> Tube an Entnahmeposition gefunden -> Entnahme
                 if(np.isclose(b,240,atol = tolaranceMiddlePoint) and np.isclose(a,320,atol = tolaranceMiddlePoint)):
                     print("CENTRE FOUND STOP TURNING!")
-                    found = True
+                    found = True 
                     break
                 # Falls x +- Toleranze und y +- Toleranze passt -> Print -> Tube nährt sich der Entnahmeposition
                 if(np.isclose(b,240,atol = 3*tolaranceMiddlePoint) and np.isclose(a,320,atol = 3*tolaranceMiddlePoint)):
                     print(a,b)
     # Bilderaufnahme beenden
     cap.release()
-    cv2.destroyAllWindows
+    cv2.destroyAllWindows 
 
 #Hauptfunktion mit Übergabeparameter Anzahl der Tubes
 def main(nrTubes):
@@ -181,11 +181,10 @@ def main(nrTubes):
         # Haltevoraussetzung Tube wurde gefunden found = True
         t2.join()
         ctrlBot.forceStop()
-
+        
         unload(x,nrTubes)
         found = False
         print(f"iterration endet, Tube {x} of, {nrTubes} Unloadet")
 
 if __name__ == "__main__":
     main(args.number)
-

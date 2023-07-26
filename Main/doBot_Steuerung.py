@@ -1,11 +1,10 @@
 # STEUERZENTRALE
 # Autor: David Weyer
-# Version 1.4
-# Änderungen: python update mit requirements.txt
-#             setplayback etc deaktiviert, nicht vorhanden
-#             RTLD_Global gesetzt aber kein effekt; dlls nach main kopiert
+# Version 1.5
+# Änderungen: neue reqirements.txt für alle Projekte zusammen
+#             DLL Ordner in Path Variable gesetzt, dadurch aus allen anderen Ordner gelöscht
 #             Whisker detection funktioniert
-#             dobot fährt mit original api call
+#             dobot fährt mit original api call und homing bei start
 
 # TODO:
 #       A: while schleife und roboteransteurerung, und dissconnect
@@ -15,9 +14,8 @@
 #       while True:
 #           dType.dSleep(1000)
 #           dType.SetIODO(api, 17, 1, isQueued=0)
-#       C: DLL Pfade aufräumen
 
-import DobotDllType as dType
+import DLL.DobotDllType as dType
 import Erkennen.microqr_reader as erkennen
 
 CON_STR = {
