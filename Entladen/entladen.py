@@ -2,7 +2,7 @@
 # Auflösung ist 640x480, für die Kallibrierung Tube and der Entnahmeposition x=320 and y=240 positionieren
 # Verwenden Sie zum Kallibrieren calibration.py
 
-import DoBotArm as Dbt
+import Entladen.DoBotArm as Dbt
 import threading
 import cv2
 import numpy as np

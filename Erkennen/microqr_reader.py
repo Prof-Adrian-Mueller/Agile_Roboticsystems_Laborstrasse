@@ -146,4 +146,4 @@ def microqr_reader(count):
     cv2.destroyAllWindows()
 
 
-microqr_reader(4)
+#microqr_reader(4)
