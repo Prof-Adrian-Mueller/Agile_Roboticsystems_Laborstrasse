@@ -29,8 +29,6 @@ import requests
 import datetime
 import csv
 
-
-
 import supervision as sv
 from supervision import VideoSink, VideoInfo
 from ultralytics import YOLO
@@ -83,8 +81,6 @@ box_annotator = sv.BoxAnnotator(
 
 # Tracker Startzeit
 Tracker_Start_Time = None
-
-
 
 
 class Station:
@@ -171,9 +167,6 @@ class Tube:
         self.nextStationDistance = None
 
 
-
-
-
 def tracker(tube_ids):
     """ Ausführung des BOTSort-Trackers und Verwaltung aller Tubes, mit Überwachung und dem Schreiben von Logeinträgen
 
@@ -187,13 +180,14 @@ def tracker(tube_ids):
     live_tracking = []
 
     # Lade Yolo Weights
-    model = YOLO(os.getcwd()+TRACKING_WEIGHTS_PATH)
+    model = YOLO(os.getcwd() + TRACKING_WEIGHTS_PATH)
 
     # Lade Kalibrierdaten
     mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
 
     # Bereite Kamera vor
-    cap = VideoCapture(RTSP_URL)
+    # cap = VideoCapture(RTSP_URL)
+    cap = cv2.VideoCapture(0)
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -211,15 +205,15 @@ def tracker(tube_ids):
     Tracker_Start_Time = datetime.datetime.now()
 
     # zum Speichern der Log.csv Datei
-    with open(os.getcwd()+DIRECTORY + '\\log.csv', 'w', newline='') as f:
+    with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
         writer = csv.writer(f)
 
         # zum Speichern der log_detail.csv Datei
-        with open(os.getcwd()+DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
-            writer2 = csv.writer(f)
+        with open(DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
+            writer2 = csv.writer(f2)
 
             # zum Speichern des Videos
-            with VideoSink(os.getcwd()+TARGET_VIDEO_PATH, videoinfo) as sink:
+            with VideoSink(os.getcwd() + TARGET_VIDEO_PATH, videoinfo) as sink:
 
                 # für jeden Frame
                 while True:
@@ -237,14 +231,16 @@ def tracker(tube_ids):
                     dst = dst[y:y + h, x:x + w]
 
                     # nach erstem Frame und live tracking ist noch leer
-                    if not start and len(live_tracking) == 0:
+                    if start and len(live_tracking) == 0:
 
                         # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
                         mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
-                        if mergedIDs ==0:
+                        if len(mergedIDs)==0:
                             print("not equal")
-                            break
+                            continue
 
+                        # setze nach erstem Frame, in dem die tubes erkannt wurden auf False
+                        start = False
                         # für jede Tube
                         for index in mergedIDs:
                             # erzeuge Tube Objekt und füge es in die live-tracking Liste
@@ -350,7 +346,8 @@ def tracker(tube_ids):
                                                                 writer.writerow([entry.tubeID, entry.startStation,
                                                                                  entry.startStationTime,
                                                                                  entry.endStation,
-                                                                                 entry.endStationTime, entry.duration,entry.videoTimestamp])
+                                                                                 entry.endStationTime, entry.duration,
+                                                                                 entry.videoTimestamp])
 
                                                         # aktualisiert tube werte
                                                         tube.leftStation = False
@@ -436,7 +433,7 @@ def tracker(tube_ids):
                                                 # überschritten wurde
                                                 if calculate_distance(newCoords,
                                                                       station.coords) * (
-                                                        STATION_LENGTH / result.boxes.xywh[2] * 2) >\
+                                                        STATION_LENGTH / result.boxes.xywh[2] * 2) > \
                                                         MOVING_STATIONS_DISTANCE_LIMIT:
                                                     station.moving_index += 1
                                                     station.name = station.moving_names[index]
@@ -458,8 +455,7 @@ def tracker(tube_ids):
                             # schreibe Frame in Datei
                             sink.write_frame(frame)
 
-                    # setze nach erstem Frame auf False
-                    start = False
+
 
                     # Abbruch mit Escape
                     if cv2.waitKey(1) == 27:
@@ -479,19 +475,15 @@ def tracker(tube_ids):
             cv2.destroyAllWindows()
 
 
-
-
-
 def start_tracking(tube_ids):
     """ Erzeugt einen eigenen Thread in dem die Methode tracking() läuft
 
     Args:
-        tube_ids ([(int,(int,int)]): Die IDs und Koordinaten aller Tubes, die getrackt werden sollen
+        tube_ids ([(xy),id]): Die IDs und Koordinaten aller Tubes, die getrackt werden sollen
 
     """
     thread = Thread(target=tracker(tube_ids))
     thread.start()
 
 
-
-start_tracking([(1,(30,40))])
+start_tracking([((30, 40), 1)])

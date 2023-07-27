@@ -93,6 +93,9 @@ def mergeIDs(liste1, liste2):
 
     """
 
+    if len(liste1) != len(liste2):
+        return []
+
     # Berechnet min und max Werte der Koordinaten beider Listen
     x_min1 = min(tube[0][0] for tube in liste1)
     y_min1 = min(tube[0][1] for tube in liste1)
@@ -106,8 +109,7 @@ def mergeIDs(liste1, liste2):
     # Rückgabe Liste
     zugewiesen_liste = []
 
-    if len(liste1) != len(liste2):
-        return False
+
 
 
 
