@@ -36,15 +36,19 @@ Und dem Tracker, der in dem Monitoring Ordner liegt.\
 Die Micro-Qr-Code Erkennung wird über die microqr_reader.py ausgeführt.\
 Wurde diese importiert, kann über die Methode microqr_reader() die Erkennung gestartet werden.\
 Der notwendige Parameter ist die Anzahl an Tubes, die erkannt werden wollen.\
+
 Die Erkennung läuft solange, bis die angegebene Anzahl an Tubes erkannt wurde\
 Es wird eine Liste zurückgegeben, die die Ids der erkannten Tubes, sowie deren Mittelpunktkoordinate enthält  [(xy,id)]\
+
 Weitere Informationen bitte der Dokumentation entnehmen.\
 
 Der Tracker wird über die monitoring.py ausgeführt.\
 Wurde diese importiert, kann über die start_tracking() der Tracker gestartet werden.\
 Der notwendige Paramteter ist der Rückgabewert der Micor-Qr-Code Erkennung\
+
 Der Tracker läuft parallel zu Laborstraße, bis es manuell beendet wird.\
-Die Ergebnisse werden in dem in der Tracker_Config/tracker_config.ini angegebenen Zielordner utner dem aktuellen Datum und Uhrzeit als .csv Datei gespeichert.\
+Die Ergebnisse werden in dem in der Tracker_Config/tracker_config.ini angegebenen Zielordner unter dem aktuellen Datum und Uhrzeit als .csv Datei gespeichert.\
+
 Weitere Informationen bitte der Dokumentation entnehmen.\
 
 
