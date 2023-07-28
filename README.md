@@ -23,7 +23,7 @@ Die Projekte Entladen und Tracking sind mit eingebunden\
 
 ## Automatisches Entladen
 
-Befindet sich indem Ordner Entladen\
+Befindet sich in dem Ordner Entladen\
 
 ## Tracking
 
