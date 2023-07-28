@@ -33,6 +33,8 @@ Das Tracking besteht aus 2 Teilen.\
 Dem Erkennen der Micro-QR-Codes. Dieser befindet sich in dem Ordner Erkennen.\
 Und dem Tracker, der in dem Monitoring Ordner liegt.\
 
+Die Kamera zum Erkennen der Micro-Qr-Codes muss über USB mit dem PC verbunden sein.
+
 Die Micro-Qr-Code Erkennung wird über die microqr_reader.py ausgeführt.\
 Wurde diese importiert, kann über die Methode microqr_reader() die Erkennung gestartet werden.\
 Der notwendige Parameter ist die Anzahl an Tubes, die erkannt werden wollen.\
@@ -41,6 +43,9 @@ Die Erkennung läuft solange, bis die angegebene Anzahl an Tubes erkannt wurde\
 Es wird eine Liste zurückgegeben, die die Ids der erkannten Tubes, sowie deren Mittelpunktkoordinate enthält  [(xy,id)]\
 
 Weitere Informationen bitte der Dokumentation entnehmen.\
+
+Die Kamera für den Tracker muss angeschaltet werden und der Hotspot am PC über den WLAN-Stick muss aktiviert sein.
+Nach erfolgreicher Verbindung der Kamera muss ihre IP ausgelesen und in der Tracker_Config/tracker_config.ini Konfigurationsdatei eingetragen werden unter kameraIP
 
 Der Tracker wird über die monitoring.py ausgeführt.\
 Wurde diese importiert, kann über die start_tracking() der Tracker gestartet werden.\
