@@ -51,4 +51,9 @@ Die Ergebnisse werden in dem in der Tracker_Config/tracker_config.ini angegebene
 
 Weitere Informationen bitte der Dokumentation entnehmen.\
 
+  ### Konfiguration
+
+  Die Konfiguration des Trackings, sowie weitere Hilfsprogramme befinden sich in dem Tracker_Config Ordner.
+  Die Bedeutung der unterschiedlichen Parameter der tracker_config.py bitte der Dokumentation entnehmen.
+
 
