@@ -204,14 +204,22 @@ def tracker(tube_ids):
     global Tracker_Start_Time
     Tracker_Start_Time = datetime.datetime.now()
 
+    headerLog = ['tubeID', 'startStation',
+                 'startStationTime',
+                 'endStation',
+                 'endStationTime', 'duration',
+                 'videoTimestamp']
+    headerLogDetail =['tubeID', 'lastStation', 'leftStation',
+                      'nextStation', 'nextStationDistance']
+
     # zum Speichern der Log.csv Datei
     with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
         writer = csv.writer(f)
-
+        writer.writerow(headerLog)
         # zum Speichern der log_detail.csv Datei
         with open(DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
             writer2 = csv.writer(f2)
-
+            writer2.writerow(headerLogDetail)
             # zum Speichern des Videos
             with VideoSink(os.getcwd() + TARGET_VIDEO_PATH, videoinfo) as sink:
 
