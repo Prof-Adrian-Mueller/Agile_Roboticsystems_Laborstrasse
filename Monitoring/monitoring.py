@@ -186,8 +186,8 @@ def tracker(tube_ids):
     mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
 
     # Bereite Kamera vor
-    # cap = VideoCapture(RTSP_URL)
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(RTSP_URL)
+    #cap = cv2.VideoCapture(0)
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -239,16 +239,16 @@ def tracker(tube_ids):
                     dst = dst[y:y + h, x:x + w]
 
                     # nach erstem Frame und live tracking ist noch leer
-                    if start and len(live_tracking) == 0:
+                    if not start and len(live_tracking) == 0:
 
                         # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
                         mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
                         if len(mergedIDs)==0:
                             print("not equal")
+                            start =True
                             continue
 
-                        # setze nach erstem Frame, in dem die tubes erkannt wurden auf False
-                        start = False
+
                         # für jede Tube
                         for index in mergedIDs:
                             # erzeuge Tube Objekt und füge es in die live-tracking Liste
@@ -258,11 +258,11 @@ def tracker(tube_ids):
                     # für jedes erkannte Objekt des Trackers
                     for result in model.track(source=img, conf=0.5, iou=0.5, tracker="botsort.yaml", stream=False,
                                               show=True,
-                                              device=0, save=True, save_txt=True):
+                                              device='cpu', save=True, save_txt=True):  #bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                         # frame
                         frame = result.orig_img
 
-                        # Detektion Obekt des aktuellen results
+                        # Detektion Objekt des aktuellen results
                         detections = sv.Detections.from_yolov8(result)
 
                         # label Liste
@@ -310,6 +310,8 @@ def tracker(tube_ids):
                                             # füge erzeugtes Station Objekt in Liste
                                             stations.append(
                                                 Station(name, result.boxes.xywh, detections.tracker_id[0], index))
+                                # setze nach erstem Frame, in dem die tubes erkannt wurden auf False
+                                start = False
 
                             # ab zweitem frame, sind alle Tracking Objekte erzeugt
                             else:
@@ -494,4 +496,4 @@ def start_tracking(tube_ids):
     thread.start()
 
 
-start_tracking([((30, 40), 1)])
+#start_tracking([((30, 40), 1)])

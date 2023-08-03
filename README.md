@@ -3,15 +3,15 @@ Repository für die automatische Laborstraße des Agile Roboticsystems Projekt
 
 Das System besteht aus 3 Teilprojekten:
 
-- Die autmatische Laborstraße
-- Das automatische Entladen
-- Das automatische Tracking
+- Die automatische Laborstraße (Bufe,Müller)
+- Das automatische Entladen (Papyschew)
+- Das automatische Erkennen und Tracken (Mettendorf)
 
 ## Einrichtung
 
 Python 3.9 installieren\
-Neustes Java installieren\
-Befehl "pip -r Tracker_Config/requirements.txt" zum installieren der notwendigen Module im Terminal im Root Projektordner ausführen.\
+Neuestes Java installieren\
+Befehl "pip -r Tracker_Config/requirements.txt" zum Installieren der notwendigen Module im Terminal im Root Projektordner ausführen.\
 
 
 ## Automatische Laborstraße

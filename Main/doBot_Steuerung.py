@@ -6,14 +6,18 @@
 #             Schleife funktioniert
 #              magnet funktioniert
 #             dobot fährt mit original api call und homing bei start
-
+import os
 
 # TODO:
 #       A: Ablauf für automatische Laborstraße
 #       B: DLL aus Ordner zu laden funktioniert auf dem Laborpc nicht
+#       C: Empfehlung Magnet über Relais und 5 Volt schalten vermutlich Port 13,
+#       D: Whisker direkt ohne Breadbord
 
-import DLL.DobotDllType as dType
+
+import Monitoring.monitoring as monitoring
 import Erkennen.microqr_reader as erkennen
+import DLL.DobotDllType as dType
 #import Entladen.entladen as entladen
 
 
@@ -24,7 +28,11 @@ CON_STR = {
     dType.DobotConnect.DobotConnect_Occupied: "DobotConnect_Occupied"}
 
 
-
+def commandDelay(api,lastIndex):
+    dType.SetQueuedCmdStartExec(api)
+    while lastIndex > dType.GetQueuedCmdCurrentIndex(api)[0]:
+        dType.dSleep(200)
+    dType.SetQueuedCmdStopExec(api)
 
 
 def steuerung():
@@ -36,12 +44,13 @@ def steuerung():
     if state == dType.DobotConnect.DobotConnect_NoError:
         dType.SetQueuedCmdClear(api)
         #Async Motion Params Setting
-        dType.SetHOMEParams(api, 250, 0, 50, 200, isQueued = 1)
-        dType.SetPTPJointParams(api, 200, 200, 200, 200, 200, 200, 200, 200, isQueued = 1)
-        dType.SetPTPCommonParams(api, 100, 100, isQueued = 1)
+        dType.SetHOMEParams(api, 250, 0, 50, 200, 0)
+        dType.SetPTPJointParams(api, 200, 200, 200, 200, 200, 200, 200, 200, 0)
+        dType.SetPTPCommonParams(api, 100, 100, 0)
+        dType.SetPTPJumpParams(api,150,150)
 
         #Async Home
-        dType.SetHOMECmd(api, temp = 0, isQueued = 1)
+        dType.SetHOMECmd(api, temp = 0,)
         dType.dSleep(1000)
         # Loop: Solange fragen bis man eine gültige Eingabe bekommt (Anzahl der Tubes abfragen)
         invalid_input = True
@@ -72,32 +81,43 @@ def steuerung():
 
         # Wenn der Input ausgelöst wird
         print("Whisker-Input detected!")
-        dType.SetIOMultiplexingEx(api, 17, 1, 0)
-        dType.SetIODO(api,17,1,0)
-        dType.dSleep(1000)
-        dType.SetIODO(api, 17, 0, 0)
-        print(str(dType.GetIODO(api,17)))
+
         # Code von Mettendorf wird aufgerufen
-        #erkennen.microqr_reader(anzahl_tubes)
+        tubes =erkennen.microqr_reader(anzahl_tubes)
+        #monitoring.start_tracking(tubes)
         # Rückgabe wird abgeglichen -> evtl abbruch
 
         # Loop: Wiederhole die Tube Entnahme (i = anzahl_tubes)
         offset_x = 0
         offset_y = 0
-        for i in range(anzahl_tubes):
-            # DoBot fährt auf HOME-Position
-            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,34.9336, -212.3015, 134.8012, -80.6559) # grap from top with jump
+        for i in range(1): #TODO für mehrere Codes differenz der tubes messen
             # DoBot fährt auf Position des Tubes (Position des 1. Tubes + Offset)
-            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,97.5212 + offset_x, -221.1407 + offset_y, 63.6053, -66.2029)
+            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,-86.8816 + offset_x,-221.5284 + offset_y,65.2446,-80,1)
+            dType.SetWAITCmd(api,2000)
+            dType.SetEndEffectorGripper(api, 1,  1, isQueued=1)
+            dType.SetWAITCmd(api,2000)
+
+            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,94.2976,238.4906,1.8375,-80)
+            dType.SetWAITCmd(api,2000)
+            #TODO aufschrauben
+            dType.SetIOMultiplexingEx(api, 17, 1, 0)  #wichtig zu konfiguration des pins, letzter parameter is queued 0 ist wichtig
+            dType.SetIODO(api,17,1,0) # 12 Volt On
+            dType.dSleep(10000)
+            dType.SetIODO(api, 17, 0, 0) # 12 Volt Off
+            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,-86.8816 + offset_x,-221.5284 + offset_y,65.2446,-80)
+            dType.SetEndEffectorGripper(api, 1,  0, isQueued=1)
+            dType.SetWAITCmd(api,2000)
+
             # DoBot verrechnet offset -> geht 3 Reihen à 4 Tubes durch
-            offset_x += 21.6
+            offset_x += 40
             if i == 3 or i == 7:
-                offset_y += 19.25
+                offset_y += 20
                 offset_x = 0
 
-            #TODO Bewegung Deckelabschrauben
 
-            dType.SetIODO(api,17,1,0)
+        #TODO schranke entfernen
+        dType.SetHOMECmd(api,0)
+            #dType.SetIODO(api,17,1,0)
             # Abfrage: Wird das letzte Tube bearbeitet -> wenn ja, wird der Blocker am Ende bewegt
             #if i == anzahl_tubes - 1:
                 #playback_file = "./MoveBlocker.playback"

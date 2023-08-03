@@ -129,7 +129,8 @@ def microqr_reader(count):
             print("Richtige Anzahl an Tubes erkannt")
             cap.release()
             #cv2.destroyAllWindows()
-            return count, tube_ids
+            print(tube_ids)
+            return tube_ids
 
         # Tube Anzahl ist falsch, nach Ablauf der Zeit Warnung herausschicken und nach 30 Sekunden wiederholen
         else:
