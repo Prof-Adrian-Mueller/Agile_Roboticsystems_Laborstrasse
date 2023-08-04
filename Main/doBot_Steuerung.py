@@ -6,7 +6,6 @@
 #             Schleife funktioniert
 #              magnet funktioniert
 #             dobot fährt mit original api call und homing bei start
-import os
 
 # TODO:
 #       A: Ablauf für automatische Laborstraße
@@ -14,10 +13,11 @@ import os
 #       C: Empfehlung Magnet über Relais und 5 Volt schalten vermutlich Port 13,
 #       D: Whisker direkt ohne Breadbord
 
+import sys
+sys.path.insert(1,'./DLL')
 
-import Monitoring.monitoring as monitoring
 import Erkennen.microqr_reader as erkennen
-import DLL.DobotDllType as dType
+import Main.DobotDllType as dType
 #import Entladen.entladen as entladen
 
 
@@ -51,6 +51,7 @@ def steuerung():
 
         #Async Home
         dType.SetHOMECmd(api, temp = 0,)
+        print(dType.GetPose(api))
         dType.dSleep(1000)
         # Loop: Solange fragen bis man eine gültige Eingabe bekommt (Anzahl der Tubes abfragen)
         invalid_input = True
@@ -92,7 +93,7 @@ def steuerung():
         offset_y = 0
         for i in range(1): #TODO für mehrere Codes differenz der tubes messen
             # DoBot fährt auf Position des Tubes (Position des 1. Tubes + Offset)
-            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,-86.8816 + offset_x,-221.5284 + offset_y,65.2446,-80,1)
+            dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,-66.8816 + offset_x,-221.5284 + offset_y,65.2446,-80,1)
             dType.SetWAITCmd(api,2000)
             dType.SetEndEffectorGripper(api, 1,  1, isQueued=1)
             dType.SetWAITCmd(api,2000)
@@ -107,8 +108,10 @@ def steuerung():
             dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,-86.8816 + offset_x,-221.5284 + offset_y,65.2446,-80)
             dType.SetEndEffectorGripper(api, 1,  0, isQueued=1)
             dType.SetWAITCmd(api,2000)
+            dType.SetEndEffectorGripper(api, 0,  0, isQueued=1)
 
             # DoBot verrechnet offset -> geht 3 Reihen à 4 Tubes durch
+            #TODO offset bestimmen
             offset_x += 40
             if i == 3 or i == 7:
                 offset_y += 20
@@ -116,7 +119,8 @@ def steuerung():
 
 
         #TODO schranke entfernen
-        dType.SetHOMECmd(api,0)
+
+        dType.SetPTPCmd(api,dType.PTPMode.PTPJUMPXYZMode,250, 0, 50, 200,1)
             #dType.SetIODO(api,17,1,0)
             # Abfrage: Wird das letzte Tube bearbeitet -> wenn ja, wird der Blocker am Ende bewegt
             #if i == anzahl_tubes - 1:
