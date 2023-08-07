@@ -60,6 +60,7 @@ def microqr_reader(count):
 
     # Erzeuge Fenster
     cv2.namedWindow('Erkannte Marker', cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty('Erkannte Marker', cv2.WND_PROP_TOPMOST, 1)
     # cv2.resizeWindow('Erkannte Marker', 1920, 1080)
 
     # Berechne Kameramatrix mit Kalibrierdaten/ für ubs webcam eigentlich nicht notwendig

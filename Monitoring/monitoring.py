@@ -187,7 +187,7 @@ def tracker(tube_ids):
 
     # Bereite Kamera vor
     cap = cv2.VideoCapture(RTSP_URL)
-    #cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -209,8 +209,8 @@ def tracker(tube_ids):
                  'endStation',
                  'endStationTime', 'duration',
                  'videoTimestamp']
-    headerLogDetail =['tubeID', 'lastStation', 'leftStation',
-                      'nextStation', 'nextStationDistance']
+    headerLogDetail = ['tubeID', 'lastStation', 'leftStation',
+                       'nextStation', 'nextStationDistance']
 
     # zum Speichern der Log.csv Datei
     with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
@@ -243,11 +243,10 @@ def tracker(tube_ids):
 
                         # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
                         mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
-                        if len(mergedIDs)==0:
+                        if len(mergedIDs) == 0:
                             print("not equal")
-                            start =True
+                            start = True
                             continue
-
 
                         # für jede Tube
                         for index in mergedIDs:
@@ -258,7 +257,8 @@ def tracker(tube_ids):
                     # für jedes erkannte Objekt des Trackers
                     for result in model.track(source=img, conf=0.5, iou=0.5, tracker="botsort.yaml", stream=False,
                                               show=True,
-                                              device='cpu', save=True, save_txt=True):  #bei vorhandener Nvidia Grafikkarte device auf 0 setzen
+                                              device='cpu', save=True,
+                                              save_txt=True):  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                         # frame
                         frame = result.orig_img
 
@@ -465,8 +465,6 @@ def tracker(tube_ids):
                             # schreibe Frame in Datei
                             sink.write_frame(frame)
 
-
-
                     # Abbruch mit Escape
                     if cv2.waitKey(1) == 27:
                         break
@@ -492,8 +490,8 @@ def start_tracking(tube_ids):
         tube_ids ([(xy),id]): Die IDs und Koordinaten aller Tubes, die getrackt werden sollen
 
     """
-    thread = Thread(target=tracker(tube_ids))
+    thread = Thread(target=tracker, args=(tube_ids,))
+    thread.setDaemon(True)
     thread.start()
 
-
-#start_tracking([((30, 40), 1)])
+# start_tracking([((316.5, 262.5), 3), ((179.5, 299.0), 5), ((332.5, 321.0), 4), ((193.0, 363.0), 2)])

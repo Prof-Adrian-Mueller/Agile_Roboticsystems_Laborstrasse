@@ -14,6 +14,9 @@
 #       D: Whisker direkt ohne Breadbord
 
 import sys
+
+from Monitoring import monitoring
+
 sys.path.insert(1,'./DLL')
 
 import Erkennen.microqr_reader as erkennen
@@ -85,7 +88,7 @@ def steuerung():
 
         # Code von Mettendorf wird aufgerufen
         tubes =erkennen.microqr_reader(anzahl_tubes)
-        #monitoring.start_tracking(tubes)
+        monitoring.start_tracking(tubes)
         # Rückgabe wird abgeglichen -> evtl abbruch
 
         # Loop: Wiederhole die Tube Entnahme (i = anzahl_tubes)
@@ -132,5 +135,8 @@ def steuerung():
         # Verbindung trennen
         dType.DisconnectDobot(api)
 
+        while True:
+            if input("Drück q zum beenden")=="q":
+                break
         # Thymio fährt weiter...
         # ENDE
