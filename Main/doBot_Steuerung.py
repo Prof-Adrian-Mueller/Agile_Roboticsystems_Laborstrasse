@@ -79,8 +79,8 @@ def steuerung():
         #entladen.main(anzahl_tubes)
 
         # EventListener = wartet auf einen Input auf Pin 14 vom DoBot-Interface
-        while dType.GetIODI(api, 14)[0]!=1:
-            print("wait for Whisker")
+        #while dType.GetIODI(api, 14)[0]!=1:
+        #   print("wait for Whisker")
 
 
         # Wenn der Input ausgelöst wird

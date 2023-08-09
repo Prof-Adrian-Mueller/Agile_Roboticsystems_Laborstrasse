@@ -110,8 +110,8 @@ def microqr_reader(count):
 
             # erzeuge Bounding-box
             cv2.rectangle(output_image, points[3], points[1], (0, 0, 255), 3)
-            #cv2.putText(output_image, qr.message, (points[1][0], points[1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 3,
-            #            (0, 0, 255), 4)
+            cv2.putText(output_image, qr.message, (points[1][0], points[1][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                        (0, 0, 255), 1)
 
             # berechne Mittelpunkt
             xy = berechne_mittelpunkt(points[3], points[1])

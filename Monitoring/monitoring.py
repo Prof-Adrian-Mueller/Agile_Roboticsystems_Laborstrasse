@@ -21,6 +21,7 @@ import math
 import os
 import threading
 from threading import Thread
+import ast
 
 import cv2
 import pyboof as pb
@@ -47,8 +48,8 @@ telegramConf = config_object["Telegram"]
 RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp"] + ':554/11'
 
 # Lese Tracking Config Werte aus
-STATION_NAMES = trackerConf["station_names"]
-MOVING_STATIONS = trackerConf["moving_station_names"]
+STATION_NAMES = ast.literal_eval(trackerConf["station_names"])
+MOVING_STATIONS = ast.literal_eval(trackerConf["moving_station_names"])
 MOVING_STATIONS_DISTANCE_LIMIT = int(trackerConf["moving_stations_distance_limit"])
 ERROR_WAIT_TIME = int(trackerConf["error_wait_time"])
 STATION_LENGTH = int(trackerConf["length_station1"])
@@ -238,27 +239,12 @@ def tracker(tube_ids):
                     x, y, w, h = roi
                     dst = dst[y:y + h, x:x + w]
 
-                    # nach erstem Frame und live tracking ist noch leer
-                    if not start and len(live_tracking) == 0:
 
-                        # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
-                        mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
-                        if len(mergedIDs) == 0:
-                            print("not equal")
-                            start = True
-                            continue
-
-                        # für jede Tube
-                        for index in mergedIDs:
-                            # erzeuge Tube Objekt und füge es in die live-tracking Liste
-                            id1, id2 = index
-                            live_tracking.append(Tube(id1, id2))
-
+                    #TODO Distortion
                     # für jedes erkannte Objekt des Trackers
-                    for result in model.track(source=img, conf=0.5, iou=0.5, tracker="botsort.yaml", stream=False,
-                                              show=True,
-                                              device='cpu', save=True,
-                                              save_txt=True):  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
+                    for result in model.track(source=img, conf=0.25, iou=0.3, tracker="botsort.yaml", stream=True
+                                              ,save_txt=True,show=True,
+                                              device='cpu', save=True,persist=True):  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                         # frame
                         frame = result.orig_img
 
@@ -280,7 +266,7 @@ def tracker(tube_ids):
                             if start:
 
                                 # erkanntes Objekt ist tube
-                                if model.model.names[detections.class_id[0]] == "tube":
+                                if model.model.names[detections.class_id[0]] == "Tube":
                                     # zwischenspeichern der Koordinaten und ID
                                     tubes_tracker_temp.append(
                                         ((result.boxes.xywh[0], result.boxes.xywh[1]), detections.tracker_id[0]))
@@ -304,14 +290,12 @@ def tracker(tube_ids):
                                             station = Station(name, result.boxes.xywh, detections.tracker_id[0], index)
                                             station.moving_names = MOVING_STATIONS[index]
                                             stations.append(station)
-
                                         # keine bewegliche Station
                                         else:
                                             # füge erzeugtes Station Objekt in Liste
                                             stations.append(
                                                 Station(name, result.boxes.xywh, detections.tracker_id[0], index))
-                                # setze nach erstem Frame, in dem die tubes erkannt wurden auf False
-                                start = False
+
 
                             # ab zweitem frame, sind alle Tracking Objekte erzeugt
                             else:
@@ -451,36 +435,55 @@ def tracker(tube_ids):
                                             # überschreibe Koordinaten in Station
                                             station.coords = newCoords
 
-                            # erzeuge Labels
-                            labels = [
-                                f'#{detections.tracker_id[0]} {model.model.names[detections.class_id[0]]} {detections.confidence[0]}']
+                    # erzeuge Labels
+                    labels = [
+                        f'#{detections.tracker_id[0]} {model.model.names[detections.class_id[0]]} {detections.confidence[0]}']
 
-                            # schreibe Werte in Konsole
-                            print(live_tracking)
-                            print(log)
+                    # schreibe Werte in Konsole
+                    print(live_tracking)
+                    print(log)
 
-                            # annotiere Frame
-                            frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
+                    # annotiere Frame
+                    frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
+                    cv2.imshow("Monitoring",frame)
+                    # schreibe Frame in Datei
+                    sink.write_frame(frame)
 
-                            # schreibe Frame in Datei
-                            sink.write_frame(frame)
+                    # nach erstem Frame
+                    if start:
+
+                        # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
+                        mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
+                        if len(mergedIDs) == 0:
+                            print("not equal")
+                            tubes_tracker_temp.clear()
+                            stations.clear()
+                        else:
+                            start = False
+
+                            # für jede Tube
+                        for index in mergedIDs:
+                            # erzeuge Tube Objekt und füge es in die live-tracking Liste
+                            id1, id2 = index
+                            live_tracking.append(Tube(id1, id2))
 
                     # Abbruch mit Escape
                     if cv2.waitKey(1) == 27:
+                        # beende auslesen der Kamera
+                        cap.release()
+                        # beende alle Fenster
+                        cv2.destroyAllWindows()
                         break
 
-                # prüfe für jede Tube
-                for tube in live_tracking:
+                    # prüfe für jede Tube
+                    for tube in live_tracking:
 
-                    # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
-                    if (datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME:
-                        send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
-                            ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+                        # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
+                        if (datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME:
+                            send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
+                                ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
 
-            # beende auslesen der Kamera
-            cap.release()
-            # beende alle Fenster
-            cv2.destroyAllWindows()
+
 
 
 def start_tracking(tube_ids):
@@ -494,4 +497,9 @@ def start_tracking(tube_ids):
     thread.setDaemon(True)
     thread.start()
 
-# start_tracking([((316.5, 262.5), 3), ((179.5, 299.0), 5), ((332.5, 321.0), 4), ((193.0, 363.0), 2)])
+if __name__ == '__main__':
+    start_tracking([((316.5, 262.5), 3), ((179.5, 299.0), 5), ((332.5, 321.0), 4), ((193.0, 363.0), 2)])
+    while True:
+        if input("Drück q zum beenden")=="q":
+            break
+
