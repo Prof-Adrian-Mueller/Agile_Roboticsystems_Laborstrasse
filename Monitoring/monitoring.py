@@ -29,6 +29,7 @@ from configparser import ConfigParser
 import requests
 import datetime
 import csv
+from PIL import Image
 
 import supervision as sv
 from supervision import VideoSink, VideoInfo
@@ -212,6 +213,8 @@ def tracker(tube_ids):
                  'videoTimestamp']
     headerLogDetail = ['tubeID', 'lastStation', 'leftStation',
                        'nextStation', 'nextStationDistance']
+
+    frameIndex =0
 
     # zum Speichern der Log.csv Datei
     with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
@@ -435,19 +438,16 @@ def tracker(tube_ids):
                                             # überschreibe Koordinaten in Station
                                             station.coords = newCoords
 
-                    # erzeuge Labels
-                    labels = [
-                        f'#{detections.tracker_id[0]} {model.model.names[detections.class_id[0]]} {detections.confidence[0]}']
+
 
                     # schreibe Werte in Konsole
                     print(live_tracking)
                     print(log)
 
-                    # annotiere Frame
-                    frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
-                    cv2.imshow("Monitoring",frame)
+
                     # schreibe Frame in Datei
-                    sink.write_frame(frame)
+                    im_array = result.plot()  # plot a BGR numpy array of predictions
+                    sink.write_frame(im_array)
 
                     # nach erstem Frame
                     if start:
@@ -466,9 +466,9 @@ def tracker(tube_ids):
                             # erzeuge Tube Objekt und füge es in die live-tracking Liste
                             id1, id2 = index
                             live_tracking.append(Tube(id1, id2))
-
-                    # Abbruch mit Escape
-                    if cv2.waitKey(1) == 27:
+                    frameIndex+=1
+                    # Abbruch Test 30 Frames
+                    if frameIndex>10:
                         # beende auslesen der Kamera
                         cap.release()
                         # beende alle Fenster
