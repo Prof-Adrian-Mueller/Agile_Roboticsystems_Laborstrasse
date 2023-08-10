@@ -58,7 +58,7 @@ TRACKING_WEIGHTS_PATH = trackerConf["tracker_weights_path"]
 TRACKING_FOLDER = trackerConf["zielpfad_log"]
 # Erzeuge Ordner
 DIRECTORY = TRACKING_FOLDER + "\\tracking_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-TARGET_VIDEO_PATH = DIRECTORY + "\\video.mp4"
+TARGET_VIDEO_PATH = DIRECTORY + "\\video.mkv"
 os.makedirs(DIRECTORY)
 
 # Einstellung um rtsp stream zu lesen
@@ -188,12 +188,12 @@ def tracker(tube_ids):
     mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
 
     # Bereite Kamera vor
-    cap = cv2.VideoCapture(RTSP_URL)
-    # cap = cv2.VideoCapture(0)
+    #cap = VideoCapture(RTSP_URL)
+    cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
-    mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (1920, 1080), 5)
+    mapx, mapy = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (3840, 2160), 5)
 
     # flag für Start
     start = True
@@ -216,6 +216,13 @@ def tracker(tube_ids):
 
     frameIndex =0
 
+    video = cv2.VideoWriter(os.getcwd() +'\\'+ TARGET_VIDEO_PATH,
+                            cv2.VideoWriter.fourcc(*'X264'),
+                            4, (3840, 2160))
+
+    cv2.namedWindow("Monitoring", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Monitoring",1920,1080)
+
     # zum Speichern der Log.csv Datei
     with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
         writer = csv.writer(f)
@@ -224,264 +231,268 @@ def tracker(tube_ids):
         with open(DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
             writer2 = csv.writer(f2)
             writer2.writerow(headerLogDetail)
-            # zum Speichern des Videos
-            with VideoSink(os.getcwd() + TARGET_VIDEO_PATH, videoinfo) as sink:
+            # für jeden Frame
+            while True:
 
-                # für jeden Frame
-                while True:
+                # lese frame
+                flag,img = cap.read()
 
-                    # lese frame
-                    flag, img = cap.read()
+                # überspringen, wenn kein frame vorhanden
+                if img is None:
+                    # neue Verbindung versuchen
+                    cap = VideoCapture(RTSP_URL)
+                    continue
 
-                    # überspringen, wenn kein frame vorhanden
-                    if img is None:
-                        break
+                # entzerre frame mit Kameramatrix
+                dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+                x, y, w, h = roi
+                dst = dst[y:y + h, x:x + w]
 
-                    # entzerre frame mit Kameramatrix
-                    dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-                    x, y, w, h = roi
-                    dst = dst[y:y + h, x:x + w]
+                test =0
 
+                #TODO Distortion
+                # für jedes erkannte Objekt des Trackers
+                for result in model.track(source=dst, conf=0.25, iou=0.3, tracker="botsort.yaml", stream=True
+                                          ,save_txt=True,show=False,
+                                          device='cpu', save=True,persist=True):  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
+                    # frame
+                    frame = result.orig_img
+                    test+=1
+                    print("Result: " + test)
+                    # Detektion Objekt des aktuellen results
+                    detections = sv.Detections.from_yolov8(result)
 
-                    #TODO Distortion
-                    # für jedes erkannte Objekt des Trackers
-                    for result in model.track(source=img, conf=0.25, iou=0.3, tracker="botsort.yaml", stream=True
-                                              ,save_txt=True,show=True,
-                                              device='cpu', save=True,persist=True):  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
-                        # frame
-                        frame = result.orig_img
+                    # label Liste
+                    labels = []
 
-                        # Detektion Objekt des aktuellen results
-                        detections = sv.Detections.from_yolov8(result)
+                    # Id des Objekts erkannt
+                    if result.boxes.id is not None:
 
-                        # label Liste
-                        labels = []
+                        # speichern der Id
+                        detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
 
-                        # Id des Objekts erkannt
-                        if result.boxes.id is not None:
+                        # im ersten Frame werden die tracking ids zwischengespeichert und die station Objekte
+                        # erzeugt, da Tube Objekte erst nach dem Erkennen aller Tubes Objekte und der Verknüpfung
+                        # mit den QR-Code IDs erzeugt werden können.
+                        if start:
 
-                            # speichern der Id
-                            detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
+                            # erkanntes Objekt ist tube
+                            if model.model.names[detections.class_id[0]] == "Tube":
+                                # zwischenspeichern der Koordinaten und ID
+                                tubes_tracker_temp.append(
+                                    ((result.boxes.xywh[0], result.boxes.xywh[1]), detections.tracker_id[0]))
 
-                            # im ersten Frame werden die tracking ids zwischengespeichert und die station Objekte
-                            # erzeugt, da Tube Objekte erst nach dem Erkennen aller Tubes Objekte und der Verknüpfung
-                            # mit den QR-Code IDs erzeugt werden können.
-                            if start:
+                            # für aktuelle Station Objekt erzeugen mit der tracking Id und der Bounding Box
+                            for name in STATION_NAMES:
 
-                                # erkanntes Objekt ist tube
-                                if model.model.names[detections.class_id[0]] == "Tube":
-                                    # zwischenspeichern der Koordinaten und ID
-                                    tubes_tracker_temp.append(
-                                        ((result.boxes.xywh[0], result.boxes.xywh[1]), detections.tracker_id[0]))
+                                # index der Station aus der Configliste
+                                index = STATION_NAMES.index(name)
 
-                                # für aktuelle Station Objekt erzeugen mit der tracking Id und der Bounding Box
-                                for name in STATION_NAMES:
+                                # Station ist aktuelles erkanntes Objekt
+                                if model.model.names[detections.class_id[0]] == name:
 
-                                    # index der Station aus der Configliste
-                                    index = STATION_NAMES.index(name)
+                                    # aktuelle Station ist eine bewegliche Station mit Unternamen
+                                    if MOVING_STATIONS[index] is not None:
 
-                                    # Station ist aktuelles erkanntes Objekt
-                                    if model.model.names[detections.class_id[0]] == name:
+                                        # Erster Name der beweglichen Station
+                                        name = MOVING_STATIONS[index][0]
 
-                                        # aktuelle Station ist eine bewegliche Station mit Unternamen
-                                        if MOVING_STATIONS[index] is not None:
-
-                                            # Erster Name der beweglichen Station
-                                            name = MOVING_STATIONS[index][0]
-
-                                            # erzeuge Station Objekt und füge es in die Liste mit den Unternamen
-                                            station = Station(name, result.boxes.xywh, detections.tracker_id[0], index)
-                                            station.moving_names = MOVING_STATIONS[index]
-                                            stations.append(station)
-                                        # keine bewegliche Station
-                                        else:
-                                            # füge erzeugtes Station Objekt in Liste
-                                            stations.append(
-                                                Station(name, result.boxes.xywh, detections.tracker_id[0], index))
+                                        # erzeuge Station Objekt und füge es in die Liste mit den Unternamen
+                                        station = Station(name, result.boxes.xywh, detections.tracker_id[0], index)
+                                        station.moving_names = MOVING_STATIONS[index]
+                                        stations.append(station)
+                                    # keine bewegliche Station
+                                    else:
+                                        # füge erzeugtes Station Objekt in Liste
+                                        stations.append(
+                                            Station(name, result.boxes.xywh, detections.tracker_id[0], index))
 
 
-                            # ab zweitem frame, sind alle Tracking Objekte erzeugt
-                            else:
-                                # es wird geprüft ob das Tube aktuell in der Station eingetragen ist, wenn nein und
-                                # es ist aber jetzt in der Station, wird der Logeintrag beendet und das Tube wird in
-                                # der Station vermerkt. Es hat eine Fahrt von einer Station zur nächsten beendet. Ist
-                                # es nicht in der Station, es stand aber in der Liste der Station, dann hat es soeben
-                                # die Station verlassen und es wird ein neuer Logeintrag erzeugt und das Tube aus der
-                                # Stationliste gelöscht.
+                        # ab zweitem frame, sind alle Tracking Objekte erzeugt
+                        else:
+                            # es wird geprüft ob das Tube aktuell in der Station eingetragen ist, wenn nein und
+                            # es ist aber jetzt in der Station, wird der Logeintrag beendet und das Tube wird in
+                            # der Station vermerkt. Es hat eine Fahrt von einer Station zur nächsten beendet. Ist
+                            # es nicht in der Station, es stand aber in der Liste der Station, dann hat es soeben
+                            # die Station verlassen und es wird ein neuer Logeintrag erzeugt und das Tube aus der
+                            # Stationliste gelöscht.
 
-                                # erkanntes Objekt ist tube
-                                if model.model.names[detections.class_id[0]] == "tube":
+                            # erkanntes Objekt ist tube
+                            if model.model.names[detections.class_id[0]] == "tube":
 
-                                    # für jede Station prüfen
-                                    for station in stations:
+                                # für jede Station prüfen
+                                for station in stations:
 
-                                        # Tube liegt in Station
-                                        if calculate_distance(station.coords, result.boxes.xywh) == 0:
+                                    # Tube liegt in Station
+                                    if calculate_distance(station.coords, result.boxes.xywh) == 0:
 
-                                            # für jede Tube
-                                            for tube in live_tracking:
+                                        # für jede Tube
+                                        for tube in live_tracking:
 
-                                                # aktuelles Objekt ist die Tube
-                                                if tube.trackingID == detections.tracker_id[0]:
+                                            # aktuelles Objekt ist die Tube
+                                            if tube.trackingID == detections.tracker_id[0]:
 
-                                                    # wenn noch nicht in Tube Liste der Station, Tube kommt neu an
-                                                    # die Station
-                                                    if tube not in station.tubes:
+                                                # wenn noch nicht in Tube Liste der Station, Tube kommt neu an
+                                                # die Station
+                                                if tube not in station.tubes:
 
-                                                        # für jeden Logeintrag
-                                                        for entry in log:
+                                                    # für jeden Logeintrag
+                                                    for entry in log:
 
-                                                            # sucht richtigen Eintrag
-                                                            if entry.trackingID == tube.trackingID:
-                                                                # setzt Endstation und Zeit
-                                                                entry.endStation = station
-                                                                entry.endStationTime = entry.startStationTime
+                                                        # sucht richtigen Eintrag
+                                                        if entry.trackingID == tube.trackingID:
+                                                            # setzt Endstation und Zeit
+                                                            entry.endStation = station
+                                                            entry.endStationTime = entry.startStationTime
 
-                                                                # löscht aus Logliste
-                                                                log.remove(entry)
-                                                                # schreibt zeile in CSV Datei
-                                                                writer.writerow([entry.tubeID, entry.startStation,
-                                                                                 entry.startStationTime,
-                                                                                 entry.endStation,
-                                                                                 entry.endStationTime, entry.duration,
-                                                                                 entry.videoTimestamp])
+                                                            # löscht aus Logliste
+                                                            log.remove(entry)
+                                                            # schreibt zeile in CSV Datei
+                                                            writer.writerow([entry.tubeID, entry.startStation,
+                                                                             entry.startStationTime,
+                                                                             entry.endStation,
+                                                                             entry.endStationTime, entry.duration,
+                                                                             entry.videoTimestamp])
 
-                                                        # aktualisiert tube werte
-                                                        tube.leftStation = False
-                                                        tube.lastStationTime = 0
+                                                    # aktualisiert tube werte
+                                                    tube.leftStation = False
+                                                    tube.lastStationTime = 0
 
-                                                        # fügt Tube in Station Tube Liste hinzu
-                                                        station.tubes.append(tube)
+                                                    # fügt Tube in Station Tube Liste hinzu
+                                                    station.tubes.append(tube)
 
-                                        # nicht in station
-                                        else:
+                                    # nicht in station
+                                    else:
 
-                                            # für jede Station prüfen
-                                            for tube in live_tracking:
+                                        # für jede Station prüfen
+                                        for tube in live_tracking:
 
-                                                # aktuelles Objekt ist die Tube
-                                                if tube.trackingID == detections.tracker_id[0]:
+                                            # aktuelles Objekt ist die Tube
+                                            if tube.trackingID == detections.tracker_id[0]:
 
-                                                    # wenn in Tubel Liste der Station, dann hat das Tube die Station verlassen
-                                                    if tube in station.tubes:
-                                                        # trackinglogentry erzeugen und mit Stationname und Zeit füllen
-                                                        entry = TrackingLogEntry(tube.tubeID, tube.trackingID)
-                                                        entry.startStation = station.name
-                                                        entry.startStationTime = datetime.datetime.now()
+                                                # wenn in Tubel Liste der Station, dann hat das Tube die Station verlassen
+                                                if tube in station.tubes:
+                                                    # trackinglogentry erzeugen und mit Stationname und Zeit füllen
+                                                    entry = TrackingLogEntry(tube.tubeID, tube.trackingID)
+                                                    entry.startStation = station.name
+                                                    entry.startStationTime = datetime.datetime.now()
 
-                                                        # in Logliste hinzufügen
-                                                        log.append(entry)
+                                                    # in Logliste hinzufügen
+                                                    log.append(entry)
 
-                                                        # aktualisiert tube werte
-                                                        tube.lastStation = station.name
-                                                        tube.leftStation = True
-                                                        tube.lastStationTime = datetime.datetime.now()
-                                                        tube.nextStationDistance = None
+                                                    # aktualisiert tube werte
+                                                    tube.lastStation = station.name
+                                                    tube.leftStation = True
+                                                    tube.lastStationTime = datetime.datetime.now()
+                                                    tube.nextStationDistance = None
 
-                                                        # entfernt Tube aus Station Tube Liste
-                                                        station.tubes.remove(tube)
+                                                    # entfernt Tube aus Station Tube Liste
+                                                    station.tubes.remove(tube)
 
-                                    # in keiner station, Abstand zur nächsten Station berechnen für jede Tube
-                                    for tube in live_tracking:
+                                # in keiner station, Abstand zur nächsten Station berechnen für jede Tube
+                                for tube in live_tracking:
 
-                                        # aktuelles Objekt ist Tube
-                                        if tube.trackingID == detections.tracker_id[0]:
+                                    # aktuelles Objekt ist Tube
+                                    if tube.trackingID == detections.tracker_id[0]:
 
-                                            # Tube hat Station verlassen
-                                            if tube.leftStation:
+                                        # Tube hat Station verlassen
+                                        if tube.leftStation:
 
-                                                # Abstand zu jeder Station berechnen
-                                                for station in stations:
-                                                    distance = calculate_distance(result.boxes.xywh, station.coords)
+                                            # Abstand zu jeder Station berechnen
+                                            for station in stations:
+                                                distance = calculate_distance(result.boxes.xywh, station.coords)
 
-                                                    # in cm umrechnen
-                                                    distance = distance * (STATION_LENGTH / result.boxes.xywh[2] * 2)
+                                                # in cm umrechnen
+                                                distance = distance * (STATION_LENGTH / result.boxes.xywh[2] * 2)
 
-                                                    # niedrigste Distanz in Tube abspeichern
-                                                    if tube.nextStationDistance is None:
+                                                # niedrigste Distanz in Tube abspeichern
+                                                if tube.nextStationDistance is None:
+                                                    tube.nextStationDistance = distance
+                                                    tube.nextStation = station.name
+                                                else:
+                                                    if distance < tube.nextStationDistance:
                                                         tube.nextStationDistance = distance
                                                         tube.nextStation = station.name
-                                                    else:
-                                                        if distance < tube.nextStationDistance:
-                                                            tube.nextStationDistance = distance
-                                                            tube.nextStation = station.name
 
-                                            # schreibe log_detail.csv
-                                            writer2.writerow(
-                                                [tube.tubeID, tube.lastStation, tube.leftStation,
-                                                 tube.nextStation, tube.nextStationDistance])
+                                        # schreibe log_detail.csv
+                                        writer2.writerow(
+                                            [tube.tubeID, tube.lastStation, tube.leftStation,
+                                             tube.nextStation, tube.nextStationDistance])
 
-                                # objekt ist Station, Koordinaten aktualisieren
-                                else:
+                            # objekt ist Station, Koordinaten aktualisieren
+                            else:
 
-                                    # für jede Station
-                                    for station in stations:
+                                # für jede Station
+                                for station in stations:
 
-                                        # aktuelles Objekt ist die Station
-                                        if detections.tracker_id == station.trackingID:
+                                    # aktuelles Objekt ist die Station
+                                    if detections.tracker_id == station.trackingID:
 
-                                            # speichere neue Koordianten der Station ab
-                                            newCoords = result.boxes.xywh
+                                        # speichere neue Koordianten der Station ab
+                                        newCoords = result.boxes.xywh
 
-                                            # Wenn bewegliche Station
-                                            if station.moving_names is not None:
+                                        # Wenn bewegliche Station
+                                        if station.moving_names is not None:
 
-                                                # ändere Stationsnamen, wenn das Distanzlimit aus der Konfig
-                                                # überschritten wurde
-                                                if calculate_distance(newCoords,
-                                                                      station.coords) * (
-                                                        STATION_LENGTH / result.boxes.xywh[2] * 2) > \
-                                                        MOVING_STATIONS_DISTANCE_LIMIT:
-                                                    station.moving_index += 1
-                                                    station.name = station.moving_names[index]
+                                            # ändere Stationsnamen, wenn das Distanzlimit aus der Konfig
+                                            # überschritten wurde
+                                            if calculate_distance(newCoords,
+                                                                  station.coords) * (
+                                                    STATION_LENGTH / result.boxes.xywh[2] * 2) > \
+                                                    MOVING_STATIONS_DISTANCE_LIMIT:
+                                                station.moving_index += 1
+                                                station.name = station.moving_names[index]
 
-                                            # überschreibe Koordinaten in Station
-                                            station.coords = newCoords
+                                        # überschreibe Koordinaten in Station
+                                        station.coords = newCoords
 
-
-
-                    # schreibe Werte in Konsole
-                    print(live_tracking)
-                    print(log)
+                # schreibe Werte in Konsole
+                print(live_tracking)
+                print(log)
 
 
-                    # schreibe Frame in Datei
-                    im_array = result.plot()  # plot a BGR numpy array of predictions
-                    sink.write_frame(im_array)
+                # schreibe Frame in Datei
+                im_array = result.plot()  # plot a BGR numpy array of predictions
+                cv2.imshow("Monitoring",im_array)
+                video.write(im_array)
+                # nach erstem Frame
+                if start:
 
-                    # nach erstem Frame
-                    if start:
+                    # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
+                    mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
+                    if len(mergedIDs) != 0: #zum testen !=0
+                        print("not equal")
+                        tubes_tracker_temp.clear()
+                        stations.clear()
+                    else:
+                        start = False
 
-                        # Merge die Ids des QR-Codereaders und des Trackers, wenn diese übereinstimmen
-                        mergedIDs = mergeIDs(tube_ids, tubes_tracker_temp)
-                        if len(mergedIDs) == 0:
-                            print("not equal")
-                            tubes_tracker_temp.clear()
-                            stations.clear()
-                        else:
-                            start = False
+                        # für jede Tube
+                    for index in mergedIDs:
+                        # erzeuge Tube Objekt und füge es in die live-tracking Liste
+                        id1, id2 = index
+                        live_tracking.append(Tube(id1, id2))
 
-                            # für jede Tube
-                        for index in mergedIDs:
-                            # erzeuge Tube Objekt und füge es in die live-tracking Liste
-                            id1, id2 = index
-                            live_tracking.append(Tube(id1, id2))
-                    frameIndex+=1
-                    # Abbruch Test 30 Frames
-                    if frameIndex>10:
-                        # beende auslesen der Kamera
-                        cap.release()
-                        # beende alle Fenster
-                        cv2.destroyAllWindows()
-                        break
+                # prüfe für jede Tube
+                for tube in live_tracking:
 
-                    # prüfe für jede Tube
-                    for tube in live_tracking:
+                    # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
+                    if (datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME:
+                        send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
+                            ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
 
-                        # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
-                        if (datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME:
-                            send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
-                                ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+                if cv2.waitKey(1) & 0xFF == ord('s'):
+                    "beende Monitoring Thread"
+                    break
+
+            # beende auslesen der Kamera
+            video.release()
+            cap.release()
+            # beende alle Fenster
+            cv2.destroyAllWindows()
+
+
+
 
 
 
