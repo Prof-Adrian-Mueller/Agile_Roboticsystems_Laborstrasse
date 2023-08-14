@@ -99,6 +99,7 @@ class Station:
         """
         self.name = name
         self.coords = coords
+        self.startCoords = coords
         self.trackingID = trackingID
         self.stationID = stationID
         self.tubes = []
@@ -237,7 +238,8 @@ def tracker(tube_ids):
                     print("beende Monitoring Thread")
                     break
 
-                for i in range(5):
+                # jeden xten Frame lesen
+                for i in range(1):
                     # lese frame
                     flag, img = cap.read()
 
@@ -255,10 +257,10 @@ def tracker(tube_ids):
                 test = 0
 
                 # Tracking für den aktuellen Frame
-                track = model.track(source=dst, conf=0.25, iou=0.3, tracker="botsort.yaml", stream=True
+                track = model.track(source=dst, conf=0.3, iou=0.8, tracker="botsort.yaml", stream=False
                                     , save_txt=True, show=False,
                                     device='cpu', save=True,
-                                    persist=False)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
+                                    persist=True)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                 # generator to list
                 for results in track:
                     # für jedes erkannte Objekt des Trackers in dem aktuellen Frame
@@ -267,7 +269,7 @@ def tracker(tube_ids):
                         print("Result: " + str(test))
                         # Detektion Objekt des aktuellen results
                         detections = sv.Detections.from_yolov8(result)
-
+                        print(model.model.names[detections.class_id[0]])
                         # Id des Objekts erkannt
                         if result.boxes.id is not None:
 
@@ -280,6 +282,7 @@ def tracker(tube_ids):
                             if start:
                                 # erkanntes Objekt ist tube
                                 if model.model.names[detections.class_id[0]] == "Tube":
+
                                     # zwischenspeichern der Koordinaten und ID
                                     tubes_tracker_temp.append(
                                         ((result.boxes.xywh.tolist()[0][0], result.boxes.xywh.tolist()[0][1]),
@@ -321,6 +324,7 @@ def tracker(tube_ids):
                                     for station in stations:
 
                                         # Tube liegt in Station
+                                        print(station.name)
                                         if calculate_distance(station.coords, result.boxes.xywh.tolist()[0]) == 0:
 
                                             # suche Tube in live_Tracking
@@ -328,26 +332,12 @@ def tracker(tube_ids):
 
                                                 # aktuelles Objekt ist die Tube
                                                 if tube.trackingID == detections.tracker_id[0]:
-
+                                                    print("Tube " + str(tube.tubeID) +" ist in Station " + station.name )
                                                     # wenn noch nicht in Tube Liste der Station, Tube kommt neu an
                                                     # die Station
                                                     if tube not in station.tubes:
 
-                                                        # noch keine Logeinträge
-                                                        if len(log)==0:
-                                                            # für den zweiten Frame müssen die Logeinträge erstmal erzeugt werden
-                                                            entry = TrackingLogEntry(tube.tubeID, tube.trackingID)
-                                                            entry.startStation = station.name
-                                                            entry.startStationTime = datetime.datetime.now()
 
-                                                            # in Logliste hinzufügen
-                                                            log.append(entry)
-
-                                                            # aktualisiert tube werte
-                                                            tube.lastStation = station.name
-                                                            tube.leftStation = True
-                                                            tube.lastStationTime = datetime.datetime.now()
-                                                            tube.nextStationDistance = None
                                                         # für jeden Logeintrag
                                                         for entry in log:
 
@@ -368,14 +358,30 @@ def tracker(tube_ids):
 
                                                         # aktualisiert tube werte
                                                         tube.leftStation = False
-                                                        tube.lastStationTime = 0
+                                                        tube.lastStationTime = datetime.datetime.now()
+                                                        tube.lastStation=station.name
 
                                                         # fügt Tube in Station Tube Liste hinzu
                                                         station.tubes.append(tube)
 
+                                                        # noch keine Logeinträge
+                                                        if len(log)<len(live_tracking):
+                                                            # für den zweiten Frame müssen die Logeinträge erstmal erzeugt werden
+                                                            entry = TrackingLogEntry(tube.tubeID, tube.trackingID)
+                                                            entry.startStation = station.name
+                                                            entry.startStationTime = datetime.datetime.now()
+
+                                                            # in Logliste hinzufügen
+                                                            log.append(entry)
+
+                                                            # aktualisiert tube werte
+                                                            tube.lastStation = station.name
+                                                            tube.leftStation = False
+                                                            tube.lastStationTime = datetime.datetime.now()
+                                                            tube.nextStationDistance = None
                                         # nicht in station
                                         else:
-
+                                            print("Tube " + str(tube.tubeID) +" ist nicht in Station " + station.name )
                                             # für jede Station prüfen
                                             for tube in live_tracking:
 
@@ -412,6 +418,7 @@ def tracker(tube_ids):
 
                                                 # Abstand zu jeder Station berechnen
                                                 for station in stations:
+                                                    print(station.name)
                                                     distance = calculate_distance(result.boxes.xywh.tolist()[0], station.coords)
 
                                                     # in cm umrechnen
@@ -442,7 +449,7 @@ def tracker(tube_ids):
 
                                             # speichere neue Koordianten der Station ab
                                             newCoords = result.boxes.xywh.tolist()[
-                                                0]  # TODO safe startposition und vergleiche damit
+                                                0]
 
                                             # Wenn bewegliche Station
                                             if station.moving_names is not None:
@@ -451,7 +458,7 @@ def tracker(tube_ids):
                                                 # überschritten wurde
                                                 #TODO wenn station wieder steht
                                                 if calculate_distance(newCoords,
-                                                                      station.coords) * (
+                                                                      station.startCoords) * (
                                                         STATION_LENGTH / newCoords[1] * 2) > \
                                                         MOVING_STATIONS_DISTANCE_LIMIT:
                                                     station.moving_index += 1

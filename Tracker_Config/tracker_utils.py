@@ -168,7 +168,20 @@ def calculate_distance(rect1, rect2):
     x1, y1, w1, h1 = rect1
     x2, y2, w2, h2 = rect2
 
-    if x1 + w1 < x2:
+    distanceX = x1-x2
+    distanceY = y1-y2
+    width = w1+w2
+    heigth = h1+h2
+
+    if(abs(distanceX)<width):
+        if(abs(distanceY)<heigth):
+            print("Distanz: " + str(0))
+            return 0
+    distance = math.sqrt(distanceX ** 2 + distanceY ** 2)
+    print("Distanz: " + str(distance))
+    return distance
+
+    '''if x1 + w1 < x2:
         distance_x = x2 - (x1 + w1)
     elif x2 + w2 < x1:
         distance_x = x1 - (x2 + w2)
@@ -183,7 +196,8 @@ def calculate_distance(rect1, rect2):
         distance_y = 0
 
     distance = math.sqrt(distance_x ** 2 + distance_y ** 2)
-    return distance
+    print("Distanz: " + str(distance))
+    return distance'''
 
 
 def send_to_telegram(message):
