@@ -272,9 +272,9 @@ def tracker(tube_ids):
                 #dst = dst[y:y + h, x:x + w]
 
                 # Tracking für den aktuellen Frame
-                track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=False
+                track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=True
                                     , save_txt=False, show=False,imgsz=1920,
-                                    device='0', save=False,
+                                    device='cpu', save=False,
                                     persist=True)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                 # generator to list
                 for results in track:
