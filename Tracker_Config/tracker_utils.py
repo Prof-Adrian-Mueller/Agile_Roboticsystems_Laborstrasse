@@ -62,8 +62,8 @@ class VideoCapture(cv2.VideoCapture):
 
         """
         with self.lock:
-            _, frame = self.cap.retrieve()
-        return frame
+            flag, frame = self.cap.retrieve()
+        return flag, frame
 
 
 def berechne_mittelpunkt(point1, point2):
@@ -214,3 +214,5 @@ def send_to_telegram(message):
         print(response.text)
     except Exception as e:
         print(e)
+
+

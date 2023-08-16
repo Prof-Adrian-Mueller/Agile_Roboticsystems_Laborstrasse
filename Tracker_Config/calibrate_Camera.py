@@ -13,6 +13,8 @@ from configparser import ConfigParser
 import cv2
 from cv2 import aruco
 
+print(os.getcwd())
+
 # Lese Config Datei
 config_object = ConfigParser()
 config_object.read("..\\Tracker_Config\\tracker_config.ini")

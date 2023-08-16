@@ -1,5 +1,6 @@
 """ Beinhaltet den Tracker, das Lesen der notwendigen Konfigwerte und die Klassen für die Tube, Station und das Log"""
 
+
 """ Inhaltsverzeichnis:
 
     Konfiguration 34-79
@@ -15,13 +16,15 @@
 __author__ = 'Mirko Mettendorf'
 __date__ = '20/05/2023'
 __version__ = '1.0'
-__last_changed__ = '13/07/2023'
+__last_changed__ = '16/08/2023'
 
+import sys
 import math
 import os
 import threading
 from threading import Thread
 import ast
+import time
 
 import cv2
 import pyboof as pb
@@ -30,13 +33,18 @@ import requests
 import datetime
 import csv
 from PIL import Image
+from viztracer import VizTracer
 
 import supervision as sv
 from supervision import VideoSink, VideoInfo
 from ultralytics import YOLO
 
-import Tracker_Config.calibrate_Camera as calibrate_Camera
-from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
+# wird benötigt um aus der Konsole raus zu starten
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'Tracker_Config'))
+#wenn diese Import rot markiert sind muss in intellij der Ordner Monitoring und Tracker_Config rechtsklick mark as
+# source Folder  eingestellt werrden
+import calibrate_Camera as calibrate_Camera
+from tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
 
 # Lese Config Datei
 config_object = ConfigParser()
@@ -71,8 +79,7 @@ config.maxIterations = 10
 config.maximumSizeFraction = 0.8
 config.minimumSizeFraction = 0.01
 
-# Settings für zu speicherndes Video
-videoinfo = VideoInfo(1920, 1080, 30)
+
 
 # Bounding_Box settings
 box_annotator = sv.BoxAnnotator(
@@ -191,8 +198,14 @@ def tracker(tube_ids):
     mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
 
     # Bereite Kamera vor
+    # cv2.VideoCapture() gibt ein Frame nacheinander zurück. Kann hinterherhängen.
+    # VideoCapture() ist eine Klasse aus tracker_utils, die immer den aktuellsten Frame zurückgibt
+
+
+    # aus Deckenkamera oder Video, gewünschte Zeile nutzen
     # cap = VideoCapture(RTSP_URL)
-    cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
+    #cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
+    cap = cv2.VideoCapture("C:\\Users\\Mirko\\Downloads\\20230809_121620.mp4")
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -214,14 +227,14 @@ def tracker(tube_ids):
                  'endStation',
                  'endStationTime', 'duration',
                  'videoTimestamp']
-    headerLogDetail = ['tubeID', 'lastStation', 'leftStation',
+    headerLogDetail = ['frame','tubeID','trackingID', 'lastStation', 'leftStation',
                        'nextStation', 'nextStationDistance']
 
     frameIndex = 0
 
     video = cv2.VideoWriter(os.getcwd() + '\\' + TARGET_VIDEO_PATH,
                             cv2.VideoWriter.fourcc(*'X264'),
-                            4, (3840, 2160))
+                            4, (3840, 2160)) # falls entzerrung ein pixel kleiner. muss immer mit Bildgröße übereinstimmen ansonsten ist das Video leer
 
     cv2.namedWindow("Monitoring", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Monitoring", 1920, 1080)
@@ -243,6 +256,7 @@ def tracker(tube_ids):
                 # jeden xten Frame lesen
                 for i in range(1):
                     # lese frame
+                    frameIndex+=1
                     flag, img = cap.read()
 
                 # überspringen, wenn kein frame vorhanden
@@ -251,16 +265,16 @@ def tracker(tube_ids):
                     # cap = VideoCapture(RTSP_URL)
                     continue
 
-                # entzerre frame mit Kameramatrix
-                dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-                x, y, w, h = roi
-                dst = dst[y:y + h, x:x + w]
-
+                # entzerre frame mit Kameramatrix,
+                # aus performance gründen auskommentiert, fals gewünscht in model.track() die source auf dst stellen
+                #dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+                #x, y, w, h = roi
+                #dst = dst[y:y + h, x:x + w]
 
                 # Tracking für den aktuellen Frame
                 track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=False
-                                    , save_txt=False, show=False,
-                                    device='cpu', save=True,
+                                    , save_txt=False, show=False,imgsz=1920,
+                                    device='0', save=False,
                                     persist=True)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                 # generator to list
                 for results in track:
@@ -442,7 +456,7 @@ def tracker(tube_ids):
 
                                             # schreibe log_detail.csv
                                             writer2.writerow(
-                                                [tube.tubeID, tube.lastStation, tube.leftStation,
+                                                [frameIndex,tube.tubeID,tube.trackingID, tube.lastStation, tube.leftStation,
                                                  tube.nextStation, tube.nextStationDistance])
 
                                 # objekt ist Station, Koordinaten aktualisieren
@@ -479,7 +493,8 @@ def tracker(tube_ids):
                 # schreibe Frame in Datei
                 im_array = results.plot()  # plot a BGR numpy array of predictions
                 cv2.imshow("Monitoring", im_array)
-                video.write(im_array)
+                #für performance deaktiviert
+                #video.write(im_array)
                 # nach erstem Frame
                 if start:
 
