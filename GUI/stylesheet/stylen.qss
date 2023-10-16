@@ -1,0 +1,107 @@
+/* Set a default background color and remove border for all widgets */
+QWidget {
+    background-color: #f2f2f2;
+    border: none;
+}
+
+/* Style for all buttons */
+QPushButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+/* Change background color on hover */
+QPushButton:hover {
+    background-color: #45a049;
+}
+
+/* Specific styles for navMenuBtns */
+QPushButton#navMenuBtns {
+    text-align: center;
+    border: 2px solid #4CAF50;
+    background-color: transparent;
+    border-radius: 20px;
+}
+
+/* Specific styles for closeButton */
+QPushButton#closeButton {
+    background-color: #FF5C57;
+    min-height: 30px;
+    max-height: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    font-size: 20px;
+    border-radius: 5px;
+    border: none;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+}
+
+/* Change background color on hover */
+QPushButton#closeButton:hover {
+    background-color: #FF3B37;
+}
+
+/* Specific styles for minimizeButton */
+QPushButton#minimizeButton {
+    background-color: #4CAF50;
+    min-height: 30px;
+    max-height: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    font-size: 20px;
+    border-radius: 5px;
+    border: none;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+}
+
+/* Change background color on hover */
+QPushButton#minimizeButton:hover {
+    background-color: #45A049;
+}
+
+
+/* Style for all QLineEdit widgets */
+QLineEdit {
+    padding: 5px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Change border color when QLineEdit has focus */
+QLineEdit:focus {
+    border-color:#4CAF50;  
+}
+
+/* Specific styles for searchBar */
+QLineEdit#searchBar {
+    max-height:10px; 
+}
+
+/* Specific styles for searchDiv */
+QWidget#searchDiv {
+    background-color:#eee; 
+}
+
+/* Specific styles for leftNav */
+QWidget#leftNav {
+    background-color:#666; 
+}
+
+/* Specific styles for liveData */
+QLabel#liveData {
+    font-size:20px; 
+}
+
+/* Specific styles for customTitleBar, leftNavigationMenu, and live_panel */
+#customTitleBar { min-height:100px; background-color:#FF0000; }
+#leftNavigationMenu { background-color:#45a049; margin-left:0%; }
+#live_panel { background-color:aqua; border:1px solid #FF0000; }
+

@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>img/qr-code-scanner.svg</file>
+    <file>img/scan-qr-code.svg</file>
+    <file>img/arrow-right.svg</file>
+    <file>img/circle.svg</file>
+    <file>img/dna.svg</file>
+    <file>img/graph-up.svg</file>
+    <file>img/home.svg</file>
+    <file>img/homebig.png</file>
+    <file>img/import.svg</file>
+    <file>img/import-1.svg</file>
+    <file>img/laboratory.svg</file>
+    <file>img/settings.svg</file>
+    <file>img/stream.svg</file>
+  </qresource>
+</RCC>
