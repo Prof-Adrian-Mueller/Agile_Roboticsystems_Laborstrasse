@@ -1,6 +1,6 @@
 import datetime
 
-from TubeQrcode import TubeQrcode
+from DBService.TubeQrcode import TubeQrcode
 
 class QRGenAdapter:
     def __init__(self, db_adapter):

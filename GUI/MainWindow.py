@@ -55,15 +55,17 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(stylesheet)
         else:
             print("Stylesheet File is either missing or not readable")
-
+            
     def add_qr_generation_info(self):
-        
         nrOfQr = self.ui.qrNrInputBox.text()
         data = self.ui_db.create_qr_code(int(nrOfQr))
-        qr_code_generated = "Folgende QR Codes sind generiert: \n"
-        for qr_code in data:
-            qr_code_generated += str(qr_code.qr_code) + " - "+ str(qr_code.datum)+"\n"
-        self.ui.infoBoxQr.setText(f"{qr_code_generated} ")
+        if data is not None:
+            qr_code_generated = "Folgende QR Codes sind generiert: \n"
+            for qr_code in data:
+                qr_code_generated += str(qr_code.qr_code) + " - "+ str(qr_code.datum)+"\n"
+            self.ui.infoBoxQr.setText(f"{qr_code_generated} ")
+        else:
+            self.ui.infoBoxQr.setText("No QR codes were generated.")
         self.ui.qrNrInputBox.clear()
 
 if __name__ == "__main__":

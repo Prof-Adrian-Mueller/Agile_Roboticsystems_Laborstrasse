@@ -1,6 +1,6 @@
-from Control.DatabaseConnection import DatabaseConnection
-from Control.DatabaseAdapter import DatabaseAdapter
-from QRGenAdapter import QRGenAdapter
+from DBService.Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.QRGenAdapter import QRGenAdapter
 
 
 class DBUIAdapter:
