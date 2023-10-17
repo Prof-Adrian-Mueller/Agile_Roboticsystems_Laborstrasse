@@ -9,10 +9,26 @@ QPushButton {
     background-color: #4CAF50;
     color: white;
     border: none;
+    font-size: 12px;
+    padding: 10px 10px;
+    min-height: 10px;
+    border-radius: 4px;
+}
+
+QWidget#leftNavigation QPushButton{
+    background-color: #4CAF50;
+    color: white;
+    border: none;
     padding: 10px 15px;
     font-size: 14px;
     border-radius: 4px;
 }
+
+QVBoxLayout#leftNavigationVerticalLayout {
+    padding: top 5px; 
+    background-color: #FF0000;
+}
+
 
 /* Change background color on hover */
 QPushButton:hover {
@@ -105,3 +121,26 @@ QLabel#liveData {
 #leftNavigationMenu { background-color:#45a049; margin-left:0%; }
 #live_panel { background-color:aqua; border:1px solid #FF0000; }
 
+QWidget#modalDialog {
+    background-color: #eee;
+    border: 1px solid #d3d3d3;
+    border-radius: 8px;
+    padding: 10px;
+    padding-bottom: 10px;
+
+}
+QWidget#footerWidgetDialogBox {
+    border: 1px solid #FF5C57;
+}
+QWidget#dialogBoxFooter Spacer{
+    background-color: #b81010;
+    padding: 5px;
+}
+
+QWidget#modalBoxFooter {
+    background-color: none;
+} 
+
+QWidget#modalDialogBackground {
+    background: none;
+}

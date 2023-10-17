@@ -5,15 +5,18 @@ from PyQt6 import QtCore
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit
 from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent
-from CustomTitleBar import CustomTitleBar
+from GUI.Custom.CustomTitleBar import CustomTitleBar
+from DBService.DBUIAdapter import DBUIAdapter
+from GUI.ModalDialogAdapter import ModalDialogAdapter
 
-from Navigation import Ui_MainWindow
-import resource_rc
+from GUI.Navigation import Ui_MainWindow
+import GUI.resource_rc
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        #UI Mainwindow
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -21,10 +24,16 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Dashboard GUI")
         self.setGeometry(100, 100, 800, 600)
 
+        self.ui_db = DBUIAdapter()
+
+        #Custom Titlebar
         title_bar = CustomTitleBar(self)
         self.setMenuWidget(title_bar)
-        # Make the window frameless
+        # Makes the window frameless
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+
+        #Custom ModalDialogBox
+        dialogBox = ModalDialogAdapter(self,self.ui)
 
         self.apply_stylesheet()
 
@@ -39,17 +48,22 @@ class MainWindow(QMainWindow):
 
     def apply_stylesheet(self):
         print(os.getcwd())
-        if os.path.isfile('qt_designer/stylesheet/stylen.qss') and os.access('qt_designer/stylesheet/stylen.qss', os.R_OK):
+        if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):
             print("File exists and is readable")
-            with open('qt_designer/stylesheet/stylen.qss', 'r') as file:
+            with open('GUI/stylesheet/stylen.qss', 'r') as file:
                 stylesheet = file.read()
             self.setStyleSheet(stylesheet)
         else:
             print("Stylesheet File is either missing or not readable")
 
     def add_qr_generation_info(self):
+        
         nrOfQr = self.ui.qrNrInputBox.text()
-        self.ui.infoBoxQr.setText(f"{nrOfQr} QR Code Generated")
+        data = self.ui_db.create_qr_code(int(nrOfQr))
+        qr_code_generated = "Folgende QR Codes sind generiert: \n"
+        for qr_code in data:
+            qr_code_generated += str(qr_code.qr_code) + " - "+ str(qr_code.datum)+"\n"
+        self.ui.infoBoxQr.setText(f"{qr_code_generated} ")
         self.ui.qrNrInputBox.clear()
 
 if __name__ == "__main__":
