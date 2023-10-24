@@ -1,16 +1,20 @@
+from multiprocessing import process
+import subprocess
 import sys
 import typing
 import os
 from PyQt6 import QtCore
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit
 from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
-from PyQt6.QtCore import Qt, QSize, QObject, QEvent
+from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.ModalDialogAdapter import ModalDialogAdapter
 
 from GUI.Navigation import Ui_MainWindow
 import GUI.resource_rc
+from Main.WorkerThread import WorkerThread
+from Main.main import MainClass
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -23,8 +27,12 @@ class MainWindow(QMainWindow):
         self.ui.homeBtn.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
         self.setGeometry(100, 100, 800, 600)
+        self.process = any
 
         self.ui_db = DBUIAdapter()
+
+        self.worker_thread = WorkerThread()
+        self.worker_thread.messageSignal.connect(self.handle_message)
 
         #Custom Titlebar
         title_bar = CustomTitleBar(self)
@@ -44,7 +52,29 @@ class MainWindow(QMainWindow):
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.settingsPage)))
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
+
+        self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
         
+
+    def startEnTProcess(self):
+        #TODO Start monitoring app using python process
+        
+        if self.ui.startEnTBtn.text() == "Start":
+            self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
+            self.ui.startEnTBtn.setText("Stop")
+
+            self.worker_thread.start()
+              
+        else:
+            self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
+            self.worker_thread.stop_child_process()
+            print("E&T process Terminated!")
+            self.ui.startEnTBtn.setText("Start")
+
+    def handle_message(self, message):
+        # TODO show this message in display box
+        print(message)
+
 
     def apply_stylesheet(self):
         print(os.getcwd())
@@ -72,7 +102,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-
     
-
     sys.exit(app.exec())
