@@ -18,6 +18,21 @@ import GUI.resource_rc
 from Main.WorkerThread import WorkerThread
 from Main.main import MainClass
 
+class RowWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.row_layout = QHBoxLayout(self)
+        self.setStyleSheet("border:1px solid black; margin-top:5px; margin-bottom:5px;")
+
+        label = QLabel('ProbeNr')
+        self.row_layout.addWidget(label)
+
+        for j in range(3):
+            button = QPushButton(f'Button {j+1}')
+            button.setMaximumHeight(10)
+            self.row_layout.addWidget(button)
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -58,15 +73,14 @@ class MainWindow(QMainWindow):
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
 
         # New code for adding buttons dynamically
-        button_layout = QVBoxLayout(self.ui.scrollAreaWidgetContents_2)
+        live_view_box_layout = QVBoxLayout(self.ui.scrollAreaWidgetContents_2)
 
-        n = 10  # dynamic number of rows
+        n = 20  # dynamic number of rows
         for i in range(n):
-            for j in range(3):
-                button = QPushButton(f'Button {j+1}')
-                button_layout.addWidget(button)
+            row_widget = RowWidget()
+            live_view_box_layout.addWidget(row_widget)      
 
-        self.ui.scrollAreaWidgetContents_2.setLayout(button_layout)
+        self.ui.scrollAreaWidgetContents_2.setLayout(live_view_box_layout)
 
     def generateLiveActionTable(self):
         self.ui.tableWidgetLiveAction.setColumnCount(4)

@@ -20,7 +20,7 @@
       <x>50</x>
       <y>0</y>
       <width>751</width>
-      <height>601</height>
+      <height>611</height>
      </rect>
     </property>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -188,7 +188,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>711</width>
-                <height>341</height>
+                <height>351</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="liveVieListItemLayout"/>
@@ -434,7 +434,7 @@
       <x>0</x>
       <y>-1</y>
       <width>801</width>
-      <height>601</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="minimumSize">

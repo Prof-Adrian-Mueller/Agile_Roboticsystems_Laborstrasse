@@ -224,6 +224,10 @@ QGridLayout#gridLayout_2 {
     border: 1px solid #b81010;
 }
 
+#live_view_box_layout{
+    background-color: chocolate;
+}
+
 QTableWidget::horizontalHeader {
     background-color: none;
     padding: 5px;
