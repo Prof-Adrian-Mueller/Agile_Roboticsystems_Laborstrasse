@@ -4,9 +4,11 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView
 from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread
+from GUI.Custom.ArrayOverlay import ArrowOverlay
+from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.ModalDialogAdapter import ModalDialogAdapter
@@ -54,7 +56,44 @@ class MainWindow(QMainWindow):
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
+
+        self.generateLiveActionTable()
+
+    def generateLiveActionTable(self):
+        self.ui.tableWidgetLiveAction.setColumnCount(4)
+        # Enable smooth scrolling
+        self.ui.tableWidgetLiveAction.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.ui.tableWidgetLiveAction.horizontalScrollBar().setSingleStep(15)  
+        self.ui.tableWidgetLiveAction.verticalScrollBar().setSingleStep(15) 
+
+        self.arrow_overlay = ArrowOverlay(self.ui.tableWidgetLiveAction)
+        self.arrow_overlay.setGeometry(self.ui.tableWidgetLiveAction.geometry())
+        self.arrow_overlay.raise_()
+        self.ui.tableWidgetLiveAction.installEventFilter(self)
+        # Stretch columns to fill the table width
+        header = self.ui.tableWidgetLiveAction.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)   
+        for row in range(32):
+            rowPosition = self.ui.tableWidgetLiveAction.rowCount()
+            self.ui.tableWidgetLiveAction.setRowHeight(row, 100)
+            self.ui.tableWidgetLiveAction.insertRow(rowPosition)
+            self.ui.tableWidgetLiveAction.setItem(rowPosition, 0, QTableWidgetItem(f"Probe #{row}"))
+            start = QPushButton()
+            start.setText("")           
+            middle = QPushButton()
+            middle.setText("")
+            end = QPushButton()
+            end.setText("")
+            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 1, start)
+            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 2, middle)
+            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 3, end)
+        self.ui.tableWidgetLiveAction.show()
         
+
+    def eventFilter(self, source, event):
+        if source == self.ui.tableWidgetLiveAction and event.type() == QEvent.Type.Resize:
+            self.arrow_overlay.setGeometry(self.ui.tableWidgetLiveAction.geometry())
+        return super().eventFilter(source, event)
 
     def startEnTProcess(self):
         #TODO Start monitoring app using python process
@@ -64,6 +103,7 @@ class MainWindow(QMainWindow):
             self.ui.startEnTBtn.setText("Stop")
 
             self.worker_thread.start()
+            
               
         else:
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
@@ -74,6 +114,7 @@ class MainWindow(QMainWindow):
     def handle_message(self, message):
         # TODO show this message in display box
         print(message)
+        self.worker_thread.send_message("Hello from Parent!")
 
 
     def apply_stylesheet(self):

@@ -14,11 +14,6 @@ class MainClass:
 
         self.is_pressed = is_pressed
         self.DEBUG = DEBUG
-        # self.process = process_arg
-
-    def child_process(self, q):
-        # This is the child process function
-        q.put("Hello, parent process!")
 
     def run(self):
         if self.DEBUG:
@@ -28,6 +23,13 @@ class MainClass:
                 time.sleep(5)
                 # Send a message to the parent process
                 sys.stdout.write("Hello from child process!\n")
+                sys.stdout.flush()
+
+                # Recieve message from the parent process
+                line = sys.stdin.readline().strip()
+                if not line:
+                    break
+                sys.stdout.write(f"Child received: {line}\n")
                 sys.stdout.flush()
 
                 # Check if 'q' is pressed

@@ -23,6 +23,10 @@ class WorkerThread(QThread):
         self.process.terminate()
         self.process.wait()
 
+    def send_message(self, message):
+        self.process.stdin.write(message + '\n')
+        self.process.stdin.flush()
+
     def start_child_process(self):
         script_directory = os.path.dirname(os.path.abspath("Main/main.py"))
         process = subprocess.Popen(
