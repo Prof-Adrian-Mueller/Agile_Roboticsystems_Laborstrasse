@@ -4,7 +4,7 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea
 from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread
 from GUI.Custom.ArrayOverlay import ArrowOverlay
@@ -57,7 +57,16 @@ class MainWindow(QMainWindow):
 
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
 
-        self.generateLiveActionTable()
+        # New code for adding buttons dynamically
+        button_layout = QVBoxLayout(self.ui.scrollAreaWidgetContents_2)
+
+        n = 10  # dynamic number of rows
+        for i in range(n):
+            for j in range(3):
+                button = QPushButton(f'Button {j+1}')
+                button_layout.addWidget(button)
+
+        self.ui.scrollAreaWidgetContents_2.setLayout(button_layout)
 
     def generateLiveActionTable(self):
         self.ui.tableWidgetLiveAction.setColumnCount(4)

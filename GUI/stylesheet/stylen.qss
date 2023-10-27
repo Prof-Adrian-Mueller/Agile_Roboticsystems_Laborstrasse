@@ -218,6 +218,12 @@ QTableWidget#tableWidgetLiveAction::item:selected {
     background-color: none;
 }
 
+QGridLayout#gridLayout_2 {
+    background-color: aqua;
+    margin-bottom: 5px;
+    border: 1px solid #b81010;
+}
+
 QTableWidget::horizontalHeader {
     background-color: none;
     padding: 5px;
