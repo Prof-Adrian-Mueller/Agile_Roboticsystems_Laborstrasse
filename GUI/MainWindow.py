@@ -4,9 +4,11 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea
+from PyQt6.QtWidgets import QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
 from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
-from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread
+from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect
+import pandas as pd
+from GUI.Custom.CustomDragDropWidget import DragDropWidget
 from GUI.Custom.ArrayOverlay import ArrowOverlay
 from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
@@ -22,16 +24,22 @@ class RowWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.row_layout = QHBoxLayout(self)
-        self.setStyleSheet("border:1px solid black; margin-top:5px; margin-bottom:5px;")
-
-        label = QLabel('ProbeNr')
-        self.row_layout.addWidget(label)
+        self.row_layout = QVBoxLayout()  # Create a QVBoxLayout
 
         for j in range(3):
+            hbox_layout = QHBoxLayout()  # Create a QHBoxLayout for each button and label
+            label = QLabel('ProbeNr')
+            hbox_layout.addWidget(label)
+
             button = QPushButton(f'Button {j+1}')
-            button.setMaximumHeight(10)
-            self.row_layout.addWidget(button)
+            hbox_layout.addWidget(button)
+
+            group_box = QGroupBox(self)  # Create a QGroupBox for each QHBoxLayout
+            group_box.setStyleSheet("border:1px solid black;min-height:60px;")
+            group_box.setLayout(hbox_layout)  # Set the QHBoxLayout inside the QGroupBox
+
+            self.row_layout.addWidget(group_box)  # Add the QGroupBox to the QVBoxLayout
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -45,7 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Dashboard GUI")
         self.setGeometry(100, 100, 800, 600)
         self.process = any
-
+       
         self.ui_db = DBUIAdapter()
 
         self.worker_thread = WorkerThread()
@@ -57,8 +65,16 @@ class MainWindow(QMainWindow):
         # Makes the window frameless
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
+        #drag & drop
+        self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
+        self.ui.importAreaDragDrop = DragDropWidget(self.ui.impotPage)
+        self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
+        self.ui.importAreaDragDrop.setGeometry(QRect(130, 90, 461, 261))
+        self.ui.importAreaDragDrop.setStyleSheet(u"background-color:#666;")
+        self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
+
         #Custom ModalDialogBox
-        dialogBox = ModalDialogAdapter(self,self.ui)
+        # self.dialogBox = ModalDialogAdapter(self,self.ui)
 
         self.apply_stylesheet()
 
@@ -71,6 +87,8 @@ class MainWindow(QMainWindow):
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
+
+        
 
         # New code for adding buttons dynamically
         live_view_box_layout = QVBoxLayout(self.ui.scrollAreaWidgetContents_2)
@@ -112,6 +130,18 @@ class MainWindow(QMainWindow):
             self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 3, end)
         self.ui.tableWidgetLiveAction.show()
         
+
+    def openFileDialog(self):
+        fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
+        if fileName:
+            print(f'Selected file: {fileName}')
+            try:
+                # df = pd.read_excel(fileName)
+                # TODO show message in dialogbox
+                print(f'Successfully imported Excel file: {fileName}')
+                
+            except Exception as e:
+                print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
 
     def eventFilter(self, source, event):
         if source == self.ui.tableWidgetLiveAction and event.type() == QEvent.Type.Resize:

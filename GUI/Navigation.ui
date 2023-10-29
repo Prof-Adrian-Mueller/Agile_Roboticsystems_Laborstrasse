@@ -33,7 +33,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="homePage">
       <property name="whatsThis">
@@ -52,7 +52,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="liveViewTab">
         <property name="font">
@@ -199,10 +199,26 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="tabWidgetHistory">
         <attribute name="title">
          <string>Tab 2</string>
         </attribute>
+        <widget class="QWidget" name="dragndroptest" native="true">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>20</y>
+           <width>631</width>
+           <height>441</height>
+          </rect>
+         </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 178, 102, 255), stop:0.55 rgba(235, 148, 61, 255), stop:0.98 rgba(0, 0, 0, 255), stop:1 rgba(0, 0, 0, 0))</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -225,29 +241,61 @@
       <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>40</y>
-         <width>281</width>
-         <height>24</height>
+         <x>490</x>
+         <y>470</y>
+         <width>231</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Experiment anlegen</string>
+        <string>Neu Experiment anlegen</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QWidget" name="importAreaDragDrop" native="true">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>120</y>
-         <width>201</width>
-         <height>22</height>
+         <x>130</x>
+         <y>90</y>
+         <width>461</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color:rgb(217, 217, 217)</string>
+       </property>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>110</y>
+          <width>181</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Drag and Drop</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="chooseFileFromExplorer">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>370</y>
+         <width>221</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Experiment Name</string>
+        <string>Dateil auswählen</string>
        </property>
       </widget>
+      <zorder>pushButton</zorder>
+      <zorder>chooseFileFromExplorer</zorder>
+      <zorder>importAreaDragDrop</zorder>
      </widget>
      <widget class="QWidget" name="qrGenPage">
       <widget class="QWidget" name="qrGenInfoPage" native="true">
@@ -353,8 +401,8 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>31</width>
-      <height>561</height>
+      <width>41</width>
+      <height>601</height>
      </rect>
     </property>
     <widget class="QWidget" name="layoutWidget">
