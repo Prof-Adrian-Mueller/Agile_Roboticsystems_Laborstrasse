@@ -318,3 +318,18 @@ QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
     background: none;
 }
+
+QWidget#itemRowLiveData {
+    border: 1px solid #666;
+    margin-bottom: 5px;
+    min-height: 60px;
+}
+
+QWidget#itemRowLiveData QPushButton {
+    min-height:25px;
+    max-height:25px;
+    min-width:25px;
+    max-width:25px;
+    border-radius:20px;
+    margin-left:20px;
+}

@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI\Navigation.ui'
+# Form implementation generated from reading ui file '.\GUI\Navigation.ui'
 #
 # Created by: PyQt6 UI code generator 6.5.3
 #
@@ -99,11 +99,9 @@ class Ui_MainWindow(object):
         self.tabWidgetHome.addTab(self.liveViewTab, icon, "")
         self.tabWidgetHistory = QtWidgets.QWidget()
         self.tabWidgetHistory.setObjectName("tabWidgetHistory")
-        self.dragndroptest = QtWidgets.QWidget(parent=self.tabWidgetHistory)
-        self.dragndroptest.setGeometry(QtCore.QRect(60, 20, 631, 441))
-        self.dragndroptest.setAcceptDrops(True)
-        self.dragndroptest.setStyleSheet("background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 178, 102, 255), stop:0.55 rgba(235, 148, 61, 255), stop:0.98 rgba(0, 0, 0, 255), stop:1 rgba(0, 0, 0, 0))")
-        self.dragndroptest.setObjectName("dragndroptest")
+        self.widgetLive = QtWidgets.QWidget(parent=self.tabWidgetHistory)
+        self.widgetLive.setGeometry(QtCore.QRect(29, 19, 711, 531))
+        self.widgetLive.setObjectName("widgetLive")
         self.tabWidgetHome.addTab(self.tabWidgetHistory, "")
         self.stackedWidget.addWidget(self.homePage)
         self.statistikPage = QtWidgets.QWidget()
@@ -249,7 +247,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidgetHome.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

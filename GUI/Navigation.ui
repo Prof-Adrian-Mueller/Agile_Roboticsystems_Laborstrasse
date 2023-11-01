@@ -33,7 +33,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="homePage">
       <property name="whatsThis">
@@ -203,20 +203,14 @@
         <attribute name="title">
          <string>Tab 2</string>
         </attribute>
-        <widget class="QWidget" name="dragndroptest" native="true">
+        <widget class="QWidget" name="widgetLive" native="true">
          <property name="geometry">
           <rect>
-           <x>60</x>
-           <y>20</y>
-           <width>631</width>
-           <height>441</height>
+           <x>29</x>
+           <y>19</y>
+           <width>711</width>
+           <height>531</height>
           </rect>
-         </property>
-         <property name="acceptDrops">
-          <bool>true</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 178, 102, 255), stop:0.55 rgba(235, 148, 61, 255), stop:0.98 rgba(0, 0, 0, 255), stop:1 rgba(0, 0, 0, 0))</string>
          </property>
         </widget>
        </widget>
