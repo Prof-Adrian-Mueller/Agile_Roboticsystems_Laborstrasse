@@ -150,16 +150,6 @@ class MainWindow(QMainWindow):
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
         
 
-        # New code for adding buttons dynamically
-        live_view_box_layout = QVBoxLayout(self.ui.scrollAreaWidgetContents_2)
-
-        n = 20  # dynamic number of rows
-        for i in range(n):
-            row_widget = RowWidget()
-            live_view_box_layout.addWidget(row_widget)      
-
-        self.ui.scrollAreaWidgetContents_2.setLayout(live_view_box_layout)
-
     def generateLiveActionTable(self):
         self.ui.tableWidgetLiveAction.setColumnCount(4)
         # Enable smooth scrolling
@@ -243,14 +233,13 @@ class MainWindow(QMainWindow):
     def add_qr_generation_info(self):
         nrOfQr = self.ui.qrNrInputBox.text()
         data = self.ui_db.create_qr_code(int(nrOfQr))
-        if data is not None:
-            qr_code_generated = "Folgende QR Codes sind generiert: \n"
-            for qr_code in data:
-                qr_code_generated += str(qr_code.qr_code) + " - "+ str(qr_code.datum)+"\n"
-            self.ui.infoBoxQr.setText(f"{qr_code_generated} ")
+        if data:
+            qr_code_generated = "Folgende QR Codes sind generiert: \n" + "\n".join([f"{qr_code.qr_code} - {qr_code.datum}" for qr_code in data])
+            self.ui.infoBoxQr.setText(qr_code_generated)
         else:
             self.ui.infoBoxQr.setText("No QR codes were generated.")
         self.ui.qrNrInputBox.clear()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

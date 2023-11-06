@@ -52,7 +52,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="liveViewTab">
         <property name="font">
@@ -68,42 +68,8 @@
           <normaloff>:/icons/img/stream.svg</normaloff>:/icons/img/stream.svg</iconset>
         </attribute>
         <attribute name="title">
-         <string>Live</string>
+         <string>Home</string>
         </attribute>
-        <widget class="QSplitter" name="splitter">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>140</y>
-           <width>701</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <widget class="QLabel" name="label_4">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Live-Action in der Laborstraße</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Datum</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Experiment</string>
-          </property>
-         </widget>
-        </widget>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
@@ -158,50 +124,10 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="gridLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>170</y>
-           <width>711</width>
-           <height>351</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QScrollArea" name="scrollArea">
-            <property name="widgetResizable">
-             <bool>true</bool>
-            </property>
-            <widget class="QWidget" name="scrollAreaWidgetContents_2">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>707</width>
-               <height>347</height>
-              </rect>
-             </property>
-             <widget class="QWidget" name="verticalLayoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>711</width>
-                <height>351</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="liveVieListItemLayout"/>
-             </widget>
-            </widget>
-           </widget>
-          </item>
-         </layout>
-        </widget>
        </widget>
        <widget class="QWidget" name="tabWidgetHistory">
         <attribute name="title">
-         <string>Tab 2</string>
+         <string>Live View</string>
         </attribute>
         <widget class="QWidget" name="widgetLive" native="true">
          <property name="geometry">
@@ -211,6 +137,25 @@
            <width>711</width>
            <height>531</height>
           </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>0</y>
+           <width>711</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Live-Action in der Laborstraße</string>
          </property>
         </widget>
        </widget>
@@ -304,10 +249,10 @@
        <widget class="QLabel" name="infoBoxQr">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>50</y>
+          <x>70</x>
+          <y>70</y>
           <width>481</width>
-          <height>121</height>
+          <height>371</height>
          </rect>
         </property>
         <property name="text">

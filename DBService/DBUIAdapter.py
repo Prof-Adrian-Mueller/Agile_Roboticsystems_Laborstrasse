@@ -9,6 +9,6 @@ class DBUIAdapter:
         self.adapter = DatabaseAdapter(self.db)
         self.qr_gen = QRGenAdapter(self.adapter)
 
-    def create_qr_code(self,total: int):
-        for i in range(total):
-            self.qr_gen.create_tube_qrcode()
+    def create_qr_code(self, total: int):
+        return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
+
