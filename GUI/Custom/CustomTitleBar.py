@@ -15,7 +15,7 @@ class CustomTitleBar(QWidget):
 
         # App logo
         app_logo = QLabel(self)
-        pixmap = QPixmap("img/laboratory.svg")
+        pixmap = QPixmap(":/icons/img/laboratory.svg")
         scaled_pixmap = pixmap.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         app_logo.setPixmap(scaled_pixmap)
         layout.addWidget(app_logo)

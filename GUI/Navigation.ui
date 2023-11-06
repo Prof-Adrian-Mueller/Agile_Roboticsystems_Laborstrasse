@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>614</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QWidget" name="widget_3" native="true">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>50</x>
       <y>0</y>
-      <width>731</width>
-      <height>561</height>
+      <width>751</width>
+      <height>611</height>
      </rect>
     </property>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -33,33 +33,131 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="homePage">
       <property name="whatsThis">
        <string>HomePage</string>
       </property>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QTabWidget" name="tabWidgetHome">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>-10</x>
          <y>0</y>
-         <width>711</width>
-         <height>551</height>
+         <width>751</width>
+         <height>591</height>
         </rect>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Tab 1</string>
+       <widget class="QWidget" name="liveViewTab">
+        <property name="font">
+         <font>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <attribute name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/img/stream.svg</normaloff>:/icons/img/stream.svg</iconset>
         </attribute>
+        <attribute name="title">
+         <string>Home</string>
+        </attribute>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>10</y>
+           <width>661</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="startEntTextLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Erfassung &amp; Tracking Application</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="entInfo">
+              <property name="text">
+               <string>Info</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="startEnTBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="tabWidgetHistory">
         <attribute name="title">
-         <string>Tab 2</string>
+         <string>Live View</string>
         </attribute>
+        <widget class="QWidget" name="widgetLive" native="true">
+         <property name="geometry">
+          <rect>
+           <x>29</x>
+           <y>19</y>
+           <width>711</width>
+           <height>531</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>0</y>
+           <width>711</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Live-Action in der Laborstraße</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -82,29 +180,61 @@
       <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>40</y>
-         <width>281</width>
-         <height>24</height>
+         <x>490</x>
+         <y>470</y>
+         <width>231</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Experiment anlegen</string>
+        <string>Neu Experiment anlegen</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QWidget" name="importAreaDragDrop" native="true">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>120</y>
-         <width>201</width>
-         <height>22</height>
+         <x>130</x>
+         <y>90</y>
+         <width>461</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color:rgb(217, 217, 217)</string>
+       </property>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>110</y>
+          <width>181</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Drag and Drop</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="chooseFileFromExplorer">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>370</y>
+         <width>221</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Experiment Name</string>
+        <string>Dateil auswählen</string>
        </property>
       </widget>
+      <zorder>pushButton</zorder>
+      <zorder>chooseFileFromExplorer</zorder>
+      <zorder>importAreaDragDrop</zorder>
      </widget>
      <widget class="QWidget" name="qrGenPage">
       <widget class="QWidget" name="qrGenInfoPage" native="true">
@@ -119,10 +249,10 @@
        <widget class="QLabel" name="infoBoxQr">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>50</y>
+          <x>70</x>
+          <y>70</y>
           <width>481</width>
-          <height>121</height>
+          <height>371</height>
          </rect>
         </property>
         <property name="text">
@@ -210,8 +340,8 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>31</width>
-      <height>561</height>
+      <width>41</width>
+      <height>601</height>
      </rect>
     </property>
     <widget class="QWidget" name="layoutWidget">
@@ -291,7 +421,7 @@
       <x>0</x>
       <y>-1</y>
       <width>801</width>
-      <height>601</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -391,6 +521,9 @@
      </widget>
     </widget>
    </widget>
+   <zorder>modalDialogBackground</zorder>
+   <zorder>widget_3</zorder>
+   <zorder>leftNavigation</zorder>
   </widget>
  </widget>
  <resources>

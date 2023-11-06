@@ -4,3 +4,6 @@ PyBoof==0.41
 Requests==2.31.0
 supervision==0.12.0
 ultralytics==8.0.142
+viztracer==0.16.0
+PyQt6==6.5.3
+PySide6==6.5.3
