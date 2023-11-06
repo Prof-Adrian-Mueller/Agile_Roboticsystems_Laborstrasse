@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
 
         #drag & drop
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
-        self.ui.importAreaDragDrop = DragDropWidget(self.ui.impotPage)
+        self.ui.importAreaDragDrop = DragDropWidget(self.ui.impotPage,self.ui_db)
         self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
         self.ui.importAreaDragDrop.setGeometry(QRect(130, 90, 461, 261))
         self.ui.importAreaDragDrop.setStyleSheet(u"background-color:#666;")
@@ -189,6 +189,7 @@ class MainWindow(QMainWindow):
                 # df = pd.read_excel(fileName)
                 # TODO show message in dialogbox
                 print(f'Successfully imported Excel file: {fileName}')
+                self.ui_db.insert_metadaten(fileName)
                 
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')

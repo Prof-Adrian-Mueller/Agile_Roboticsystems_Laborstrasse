@@ -1,7 +1,7 @@
-from Control.DatabaseConnection import DatabaseConnection
-from Control.DatabaseAdapter import DatabaseAdapter
-from Control.ExcelImporter import ExcelImporter
-from QRGenAdapter import QRGenAdapter
+from DBService.Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.ExcelImporter import ExcelImporter
+from DBService.QRGenAdapter import QRGenAdapter
 import tkinter as tk
 from tkinter import filedialog
 
@@ -23,8 +23,8 @@ class DBUIAdapter:
     def create_qr_code(self, total: int):
         return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
 
-    def insert_metadaten(self):
-        file_path=self.select_file()
+    def insert_metadaten(self, file_path):
+        # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.adapter,file_path)
             self.importer.import_data()

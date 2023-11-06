@@ -1,7 +1,7 @@
 import pandas as pd
 
-from Model.Plasmid import Plasmid
-from Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Model.Plasmid import Plasmid
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
 
 class ExcelImporter:
     def __init__(self, adapter,file_path):
