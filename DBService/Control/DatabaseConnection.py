@@ -20,12 +20,30 @@ class DatabaseConnection:
             self.conn.close()
 
     def create_table(self):
+        print("Hello, World!-------------------------------------------------------")
+
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS TubeQrcode (
                 qr_code INTEGER PRIMARY KEY,
                 datum DATE
             )
+    
             ''')
+    def create_plasmid_table(self):
+        print("in create")
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Plasmid (
+                plasmid_nr TEXT PRIMARY KEY,
+                vektor TEXT,
+                "insert" TEXT,
+                sequenz_nr TEXT,
+                name TEXT,
+                datum_maxi DATE,
+                quelle TEXT,
+                konstruktion_datum DATE
+            )
+            ''')         
 
 
