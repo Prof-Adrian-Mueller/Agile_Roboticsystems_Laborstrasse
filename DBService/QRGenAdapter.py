@@ -1,10 +1,11 @@
 import datetime
 
-from DBService.TubeQrcode import TubeQrcode
+from TubeQrcode import TubeQrcode
 
 class QRGenAdapter:
-    def __init__(self, db_adapter):
+    def __init__(self, db_adapter):        
         self.db_adapter = db_adapter
+
 
     def get_last_qr_code(self):
         with self.db_adapter.db as conn:
