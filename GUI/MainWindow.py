@@ -131,7 +131,8 @@ class MainWindow(QMainWindow):
         self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
 
         #Custom ModalDialogBox
-        # self.dialogBox = ModalDialogAdapter(self,self.ui)
+        self.dialogBox = ModalDialogAdapter(self,self.ui)
+        self.dialogBox.hideDialog()
 
         self.apply_stylesheet()
 
@@ -189,7 +190,15 @@ class MainWindow(QMainWindow):
                 # df = pd.read_excel(fileName)
                 # TODO show message in dialogbox
                 print(f'Successfully imported Excel file: {fileName}')
-                self.ui_db.insert_metadaten(fileName)
+                message = self.ui_db.insert_metadaten(fileName)
+                self.dialogBox.showDialog()
+                if message is not None:
+                    displayMsg = " ".join(str(item) for item in message)
+                else:
+                    displayMsg = "No Display Text"
+
+                self.dialogBox.displayText(displayMsg)
+
                 
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')

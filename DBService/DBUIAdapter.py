@@ -27,9 +27,9 @@ class DBUIAdapter:
         # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.adapter,file_path)
-            self.importer.import_data()
+            return self.importer.import_data()
         else:
-            print("Keine Datei ausgewählt.")
+            return "Keine Datei ausgewählt."
 
 
     

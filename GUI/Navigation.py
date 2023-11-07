@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI\Navigation.ui'
+# Form implementation generated from reading ui file '.\GUI\Navigation.ui'
 #
 # Created by: PyQt6 UI code generator 6.5.3
 #
@@ -189,16 +189,17 @@ class Ui_MainWindow(object):
         self.modalDialogBackground.setStyleSheet("")
         self.modalDialogBackground.setObjectName("modalDialogBackground")
         self.modalDialog = QtWidgets.QWidget(parent=self.modalDialogBackground)
-        self.modalDialog.setGeometry(QtCore.QRect(200, 150, 371, 211))
+        self.modalDialog.setGeometry(QtCore.QRect(200, 180, 401, 241))
         self.modalDialog.setStyleSheet("")
         self.modalDialog.setObjectName("modalDialog")
         self.modalBoxTextContent = QtWidgets.QWidget(parent=self.modalDialog)
-        self.modalBoxTextContent.setGeometry(QtCore.QRect(20, 20, 341, 141))
+        self.modalBoxTextContent.setGeometry(QtCore.QRect(20, -40, 341, 201))
         self.modalBoxTextContent.setMinimumSize(QtCore.QSize(200, 120))
         self.modalBoxTextContent.setStyleSheet("background-color: rgb(238, 238, 238);")
         self.modalBoxTextContent.setObjectName("modalBoxTextContent")
         self.modalBoxText = QtWidgets.QLabel(parent=self.modalBoxTextContent)
-        self.modalBoxText.setGeometry(QtCore.QRect(20, 10, 49, 16))
+        self.modalBoxText.setGeometry(QtCore.QRect(20, 50, 301, 131))
+        self.modalBoxText.setText("")
         self.modalBoxText.setObjectName("modalBoxText")
         self.footerWidgetDialogBox = QtWidgets.QWidget(parent=self.modalDialog)
         self.footerWidgetDialogBox.setGeometry(QtCore.QRect(20, 160, 341, 41))
@@ -214,9 +215,6 @@ class Ui_MainWindow(object):
         self.closeBtnModal = QtWidgets.QPushButton(parent=self.layoutWidget3)
         self.closeBtnModal.setObjectName("closeBtnModal")
         self.dialogBoxFooter.addWidget(self.closeBtnModal)
-        self.modalDialogBackground.raise_()
-        self.widget_3.raise_()
-        self.leftNavigation.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -242,7 +240,6 @@ class Ui_MainWindow(object):
         self.generateQrBtn.setText(_translate("MainWindow", "Generate"))
         self.label_2.setText(_translate("MainWindow", "QR-Code Generator"))
         self.label_5.setText(_translate("MainWindow", "Settings"))
-        self.modalBoxText.setText(_translate("MainWindow", "TextLabel"))
         self.closeBtnModal.setText(_translate("MainWindow", "Close"))
 
 
