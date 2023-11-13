@@ -62,6 +62,9 @@ def steuerung():
             # Abfrage: Wieviele Tubes werden bearbeitet
             print("Auf pipsen des Dobots warten")
             anzahl_tubes = int(input("Anzahl der Tubes eingeben: "))
+            # Send a message to the parent process
+            sys.stdout.write("ANZAHL_TUBES")
+            sys.stdout.flush()
             # Fehlerkennung: Eingabe muss eine Zahl zwischen 1 und 12 sein!
             if anzahl_tubes < 1 or anzahl_tubes > 12:
                 print("Ungültige Eingabe -> Eingabe muss eine Zahl zwischen 1 und 12 sein!")

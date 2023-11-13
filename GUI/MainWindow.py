@@ -13,6 +13,7 @@ from GUI.Custom.ArrayOverlay import ArrowOverlay
 from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from DBService.DBUIAdapter import DBUIAdapter
+from GUI.CustomDialog import ContentType, CustomDialog
 from GUI.ModalDialogAdapter import ModalDialogAdapter
 
 from GUI.Navigation import Ui_MainWindow
@@ -115,6 +116,8 @@ class MainWindow(QMainWindow):
 
         self.worker_thread = WorkerThread()
         self.worker_thread.messageSignal.connect(self.handle_message)
+        self.worker = WorkerThread()
+        self.worker.start()
 
         #Custom Titlebar
         title_bar = CustomTitleBar(self)
@@ -131,8 +134,9 @@ class MainWindow(QMainWindow):
         self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
 
         #Custom ModalDialogBox
-        self.dialogBox = ModalDialogAdapter(self,self.ui)
-        self.dialogBox.hideDialog()
+        self.dialog = CustomDialog(self.ui.modalDialogBackground)
+        self.dialog.send_button.clicked.connect(self.send_button_dialog_clicked)
+        # self.dialogBox.hideDialog()
 
         self.apply_stylesheet()
 
@@ -149,6 +153,7 @@ class MainWindow(QMainWindow):
         widgetLiveLayout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
         customWidget = CustomWidget(self.ui.widgetLive)  
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
+
         
 
     def generateLiveActionTable(self):
@@ -214,10 +219,8 @@ class MainWindow(QMainWindow):
         if self.ui.startEnTBtn.text() == "Start":
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
             self.ui.startEnTBtn.setText("Stop")
-
             self.worker_thread.start()
-            
-              
+                     
         else:
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
             self.worker_thread.stop_child_process()
@@ -226,10 +229,19 @@ class MainWindow(QMainWindow):
 
     def handle_message(self, message):
         # TODO show this message in display box
-        print(message)
-        self.worker_thread.send_message("Hello from Parent!")
+        print(message + " recieved from client")
+        message_split = message.split()
+        if message_split[0] == "INPUT":         
+            self.dialog.addContent(f"Bitte {message_split[1]} eingeben: ", ContentType.INPUT)
+            self.dialog.show()
 
-
+    def send_button_dialog_clicked(self):
+        text = self.dialog.input_line_edit.text()
+        self.worker_thread.send_message("ANZAHL_TUBES "+text)
+        self.dialog.clear()
+        self.dialog.addContent(f"{text} sent to the required method.", ContentType.OUTPUT)
+        return text
+    
     def apply_stylesheet(self):
         print(os.getcwd())
         if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):

@@ -18,6 +18,8 @@ class MainClass:
     def run(self):
         if self.DEBUG:
             print("E&T Started!")
+            sys.stdout.write("INPUT ANZAHL_TUBES")
+            sys.stdout.flush()
 
             while True:
                 time.sleep(5)
