@@ -1,8 +1,9 @@
 from enum import Enum
 from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QScrollArea, QWidget, QHBoxLayout, QLineEdit
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
 import GUI.resource_rc
+from PyQt6 import sip
 
 class CustomTitleBar(QWidget):
     def __init__(self, parent=None):
@@ -21,6 +22,7 @@ class CustomTitleBar(QWidget):
                 font-weight: bold;  # Bold font
             }
         """)
+        
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -42,6 +44,7 @@ class ContentType(Enum):
     OUTPUT = 2
 
 class CustomDialog(QDialog):
+    sendButtonClicked = pyqtSignal(str)
     def __init__(self, parent=None, max_percentage=0.75):
         super().__init__(parent, Qt.WindowType.FramelessWindowHint)
         self.max_percentage = max_percentage
@@ -61,8 +64,8 @@ class CustomDialog(QDialog):
         self.titleBar = CustomTitleBar(self)
         self.layout.addWidget(self.titleBar)
 
-        self.send_button = QPushButton("Send")
-        self.input_line_edit = QLineEdit(self)
+        # self.send_button = QPushButton("Send")
+        # self.input_line_edit_data = QLineEdit(self)
 
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -80,16 +83,36 @@ class CustomDialog(QDialog):
         # Update the size of the dialog dynamically
         self.update_size()
 
+        self.lineEditTextChanged = ""
+        
+
     def clear(self):
         for row_widget in self.row_widgets:
+            for child in row_widget.children():
+                if isinstance(child, QLineEdit) and child is self.input_line_edit:
+                    continue  
+
             self.scroll_area_layout.removeWidget(row_widget)
             row_widget.deleteLater()
+
+    def removeItems(self, row_data):
+        for row_widget in row_data:
+            # Check if the widget is valid and not deleted
+            if row_widget is not None and not sip.isdeleted(row_widget):
+                # Safely remove the widget from the layout
+                self.scroll_area_layout.removeWidget(row_widget)
+                # Delete the widget
+                row_widget.deleteLater()
+
+                # Remove the widget from the row_widgets list if it's there
+                if row_widget in self.row_widgets:
+                    self.row_widgets.remove(row_widget)
+
 
     def addContent(self, content,content_type = ContentType):
         row_widget = QWidget()
         row_box = QHBoxLayout()
         if content_type == ContentType.OUTPUT:
-            # Create and configure the label
             label = QLabel(content)
             label.setWordWrap(True)
             row_box.addWidget(label)
@@ -106,11 +129,14 @@ class CustomDialog(QDialog):
             row_box.addWidget(copy_button)
 
         elif content_type == ContentType.INPUT:
-            label = QLabel(content, self)           
+            label = QLabel(content, self)
             row_box.addWidget(label)
-            row_box.addWidget(self.input_line_edit)                     
-            row_box.addWidget(self.send_button)
-
+            input_line_edit = QLineEdit(self)
+            input_line_edit.textChanged.connect(self.emitTextChanged)
+            row_box.addWidget(input_line_edit)
+            send_button = QPushButton("Send")
+            send_button.clicked.connect(lambda: self.sendButtonClicked.emit(input_line_edit.text()))
+            row_box.addWidget(send_button)
 
         # Set the layout for the row widget
         row_widget.setLayout(row_box)
@@ -120,7 +146,9 @@ class CustomDialog(QDialog):
         self.row_widgets.append(row_widget)
         return row_widget
 
-    
+    def emitTextChanged(self, text):
+        self.lineEditTextChanged = text
+
 
     def update_size(self):
         self.setFixedWidth(int(self.parent().width() * 0.8))

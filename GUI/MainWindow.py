@@ -19,7 +19,6 @@ from GUI.ModalDialogAdapter import ModalDialogAdapter
 from GUI.Navigation import Ui_MainWindow
 import GUI.resource_rc
 from Main.WorkerThread import WorkerThread
-from Main.main import MainClass
 
 class RowWidget(QWidget):
     def __init__(self):
@@ -125,6 +124,8 @@ class MainWindow(QMainWindow):
         # Makes the window frameless
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
+        self.dialogBoxContents = []
+
         #drag & drop
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
         self.ui.importAreaDragDrop = DragDropWidget(self.ui.impotPage,self.ui_db)
@@ -135,7 +136,7 @@ class MainWindow(QMainWindow):
 
         #Custom ModalDialogBox
         self.dialog = CustomDialog(self.ui.modalDialogBackground)
-        self.dialog.send_button.clicked.connect(self.send_button_dialog_clicked)
+        self.dialog.sendButtonClicked.connect(self.send_button_dialog_clicked)
         # self.dialogBox.hideDialog()
 
         self.apply_stylesheet()
@@ -155,6 +156,8 @@ class MainWindow(QMainWindow):
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
 
         
+    def sendButtonClicked(self, text):
+        print(f'Send button clicked! Text: {text}')
 
     def generateLiveActionTable(self):
         self.ui.tableWidgetLiveAction.setColumnCount(4)
@@ -194,19 +197,22 @@ class MainWindow(QMainWindow):
             try:
                 # df = pd.read_excel(fileName)
                 # TODO show message in dialogbox
+                if self.dialogBoxContents.count:
+                    self.dialog.removeItems(self.dialogBoxContents)
                 print(f'Successfully imported Excel file: {fileName}')
+                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
                 message = self.ui_db.insert_metadaten(fileName)
-                self.dialogBox.showDialog()
                 if message is not None:
                     displayMsg = " ".join(str(item) for item in message)
                 else:
                     displayMsg = "No Display Text"
-
-                self.dialogBox.displayText(displayMsg)
-
-                
+                self.dialogBoxContents.append(self.dialog.addContent(f"{displayMsg}", ContentType.OUTPUT))
+              
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
+                self.dialogBoxContents.append(self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}", ContentType.OUTPUT))
+                self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
+            self.dialog.show()
 
     def eventFilter(self, source, event):
         if source == self.ui.tableWidgetLiveAction and event.type() == QEvent.Type.Resize:
@@ -232,16 +238,24 @@ class MainWindow(QMainWindow):
         print(message + " recieved from client")
         message_split = message.split()
         if message_split[0] == "INPUT":         
-            self.dialog.addContent(f"Bitte {message_split[1]} eingeben: ", ContentType.INPUT)
-            self.dialog.show()
+            if self.dialogBoxContents:
+                print(self.dialogBoxContents)
+                self.dialog.removeItems(self.dialogBoxContents)
+            self.dialogBoxContents.append(self.dialog.addContent(f"Bitte {message_split[1]} eingeben: ", ContentType.INPUT))
+            
+            if not self.dialog.isVisible():
+                self.dialog.show()
 
     def send_button_dialog_clicked(self):
-        text = self.dialog.input_line_edit.text()
+        text = self.dialog.lineEditTextChanged
         self.worker_thread.send_message("ANZAHL_TUBES "+text)
-        self.dialog.clear()
-        self.dialog.addContent(f"{text} sent to the required method.", ContentType.OUTPUT)
+        if self.dialogBoxContents:
+            self.dialog.removeItems(self.dialogBoxContents)
+        self.dialogBoxContents.append(self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
         return text
     
+
+
     def apply_stylesheet(self):
         print(os.getcwd())
         if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):

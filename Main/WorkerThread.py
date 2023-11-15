@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import time
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
@@ -20,7 +21,8 @@ class WorkerThread(QThread):
         rc = self.process.poll()
 
     def stop_child_process(self):
-        self.process.terminate()
+        self.send_message('exit')
+        print("Stopping E&T...")
         self.process.wait()
 
     def send_message(self, message):

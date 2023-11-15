@@ -1,52 +1,55 @@
-from multiprocessing import Process, Queue
 import subprocess
 import sys
 import time
+import threading
 
-class MainClass:
-    def __init__(self, DEBUG = True):
-        try:
-            from keyboard import is_pressed
-        except ImportError:
-            print("The 'keyboard' module is not installed. Installing now...")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "keyboard"])
-            from keyboard import is_pressed
+class InterprocessCommunication:
+    def __init__(self, is_debug=True):
+        self.is_debug = is_debug
 
-        self.is_pressed = is_pressed
-        self.DEBUG = DEBUG
+    def send_message(self, message):
+        sys.stdout.write(f"Sending message: {message}\n")
+        sys.stdout.flush()
 
-    def run(self):
-        if self.DEBUG:
-            print("E&T Started!")
-            sys.stdout.write("INPUT ANZAHL_TUBES")
+    def receive_message(self):
+        line = sys.stdin.readline().strip()
+        sys.stdout.write(f"Received message: {line}\n")
+        sys.stdout.flush()
+        return line
+
+    def run_child_process(self):
+        if self.is_debug:
+            sys.stdout.write("INPUT ANZAHL_TUBES\n")
             sys.stdout.flush()
 
             while True:
-                time.sleep(5)
-                # Send a message to the parent process
-                sys.stdout.write("Hello from child process!\n")
-                sys.stdout.flush()
+                received_message = self.receive_message()
 
-                # Recieve message from the parent process
-                line = sys.stdin.readline().strip()
-                if not line:
-                    break
-                sys.stdout.write(f"Child received: {line}\n")
-                sys.stdout.flush()
+                if received_message == 'exit':
+                    print('Child process Exited!')
+                    sys.exit(0)
 
-                # Check if 'q' is pressed
-                if self.is_pressed('q'):
-                    print('Program Exited!')
-                    break
+    def run(self):
+        if self.is_debug:
+            print("E&T Started!")
 
-            print('Please enter "q" to exit.')
+            # Start the child process in a separate thread
+            child_thread = threading.Thread(target=self.run_child_process)
+            child_thread.start()
+
+            self.send_message("exit")
+            child_thread.join()
+
         else:
             from Main.doBot_Steuerung import steuerung
             print("Starting steuerung")
             steuerung()
 
 if __name__ == "__main__":
-    main_class = MainClass()
-    main_class.run()
+    ipc = InterprocessCommunication()
 
-
+    try:
+        ipc.run()
+    except KeyboardInterrupt:
+        print("Interrupt received, stopping child process...")
+        ipc.worker_thread.stop_child_process()
