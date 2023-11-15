@@ -23,14 +23,28 @@ class DBUIAdapter:
     def create_qr_code(self, total: int):
         return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
 
-    def insert_metadaten(self, file_path):
-        # file_path=self.select_file()
+    def insert_metadaten(self,file_path):
+       # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.adapter,file_path)
             return self.importer.import_data()
         else:
             return "Keine Datei ausgewählt."
 
+    def insert_experiment_data(self,file_path):
+        # file_path = self.select_file()
+        if file_path:
+            # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
+            self.experiment_importer = ExperimentImporter(self.adapter, file_path)
+            #die Methode import_data auf, um die Daten zu importieren
+            self.experiment_importer.import_data()
+        else:
+            print("Keine Datei ausgewählt.")
+
+
+
+    def delete_all_experiment(self):
+        self.adapter.delete_all_experiments()
 
     
 
