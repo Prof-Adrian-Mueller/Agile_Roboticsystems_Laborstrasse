@@ -20,3 +20,4 @@ class QRGenAdapter:
         datum = datetime.date.today()  # Aktuelles Datum
         tube_qrcode = TubeQrcode(new_qr_code, datum)
         self.db_adapter.insert_data(tube_qrcode)
+        return tube_qrcode

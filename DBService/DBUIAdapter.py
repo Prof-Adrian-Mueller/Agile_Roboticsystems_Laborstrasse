@@ -21,9 +21,8 @@ class DBUIAdapter:
         file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
         return file_path
         
-    def create_qr_code(self,total: int):
-        for i in range(total):
-            self.qr_gen.create_tube_qrcode()
+    def create_qr_code(self, total: int):
+        return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
 
     def insert_metadaten(self,file_path):
        # file_path=self.select_file()
@@ -48,4 +47,5 @@ class DBUIAdapter:
     def delete_all_experiment(self):
         self.adapter.delete_all_experiments()
 
+    
 

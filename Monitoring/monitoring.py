@@ -43,8 +43,8 @@ from ultralytics import YOLO
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'Tracker_Config'))
 #wenn diese Import rot markiert sind muss in intellij der Ordner Monitoring und Tracker_Config rechtsklick mark as
 # source Folder  eingestellt werrden
-import calibrate_Camera as calibrate_Camera
-from tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
+import Tracker_Config.calibrate_Camera as calibrate_Camera
+from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
 
 # Lese Config Datei
 config_object = ConfigParser()
