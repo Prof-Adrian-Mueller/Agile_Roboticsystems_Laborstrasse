@@ -45,5 +45,18 @@ class DatabaseConnection:
                 konstruktion_datum DATE
             )
             ''')         
-
+    def create_experiment_table(self):
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Experiment (
+                exp_id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255),
+                vorname VARCHAR(255),
+                anz_tubes INT,
+                video_id VARCHAR(255),
+                datum DATE,
+                anz_fehler INT,
+                bemerkung TEXT
+            )
+            ''')
 

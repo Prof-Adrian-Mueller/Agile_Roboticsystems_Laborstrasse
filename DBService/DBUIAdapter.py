@@ -1,6 +1,7 @@
 from Control.DatabaseConnection import DatabaseConnection
 from Control.DatabaseAdapter import DatabaseAdapter
 from Control.ExcelImporter import ExcelImporter
+from Control.ExperimentImporter import ExperimentImporter
 from QRGenAdapter import QRGenAdapter
 import tkinter as tk
 from tkinter import filedialog
@@ -24,13 +25,27 @@ class DBUIAdapter:
         for i in range(total):
             self.qr_gen.create_tube_qrcode()
 
-    def insert_metadaten(self):
-        file_path=self.select_file()
+    def insert_metadaten(self,file_path):
+       # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.adapter,file_path)
             self.importer.import_data()
         else:
             print("Keine Datei ausgewählt.")
 
+    def insert_experiment_data(self,file_path):
+        # file_path = self.select_file()
+        if file_path:
+            # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
+            self.experiment_importer = ExperimentImporter(self.adapter, file_path)
+            #die Methode import_data auf, um die Daten zu importieren
+            self.experiment_importer.import_data()
+        else:
+            print("Keine Datei ausgewählt.")
+
+
+
+    def delete_all_experiment(self):
+        self.adapter.delete_all_experiments()
 
 

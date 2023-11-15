@@ -1,5 +1,4 @@
-
-
+from Model.Experiment import Experiment
 class DatabaseAdapter:
     def __init__(self, db):
         self.db = db
@@ -38,6 +37,38 @@ class DatabaseAdapter:
             ''', (plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle, konstruktion_datum))
 
 
+   
+    def insert_experiment(self, experiment):
+        with self.db as conn:
+            # video_id in einen String
+            video_id_str = str(experiment.video_id)
+
+            # konvert das Datum in einen String im Format YYYY-MM-DD
+            datum_str = experiment.datum.strftime('%Y-%m-%d') if experiment.datum is not None else None
+
+            # Überprüfen, ob das Experiment bereits existiert
+            cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (experiment.exp_id,))
+            exists = cursor.fetchone()[0] > 0
+
+            if exists:
+                # Aktualisiere das vorhandene Experiment
+                conn.execute('''
+                    UPDATE Experiment
+                    SET name = ?, vorname = ?, anz_tubes = ?, video_id = ?, datum = ?, anz_fehler = ?, bemerkung = ?
+                    WHERE exp_id = ?
+                ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
+            else:
+                # ein neues Experiment einfügen
+                conn.execute('''
+                    INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler, bemerkung)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung))
+   
+    def delete_all_experiments(self):
+        with self.db as conn:
+            # alle Einträge in der Tabelle Experiment löschen
+            conn.execute('DELETE FROM Experiment')
+            print("Alle Experimente wurden gelöscht.")
 
 
             
@@ -48,6 +79,19 @@ class DatabaseAdapter:
             for row in rows:
                 print(row)
 
+    def get_all_experiments(self):
+        with self.db as conn:
+            cursor = conn.execute('SELECT * FROM Experiment')
+            experiments = cursor.fetchall()
+
+            # Optional: Konvertiere die Ergebnisse in eine Liste von Experiment-Objekten
+            experiment_list = []
+            for exp in experiments:
+                experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3], video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
+                experiment_list.append(experiment_obj)
+
+            return experiment_list
+        
     def does_table_exist(self, table_name):
         with self.db as conn:
             result = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,)).fetchone()
