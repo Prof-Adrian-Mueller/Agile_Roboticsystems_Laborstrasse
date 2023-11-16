@@ -8,11 +8,13 @@ from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidge
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
+from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
 from GUI.Custom.ArrayOverlay import ArrowOverlay
 from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from DBService.DBUIAdapter import DBUIAdapter
+from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
 from GUI.ModalDialogAdapter import ModalDialogAdapter
 
@@ -150,12 +152,29 @@ class MainWindow(QMainWindow):
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
+        self.ui.plasmidMetaDataImport.clicked.connect(self.importPlasmidMetaDaten)
 
         widgetLiveLayout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
         customWidget = CustomWidget(self.ui.widgetLive)  
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
 
-        
+        #Experiment Data
+        experimentTableLayout = QVBoxLayout()
+        generator = DummyDataGenerator()
+        generator.generate_random_entries_experiment(15)
+        df_exp = generator.to_dataframe_experiment()
+        experimentDataTable = CustomDataTable(df_exp, self.ui.experimentView)
+        experimentTableLayout.addWidget(experimentDataTable)
+        self.ui.experimentView.setLayout(experimentTableLayout)
+
+        plasmidTableLayout = QVBoxLayout()
+        generator.generate_random_entries_plasmid(15)
+        df_exp = generator.to_dataframe_plasmid()
+        plasmidTable = CustomDataTable(df_exp, self.ui.plasmidMetadatenView)
+        plasmidTableLayout.addWidget(plasmidTable)
+        self.ui.plasmidMetadatenView.setLayout(plasmidTableLayout)
+
+
     def sendButtonClicked(self, text):
         print(f'Send button clicked! Text: {text}')
 
@@ -201,7 +220,7 @@ class MainWindow(QMainWindow):
                     self.dialog.removeItems(self.dialogBoxContents)
                 print(f'Successfully imported Excel file: {fileName}')
                 self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
-                message = self.ui_db.insert_metadaten(fileName)
+                message = self.ui_db.insert_experiment_data(fileName)
                 if message is not None:
                     displayMsg = " ".join(str(item) for item in message)
                 else:
@@ -254,8 +273,29 @@ class MainWindow(QMainWindow):
         self.dialogBoxContents.append(self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
         return text
     
-
-
+    def importPlasmidMetaDaten(self):
+        fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
+        if fileName:
+            print(f'Selected file: {fileName}')
+            try:
+                # df = pd.read_excel(fileName)
+                # TODO show message in dialogbox
+                if self.dialogBoxContents.count:
+                    self.dialog.removeItems(self.dialogBoxContents)
+                print(f'Successfully imported Excel file: {fileName}')
+                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
+                message = self.ui_db.insert_metadaten(fileName)
+                if message is not None:
+                    displayMsg = " ".join(str(item) for item in message)
+                else:
+                    displayMsg = "No Display Text"
+                self.dialogBoxContents.append(self.dialog.addContent(f"{displayMsg}", ContentType.OUTPUT))
+              
+            except Exception as e:
+                print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
+                self.dialogBoxContents.append(self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}", ContentType.OUTPUT))
+                self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
+    
     def apply_stylesheet(self):
         print(os.getcwd())
         if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):

@@ -1,6 +1,7 @@
 import pandas as pd
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
 
-from Model.Experiment import Experiment
+from DBService.Model.Experiment import Experiment
 
 
 class ExperimentImporter:
@@ -27,6 +28,6 @@ class ExperimentImporter:
         # Ausgabe der Daten
         for experiment in self.experiments:
             print("_______________________________Imported_________________________________________________")
-            ausgabe_data.append(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
+            ausgabe_data.append(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")         
             self.adapter.insert_experiment(experiment)
         return ausgabe_data

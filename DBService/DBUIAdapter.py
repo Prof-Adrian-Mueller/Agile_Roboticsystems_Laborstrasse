@@ -1,6 +1,7 @@
 from DBService.Control.DatabaseConnection import DatabaseConnection
 from DBService.Control.DatabaseAdapter import DatabaseAdapter
 from DBService.Control.ExcelImporter import ExcelImporter
+from DBService.Control.ExperimentImporter import ExperimentImporter
 from DBService.QRGenAdapter import QRGenAdapter
 import tkinter as tk
 from tkinter import filedialog
@@ -37,9 +38,9 @@ class DBUIAdapter:
             # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
             self.experiment_importer = ExperimentImporter(self.adapter, file_path)
             #die Methode import_data auf, um die Daten zu importieren
-            self.experiment_importer.import_data()
+            return self.experiment_importer.import_data()
         else:
-            print("Keine Datei ausgewählt.")
+            return "Keine Datei ausgewählt."
 
 
 

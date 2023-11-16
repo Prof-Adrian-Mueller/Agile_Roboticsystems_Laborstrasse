@@ -20,7 +20,7 @@
       <x>50</x>
       <y>0</y>
       <width>751</width>
-      <height>611</height>
+      <height>601</height>
      </rect>
     </property>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -159,6 +159,36 @@
          </property>
         </widget>
        </widget>
+       <widget class="QWidget" name="experiments">
+        <attribute name="title">
+         <string>Experimente</string>
+        </attribute>
+        <widget class="QWidget" name="experimentView" native="true">
+         <property name="geometry">
+          <rect>
+           <x>29</x>
+           <y>-1</y>
+           <width>721</width>
+           <height>571</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="plasmidMetadaten">
+        <attribute name="title">
+         <string>Plasmid Metadaten</string>
+        </attribute>
+        <widget class="QWidget" name="plasmidMetadatenView" native="true">
+         <property name="geometry">
+          <rect>
+           <x>29</x>
+           <y>9</y>
+           <width>721</width>
+           <height>531</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="statistikPage">
@@ -177,17 +207,17 @@
       </widget>
      </widget>
      <widget class="QWidget" name="impotPage">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="plasmidMetaDataImport">
        <property name="geometry">
         <rect>
-         <x>490</x>
-         <y>470</y>
+         <x>360</x>
+         <y>370</y>
          <width>231</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Neu Experiment anlegen</string>
+        <string>Plasmid Metadaten Importieren</string>
        </property>
       </widget>
       <widget class="QWidget" name="importAreaDragDrop" native="true">
@@ -229,10 +259,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>Dateil auswählen</string>
+        <string>Experiment Importieren</string>
        </property>
       </widget>
-      <zorder>pushButton</zorder>
+      <zorder>plasmidMetaDataImport</zorder>
       <zorder>chooseFileFromExplorer</zorder>
       <zorder>importAreaDragDrop</zorder>
      </widget>
