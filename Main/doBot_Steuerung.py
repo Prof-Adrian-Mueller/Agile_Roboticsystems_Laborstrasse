@@ -63,8 +63,6 @@ def steuerung():
             print("Auf pipsen des Dobots warten")
             anzahl_tubes = int(input("Anzahl der Tubes eingeben: "))
             # Send a message to the parent process
-            sys.stdout.write("ANZAHL_TUBES")
-            sys.stdout.flush()
             # Fehlerkennung: Eingabe muss eine Zahl zwischen 1 und 12 sein!
             if anzahl_tubes < 1 or anzahl_tubes > 12:
                 print("Ungültige Eingabe -> Eingabe muss eine Zahl zwischen 1 und 12 sein!")
@@ -137,6 +135,7 @@ def steuerung():
 
         # Verbindung trennen
         dType.DisconnectDobot(api)
+        #TODO: send message to gui that it is finished
 
         while True:
             if input("Drück q zum beenden")=="q":

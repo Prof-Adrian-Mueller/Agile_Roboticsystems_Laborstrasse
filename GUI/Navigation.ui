@@ -33,7 +33,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="homePage">
       <property name="whatsThis">
@@ -52,7 +52,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="liveViewTab">
         <property name="font">
@@ -204,6 +204,50 @@
        <property name="text">
         <string>Statistik</string>
        </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="cliPage">
+      <widget class="QWidget" name="widget" native="true">
+       <property name="geometry">
+        <rect>
+         <x>19</x>
+         <y>-11</y>
+         <width>731</width>
+         <height>601</height>
+        </rect>
+       </property>
+       <widget class="QWidget" name="cliOutputArea" native="true">
+        <property name="geometry">
+         <rect>
+          <x>29</x>
+          <y>9</y>
+          <width>681</width>
+          <height>461</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>480</y>
+          <width>681</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLineEdit" name="inputTextFromCli"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="sendBtnInputFromCli">
+           <property name="text">
+            <string>Send</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="impotPage">
@@ -380,7 +424,7 @@
        <x>0</x>
        <y>0</y>
        <width>30</width>
-       <height>171</height>
+       <height>221</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="leftNavigationVerticalLayout">
@@ -439,6 +483,17 @@
         <property name="icon">
          <iconset resource="resources.qrc">
           <normaloff>:/icons/img/settings.svg</normaloff>:/icons/img/settings.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cliBtn">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/img/command-line.svg</normaloff>:/icons/img/command-line.svg</iconset>
         </property>
        </widget>
       </item>

@@ -8,12 +8,14 @@ from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidge
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
+from GUI.CliInOutManager import CliInOutManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
 from GUI.Custom.ArrayOverlay import ArrowOverlay
 from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from DBService.DBUIAdapter import DBUIAdapter
+from GUI.Custom.CustomWidget import CustomWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
 from GUI.ModalDialogAdapter import ModalDialogAdapter
@@ -21,84 +23,7 @@ from GUI.ModalDialogAdapter import ModalDialogAdapter
 from GUI.Navigation import Ui_MainWindow
 import GUI.resource_rc
 from Main.WorkerThread import WorkerThread
-
-class RowWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.row_layout = QVBoxLayout()  # Create a QVBoxLayout
-
-        for j in range(3):
-            hbox_layout = QHBoxLayout()  # Create a QHBoxLayout for each button and label
-            label = QLabel('ProbeNr')
-            hbox_layout.addWidget(label)
-
-            button = QPushButton(f'Button {j+1}')
-            hbox_layout.addWidget(button)
-
-            group_box = QGroupBox(self)  # Create a QGroupBox for each QHBoxLayout
-            group_box.setStyleSheet("border:1px solid black;min-height:60px;")
-            group_box.setLayout(hbox_layout)  # Set the QHBoxLayout inside the QGroupBox
-
-            self.row_layout.addWidget(group_box)  # Add the QGroupBox to the QVBoxLayout
-
-class ArrowWidget(QWidget):
-    def __init__(self, start_widget, end_widget):
-        super().__init__()
-        self.start_widget = start_widget
-        self.end_widget = end_widget
-
-    def paintEvent(self, event):
-        qp = QPainter()
-        qp.begin(self)
-        pen = QPen(Qt.GlobalColor.black, 2)
-        qp.setPen(pen)
-
-        start_pos = self.start_widget.pos()
-        end_pos = self.end_widget.pos()
-
-        qp.drawLine(QPoint(start_pos.x() + self.start_widget.width(), int(start_pos.y() + self.start_widget.height() / 2)),
-                            QPoint(end_pos.x(), int(end_pos.y() + self.end_widget.height() / 2)))
-
-
-        qp.end()
-
-
-class CustomWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.layout = QVBoxLayout(self)
-
-        scroll = QScrollArea(self)
-        self.layout.addWidget(scroll)
-        scroll.setWidgetResizable(True)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)  # Disable horizontal scrolling
-
-        frame = QFrame(scroll)
-        scroll.setWidget(frame)
-
-        layout = QVBoxLayout(frame)
-
-        for i in range(10):
-            widget = QWidget()
-            widget.setObjectName("itemRowLiveData")
-            layout.addWidget(widget)
-            h_layout = QHBoxLayout(widget)
-
-            buttons = []
-            label = QLabel('ProbeNr')
-            h_layout.addWidget(label)
-
-            for j in range(3):
-                button = QPushButton(f'Button {j+1}')
-                h_layout.addWidget(button)
-                buttons.append(button)
-
-            if len(buttons) > 1:
-                arrow = ArrowWidget(buttons[0], buttons[1])
-                arrow.setStyleSheet("margin:10px;background-color:#FF0000;")
-                h_layout.addWidget(arrow)
+from PyQt6.QtCore import QProcess
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -118,7 +43,7 @@ class MainWindow(QMainWindow):
         self.worker_thread = WorkerThread()
         self.worker_thread.messageSignal.connect(self.handle_message)
         self.worker = WorkerThread()
-        self.worker.start()
+        # self.worker.start()
 
         #Custom Titlebar
         title_bar = CustomTitleBar(self)
@@ -148,6 +73,7 @@ class MainWindow(QMainWindow):
         self.ui.importBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.impotPage)))
         self.ui.qrGenBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.qrGenPage)))
         self.ui.settingsBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.settingsPage)))
+        self.ui.cliBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.cliPage)))
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
@@ -157,6 +83,10 @@ class MainWindow(QMainWindow):
         widgetLiveLayout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
         customWidget = CustomWidget(self.ui.widgetLive)  
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
+
+        #Cli stdin stdout
+        self.cliManager = CliInOutManager(self.ui)
+        self.ui.sendBtnInputFromCli.clicked.connect(self.cliManager.send_input)
 
         #Experiment Data
         experimentTableLayout = QVBoxLayout()
@@ -174,41 +104,9 @@ class MainWindow(QMainWindow):
         plasmidTableLayout.addWidget(plasmidTable)
         self.ui.plasmidMetadatenView.setLayout(plasmidTableLayout)
 
-
     def sendButtonClicked(self, text):
         print(f'Send button clicked! Text: {text}')
-
-    def generateLiveActionTable(self):
-        self.ui.tableWidgetLiveAction.setColumnCount(4)
-        # Enable smooth scrolling
-        self.ui.tableWidgetLiveAction.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
-        self.ui.tableWidgetLiveAction.horizontalScrollBar().setSingleStep(15)  
-        self.ui.tableWidgetLiveAction.verticalScrollBar().setSingleStep(15) 
-
-        self.arrow_overlay = ArrowOverlay(self.ui.tableWidgetLiveAction)
-        self.arrow_overlay.setGeometry(self.ui.tableWidgetLiveAction.geometry())
-        self.arrow_overlay.raise_()
-        self.ui.tableWidgetLiveAction.installEventFilter(self)
-        # Stretch columns to fill the table width
-        header = self.ui.tableWidgetLiveAction.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)   
-        for row in range(32):
-            rowPosition = self.ui.tableWidgetLiveAction.rowCount()
-            self.ui.tableWidgetLiveAction.setRowHeight(row, 100)
-            self.ui.tableWidgetLiveAction.insertRow(rowPosition)
-            self.ui.tableWidgetLiveAction.setItem(rowPosition, 0, QTableWidgetItem(f"Probe #{row}"))
-            start = QPushButton()
-            start.setText("")           
-            middle = QPushButton()
-            middle.setText("")
-            end = QPushButton()
-            end.setText("")
-            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 1, start)
-            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 2, middle)
-            self.ui.tableWidgetLiveAction.setCellWidget(rowPosition, 3, end)
-        self.ui.tableWidgetLiveAction.show()
         
-
     def openFileDialog(self):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
         if fileName:
