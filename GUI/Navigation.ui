@@ -207,7 +207,7 @@
       </widget>
      </widget>
      <widget class="QWidget" name="cliPage">
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="QWidget" name="cliPageWidgetwidget" native="true">
        <property name="geometry">
         <rect>
          <x>19</x>
@@ -219,9 +219,9 @@
        <widget class="QWidget" name="cliOutputArea" native="true">
         <property name="geometry">
          <rect>
-          <x>29</x>
+          <x>-1</x>
           <y>9</y>
-          <width>681</width>
+          <width>731</width>
           <height>461</height>
          </rect>
         </property>

@@ -1,5 +1,6 @@
 from PyQt6.QtCore import QProcess
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QApplication
+from PyQt6.QtWidgets import QSizePolicy
 from GUI.Navigation import Ui_MainWindow
 import sys
 import os
@@ -9,15 +10,19 @@ class CliInOutManager(QWidget):
         super().__init__()
         self.ui = ui_main
 
-        self.outputWidget = QWidget(self.ui.cliOutputArea)
-        self.outputLayout = QVBoxLayout(self.outputWidget)
+        self.outputLayout = QVBoxLayout(self.ui.cliOutputArea)
         self.text_area_stdout = QTextEdit()
         self.text_area_stdout.setReadOnly(True)
         self.outputLayout.addWidget(self.text_area_stdout)
 
+        # Set size policy for text area
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.text_area_stdout.setSizePolicy(sizePolicy)
+
         self.process = QProcess()
         self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
         self.process.readyReadStandardError.connect(self.errorOutputWritten)
+
         if self.process.state() != QProcess.ProcessState.Running:
             script_path = os.path.join('.', 'GUI', 'subprocess_script.py')
             self.process.start('python', ['-u', script_path])
