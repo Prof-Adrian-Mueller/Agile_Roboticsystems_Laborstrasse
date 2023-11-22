@@ -1,7 +1,60 @@
 from DBService.Model.Experiment import Experiment
+from DBService.Model.Experimente import Experimente
 class DatabaseAdapter:
     def __init__(self, db):
         self.db = db
+        self.last_qr_code_index = 0  # Initialisieren den Zähler
+   
+   
+
+
+
+    def insert_tube(self, qr_code, exp_id, plasmid_nr):
+        # Überprüfen, ob die Tabelle existiert
+        if not self.does_table_exist("Tubes"):
+            print("Tabelle 'Tubes' existiert nicht. Sie wird erstellt.")
+            self.db.create_tubes_table()
+        else:
+            print("Tabelle 'Tubes' existiert bereits.")
+
+        with self.db as conn:
+            # Fügen Sie das Tube in die Datenbank ein
+            conn.execute('''
+                INSERT INTO Tubes (qr_code, exp_id, plasmid_nr)
+                VALUES (?, ?, ?)
+            ''', (qr_code, exp_id, plasmid_nr))
+            print(f"Tube mit QR-Code {qr_code} hinzugefügt.")
+    def get_all_tubes(self):
+        with self.db as conn:
+            # SQL-Abfrage, um alle Einträge aus der Tubes Tabelle zu holen
+            cursor = conn.execute("SELECT * FROM Tubes")
+            tubes = cursor.fetchall()
+
+            # Optional: Konvertieren Sie die Ergebnisse in eine Liste von Objekten oder Dictionaries
+            tubes_list = []
+            for tube in tubes:
+                tube_dict = {
+                    'qr_code': tube[0],
+                    'exp_id': tube[1],
+                    'plasmid_nr': tube[2]
+                }
+                tubes_list.append(tube_dict)
+
+            return tubes_list
+    # def create_tube_qrcode_table_if_not_exists(self):
+    #     if not self.does_table_exist("TubeQrcode"):
+    #         with self.db as conn:
+    #             conn.execute('''
+    #                 CREATE TABLE IF NOT EXISTS TubeQrcode (
+    #                     qr_code TEXT PRIMARY KEY,
+    #                     datum TEXT
+    #                 )
+    #             ''')
+    #         print("Tabelle 'TubeQrcode' wurde erstellt.")
+    def drop_table_tube_qrcode(self):
+        with self.db as conn:
+            # Löschen der Tabelle TubeQrcode
+            conn.execute("DROP TABLE IF EXISTS TubeQrcode")
 
     def insert_data(self, tubeQrcode):  
         with self.db as conn:
@@ -18,11 +71,31 @@ class DatabaseAdapter:
             return int(row[0]) if row[0] else 0
 
     def select_all_from_tubeqrcode(self):
+         # Überprüfen, ob die Tabelle existiert
+        if not self.does_table_exist("Tubes"):
+            print("Tabelle 'Tubes' existiert nicht. Sie wird erstellt.")
+            self.db.create_tubes_table()
+            with self.db as conn:
+                rows = conn.execute("SELECT * FROM TubeQrcode").fetchall()
+                for row in rows:
+                        formatted_qr_code = str(row[0]).zfill(6)
+                        print((formatted_qr_code, row[1]))
+        else:
+            print("Tabelle 'Tubes' existiert bereits.")
+       
+
+    def get_next_qr_codes(self, count):
         with self.db as conn:
-            rows = conn.execute("SELECT * FROM TubeQrcode").fetchall()
-            for row in rows:
-                    formatted_qr_code = str(row[0]).zfill(6)
-                    print((formatted_qr_code, row[1]))
+            # Abrufen der QR-Codes ab der letzten Position
+            cursor = conn.execute("SELECT * FROM TubeQrcode ORDER BY qr_code LIMIT ? OFFSET ?", (count, self.last_qr_code_index))
+            qr_codes = cursor.fetchall()
+
+            # Aktualisieren Sie den Zähler
+            self.last_qr_code_index += len(qr_codes)
+
+            # Formatieren und zurückgeben der QR-Codes
+            formatted_qr_codes = [(str(row[0]).zfill(6), row[1]) for row in qr_codes]
+            return formatted_qr_codes
 
     def insert_plasmid(self, plasmid):
      # Überprüfen, ob die Tabelle existiert
@@ -46,7 +119,46 @@ class DatabaseAdapter:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle, konstruktion_datum))
 
+    def add_experiment(self, exp_id, name, vorname, anz_tubes, datum):
+        # Überprüfen, ob die Tabelle existiert
+        if not self.does_table_exist("Experiment"):
+            print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
+            self.db.create_experiment_table()
 
+        with self.db as conn:
+            # Überprüfen, ob das Experiment bereits existiert
+            cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (exp_id,))
+            exists = cursor.fetchone()[0] > 0
+
+            if exists:
+                # Aktualisiere das vorhandene Experiment
+                conn.execute('''
+                    UPDATE Experiment
+                    SET name = ?, vorname = ?, anz_tubes = ?, datum = ?
+                    WHERE exp_id = ?
+                ''', (name, vorname, anz_tubes, datum, exp_id))
+                print(f"Experiment mit ID {exp_id} wurde aktualisiert.")
+            else:
+                # Füge ein neues Experiment hinzu
+                conn.execute('''
+                    INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, datum)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (exp_id, name, vorname, anz_tubes, datum))
+                print(f"Experiment mit ID {exp_id} wurde hinzugefügt.")
+
+    def get_experiments(self):
+        with self.db as conn:
+            cursor = conn.execute('SELECT * FROM Experiment')
+            experiments = cursor.fetchall()
+
+            # Optional: Konvertieren Sie die Ergebnisse in eine Liste von Experiment-Objekten
+            experiment_list = []
+            for exp in experiments:
+                experiment_obj = Experimente(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3], datum=exp[4])
+                experiment_list.append(experiment_obj)
+
+            return experiment_list       
+        
    
     def insert_experiment(self, experiment):
         if not self.does_table_exist("Experiment"):
