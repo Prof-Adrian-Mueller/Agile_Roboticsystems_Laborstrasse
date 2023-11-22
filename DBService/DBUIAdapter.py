@@ -22,6 +22,7 @@ class DBUIAdapter:
         return file_path
         
     def create_qr_code(self, total: int):
+        self.db.create_table()
         return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
 
     def insert_metadaten(self,file_path):
@@ -32,8 +33,9 @@ class DBUIAdapter:
         else:
             print("Keine Datei ausgewählt.")
 
-    def insert_experiment_data(self,file_path):
-        # file_path = self.select_file()
+    def insert_experiment_data(self):
+    # def insert_experiment_data(self,file_path):
+        file_path = self.select_file()
         if file_path:
             # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
             self.experiment_importer = ExperimentImporter(self.adapter, file_path)

@@ -14,6 +14,11 @@ class QRGenAdapter:
 
 
     def create_tube_qrcode(self):
+        # self.db_adapter.create_tube_qrcode_table_if_not_exists()
+
+        # self.db_adapter.db.create_table()
+
+
         last_qr_code = self.get_last_qr_code()
         new_qr_code = str(last_qr_code + 1).zfill(6)  # QR-Code startet bei 000001
         print(new_qr_code)
