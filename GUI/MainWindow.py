@@ -4,7 +4,7 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
+from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout,QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
@@ -18,6 +18,8 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomWidget import CustomWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
+from GUI.Menu.ExperimentVorbereitung import ExperimentVorbereitung
+from GUI.Menu.Settings import Settings
 from GUI.ModalDialogAdapter import ModalDialogAdapter
 
 from GUI.Navigation import Ui_MainWindow
@@ -32,10 +34,19 @@ class MainWindow(QMainWindow):
         #UI Mainwindow
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # self.central_widget = QWidget()
+        # self.setCentralWidget(self.central_widget)
+        # layout = QVBoxLayout(self.central_widget) 
+
+        # layout.addWidget(self.ui.stackedWidget)
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.homeBtn.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
-        self.setGeometry(100, 100, 800, 600)
+        # self.setWindowFlags(Qt.Window)
+        self.showMaximized()
+        self.setCentralWidget(self.ui.centralwidget)
+        
+        # self.setGeometry(100, 100, 800, 600)
         self.process = any
        
         self.ui_db = DBUIAdapter()
@@ -104,10 +115,37 @@ class MainWindow(QMainWindow):
         plasmidTableLayout.addWidget(plasmidTable)
         self.ui.plasmidMetadatenView.setLayout(plasmidTableLayout)
 
+        #settings
+        self.settings = Settings(self.ui, self)
+        self.ui.windowResizeSlider.valueChanged.connect(self.settings.resize_window)
+         
+        #ExperimentVorbereitung Pages
+        self.experimentVorbereitung = ExperimentVorbereitung(self.ui, self)
+        self.ui.vorbereitungPrev.clicked.connect(self.experimentVorbereitung.prevPage)
+        self.ui.vorbereitungPrev_2.clicked.connect(self.experimentVorbereitung.prevPage)
+        self.ui.vorbereitungPrev_4.clicked.connect(self.experimentVorbereitung.prevPage)
+        self.ui.vorbereitungNext.clicked.connect(self.experimentVorbereitung.nextPage)
+        self.ui.vorbereitungWeiter_2.clicked.connect(self.experimentVorbereitung.nextPage)
+        self.ui.vorbereitungWeiter_3.clicked.connect(self.experimentVorbereitung.nextPage)
+        self.ui.vorbereitungWeiter_5.clicked.connect(self.experimentVorbereitung.nextPage)
+
+        self.ui.experimentImportierenVorbereitung.clicked.connect(lambda: self.openFileDialog('experiment'))
+        self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
+
+    def resizeEvent(self, event):
+        if self.ui.centralwidget is not None:
+            try:
+                self.ui.centralwidget.adjustSize()
+            except RuntimeError as e:
+                print("Error adjusting size:", e)
+        super().resizeEvent(event)
+
+
+
     def sendButtonClicked(self, text):
         print(f'Send button clicked! Text: {text}')
         
-    def openFileDialog(self):
+    def openFileDialog(self, fileType):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
         if fileName:
             print(f'Selected file: {fileName}')
@@ -116,9 +154,11 @@ class MainWindow(QMainWindow):
                 # TODO show message in dialogbox
                 if self.dialogBoxContents.count:
                     self.dialog.removeItems(self.dialogBoxContents)
-                print(f'Successfully imported Excel file: {fileName}')
-                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
-                message = self.ui_db.insert_experiment_data(fileName)
+               
+                if fileType == 'experiment':
+                    message = self.ui_db.insert_experiment_data(fileName)
+                elif fileType == 'plasmid':
+                    message = self.ui_db.insert_metadaten(fileName)
                 if message is not None:
                     displayMsg = " ".join(str(item) for item in message)
                 else:
@@ -129,6 +169,9 @@ class MainWindow(QMainWindow):
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
                 self.dialogBoxContents.append(self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}", ContentType.OUTPUT))
                 self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
+            finally:
+                print(f'Successfully imported Excel file: {fileName}')
+                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
             self.dialog.show()
 
     def eventFilter(self, source, event):
