@@ -349,3 +349,18 @@ QWidget#clioutputwidgetdesign QLabel {
     color: #FFFFFF;
     border: none;
 }
+
+QWidget#displayQrCode {
+    border: 1px solid bisque;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+}
+
+QWidget#displayQrCode QPushButtons {
+    max-width: fit-content;
+    min-width: 15px;
+}
+QLabel#qrCodeLabel {
+    font-style: oblique;
+    font-size: medium;
+}

@@ -18,6 +18,7 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomWidget import CustomWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
+from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentVorbereitung import ExperimentVorbereitung
 from GUI.Menu.Settings import Settings
 from GUI.ModalDialogAdapter import ModalDialogAdapter
@@ -124,13 +125,22 @@ class MainWindow(QMainWindow):
         self.ui.vorbereitungPrev.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungPrev_2.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungPrev_4.clicked.connect(self.experimentVorbereitung.prevPage)
+        self.ui.vorbereitungPrev_5.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungNext.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_2.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_3.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_5.clicked.connect(self.experimentVorbereitung.nextPage)
+        self.ui.vorbereitungWeiter_6.clicked.connect(self.experimentVorbereitung.nextPage)
 
         self.ui.experimentImportierenVorbereitung.clicked.connect(lambda: self.openFileDialog('experiment'))
         self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
+
+        qrCodeDisplay = DisplayQRCode(self.ui, self)
+        # qrCodeDisplay.appendOutput("Hello")
+        qrCodeDisplay.displayQrCode('000001')
+        qrCodeDisplay.displayQrCode('000002')
+        qrCodeDisplay.displayQrCode('000003')
+        qrCodeDisplay.displayQrCode('000004')
 
     def resizeEvent(self, event):
         if self.ui.centralwidget is not None:
