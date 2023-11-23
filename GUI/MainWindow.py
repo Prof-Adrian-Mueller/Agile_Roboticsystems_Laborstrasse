@@ -135,12 +135,11 @@ class MainWindow(QMainWindow):
         self.ui.experimentImportierenVorbereitung.clicked.connect(lambda: self.openFileDialog('experiment'))
         self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
 
+        #Display QR Codes
         qrCodeDisplay = DisplayQRCode(self.ui, self)
-        # qrCodeDisplay.appendOutput("Hello")
-        qrCodeDisplay.displayQrCode('000001')
-        qrCodeDisplay.displayQrCode('000002')
-        qrCodeDisplay.displayQrCode('000003')
-        qrCodeDisplay.displayQrCode('000004')
+        qrData = self.ui_db.adapter.get_next_qr_codes(8)
+        for qrElem in qrData:
+            qrCodeDisplay.displayQrCode(qrElem[0])
 
     def resizeEvent(self, event):
         if self.ui.centralwidget is not None:

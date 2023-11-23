@@ -132,3 +132,6 @@ Monitoring/logs
 Monitoring/Logs.zip
 .vscode/settings.json
 venv_n/
+QRCodeImages/
+laborstreet_management
+DBService/DefaultTemplate/.~lock.Experiment.xlsx\#

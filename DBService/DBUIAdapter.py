@@ -33,9 +33,9 @@ class DBUIAdapter:
         else:
             return "Keine Datei ausgewählt."
 
-    def insert_experiment_data(self):
+    def insert_experiment_data(self, file_path):
     # def insert_experiment_data(self,file_path):
-        file_path = self.select_file()
+        # file_path = self.select_file()
         if file_path:
             # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
             self.experiment_importer = ExperimentImporter(self.adapter, file_path)

@@ -1,63 +1,53 @@
-import sys
-import subprocess
-from PyQt6.QtWidgets import QApplication, QTextEdit, QMainWindow, QVBoxLayout, QWidget, QLineEdit, QPushButton
-from PyQt6.QtCore import QThread, pyqtSignal
-from PyQt6.QtGui import QTextCursor
-from PyQt6.QtCore import QProcess
-import select
+from PyQt6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QFileDialog, QApplication
+from PyQt6.QtGui import QPixmap
+import qrcode
 
-class MyApp(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()
 
-    def initUI(self):
-        self.text_area_stdout = QTextEdit()  # Initialize QTextEdit for stdout
-        self.text_area_stderr = QTextEdit()  # Initialize QTextEdit for stderr
-        self.text_area_stdin = QLineEdit()   # Initialize text_area_stdin
-        self.send_button = QPushButton('Send Input')
-
+        # Create a QVBoxLayout
         layout = QVBoxLayout()
-        layout.addWidget(self.text_area_stdout)
-        layout.addWidget(self.text_area_stderr)
-        layout.addWidget(self.text_area_stdin)
-        layout.addWidget(self.send_button)
 
+        # Create a QLabel to display the QR code
+        self.label = QLabel()
+        layout.addWidget(self.label)
+
+        # Create a QPushButton to open the file dialog
+        button = QPushButton("Generate QR Code")
+        button.clicked.connect(self.generate_qr_code)
+        layout.addWidget(button)
+
+        # Create a QWidget and set the layout
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-        self.process = QProcess()
-        self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
-        self.process.readyReadStandardError.connect(self.errorOutputWritten)
-        self.process.start('python', ['-u', '.\GUI\subprocess_script.py'])
+    def generate_qr_code(self):
+        # Open a file dialog to get the 6-digit number
+        number = '000001'
 
-        self.send_button.clicked.connect(self.send_input)
+        # Check if the number is 6 digits
+        if len(number) == 6 and number.isdigit():
+            # Generate the QR code
+            img = qrcode.make(number)
 
-    def send_input(self):
-        input_text = self.text_area_stdin.text() + '\n'
-        if self.process.state() == QProcess.ProcessState.Running:
-            self.process.write(input_text.encode())
-            self.text_area_stdin.clear()  # Clear the input field
-        else:
-            print("The subprocess has already terminated.")
+            # Save the QR code to a file
+            img.save("qrcode.png")
 
-    def normalOutputWritten(self):
-        text = self.process.readAllStandardOutput().data().decode()
-        self.text_area_stdout.append(text.strip())  # Append new message to the QTextEdit
+            # Load the QR code into a QPixmap and display it
+            pixmap = QPixmap("qrcode.png")
+            self.label.setPixmap(pixmap)
 
-    def errorOutputWritten(self):
-        text = self.process.readAllStandardError().data().decode()
-        self.text_area_stderr.append(text.strip())  # Append new error message to the QTextEdit
 
-    def closeEvent(self, event):
-        self.process.kill()
-        event.accept()
+import sys
 
 def main():
     app = QApplication(sys.argv)
-    window = MyApp()
+
+    window = MainWindow()
     window.show()
+
     sys.exit(app.exec())
 
 if __name__ == "__main__":
