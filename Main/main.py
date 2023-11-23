@@ -2,9 +2,10 @@ import subprocess
 import sys
 import time
 import threading
+from doBot_Steuerung import SteuerungControl
 
 class InterprocessCommunication:
-    def __init__(self, is_debug=True):
+    def __init__(self, is_debug=False):
         self.is_debug = is_debug
 
     def send_message(self, message):
@@ -41,9 +42,9 @@ class InterprocessCommunication:
             child_thread.join()
 
         else:
-            from Main.doBot_Steuerung import steuerung
             print("Starting steuerung")
-            steuerung()
+            steuerung = SteuerungControl()
+            steuerung.steuerung()
 
 if __name__ == "__main__":
     ipc = InterprocessCommunication()

@@ -26,7 +26,7 @@ from threading import Thread
 import ast
 import time
 
-import cv2
+import cv2 as cv2
 import pyboof as pb
 from configparser import ConfigParser
 import requests

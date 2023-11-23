@@ -149,8 +149,6 @@ class MainWindow(QMainWindow):
                 print("Error adjusting size:", e)
         super().resizeEvent(event)
 
-
-
     def sendButtonClicked(self, text):
         print(f'Send button clicked! Text: {text}')
         

@@ -32,7 +32,7 @@ class WorkerThread(QThread):
     def start_child_process(self):
         script_directory = os.path.dirname(os.path.abspath("Main/main.py"))
         process = subprocess.Popen(
-            ["python", "main.py"], 
+            ["python", "-m","main.py"], 
             cwd=script_directory, 
             stdin=subprocess.PIPE, 
             stdout=subprocess.PIPE, 
