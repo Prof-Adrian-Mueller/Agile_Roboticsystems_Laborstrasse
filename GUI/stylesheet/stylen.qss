@@ -152,48 +152,6 @@ QTableWidget {
     padding-bottom: 10px;
 }
 
-/* QTableWidget::item {
-    padding: 5px;
-    border: none;
-    height: 50px;
-    background-color: blue;
-    min-height: 100px;
-    max-height: 100px;
-}
-
-QTableWidget::item:selected {
-    background-color: none;
-    color: #FFFFFF;
-}
-
-QTableWidget::horizontalHeader {
-    background-color: none;
-    padding: 5px;
-    border: none;
-    height: 50px;
-}
-
-QTableWidget::verticalHeader {
-    background-color: #b81010;
-    padding: 5px;
-    border: none;
-    height: 50px;
-}
-
-QHeaderView::section:horizontal {
-    border: fuchsia;
-    background-color: none;
-    padding: 5px;
-    font-size: 12pt;
-}
-
-QHeaderView::section:vertical {
-    border: none;
-    background-color: aquamarine;
-    padding: 5px;
-    font-size: 12pt;
-} */
-
 #tableWidgetLiveAction {
     background-color: none;
 }

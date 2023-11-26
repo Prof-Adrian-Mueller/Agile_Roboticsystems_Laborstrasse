@@ -4,7 +4,7 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout,QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
+from PyQt6.QtWidgets import QSizePolicy, QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout,QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
@@ -27,6 +27,58 @@ from GUI.Navigation import Ui_MainWindow
 import GUI.resource_rc
 from PyQt6.QtCore import QProcess
 
+from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtGui import QPainter, QPolygon
+from PyQt6.QtWidgets import QWidget
+
+class ResizeGripWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.setCursor(Qt.CursorShape.SizeFDiagCursor)  # Diagonal resize cursor
+        self.setToolTip("Drag to resize")
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        points = QPolygon([
+            QPoint(self.width() - 16, self.height() - 16),
+            QPoint(self.width() - 1, self.height() - 16),
+            QPoint(self.width() - 16, self.height() - 1)
+        ])
+
+        # Draw the triangle
+        painter.drawPolygon(points)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clickPosition = event.globalPosition().toPoint()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() & Qt.MouseButton.LeftButton and self.parent:
+            # Calculate the new size
+            currentPos = event.globalPosition().toPoint()
+            diff = currentPos - self.clickPosition
+            newWidth = self.parent.width() + diff.x()
+            newHeight = self.parent.height() + diff.y()
+
+            # Update the main window size
+            self.parent.resize(newWidth, newHeight)
+
+            # Update click position
+            self.clickPosition = currentPos
+            
+            # Reposition the triangle
+            if self.parent.isMaximized():
+                self.setGeometry(self.parent.width() - 16, self.parent.height() - 16, 16, 16)
+            else:
+                self.setGeometry(newWidth - 16, newHeight - 16, 16, 16)
+
+    def setDraggable(self, draggable):
+        self.draggable = draggable
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -34,17 +86,16 @@ class MainWindow(QMainWindow):
         #UI Mainwindow
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # self.central_widget = QWidget()
-        # self.setCentralWidget(self.central_widget)
-        # layout = QVBoxLayout(self.central_widget) 
-
-        # layout.addWidget(self.ui.stackedWidget)
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.homeBtn.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
-        # self.setWindowFlags(Qt.Window)
-        self.showMaximized()
-        self.setCentralWidget(self.ui.centralwidget)
+        # self.set_expanding_size_policy(self.ui.mainContentWidget)
+        # self.showMaximized()
+        # self.setCentralWidget(self.ui.centralwidget)
+        
+        self.resizeGrip = ResizeGripWidget(self)
+        self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
+        self.resizeGrip.show()
         
         # self.setGeometry(100, 100, 800, 600)
         self.process = any
@@ -55,6 +106,7 @@ class MainWindow(QMainWindow):
         #Custom Titlebar
         title_bar = CustomTitleBar(self)
         self.setMenuWidget(title_bar)
+        self.setWindowTitle("Dashboard UI")
         # Makes the window frameless
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
@@ -62,14 +114,14 @@ class MainWindow(QMainWindow):
 
         #drag & drop
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
-        self.ui.importAreaDragDrop = DragDropWidget(self.ui.impotPage,self.ui_db)
+        self.ui.importAreaDragDrop = DragDropWidget(self.ui.importPage,self.ui_db)
         self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
         self.ui.importAreaDragDrop.setGeometry(QRect(130, 90, 461, 261))
         self.ui.importAreaDragDrop.setStyleSheet(u"background-color:#666;")
         self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
 
         #Custom ModalDialogBox
-        self.dialog = CustomDialog(self.ui.modalDialogBackground)
+        self.dialog = CustomDialog(self.ui.centralwidget)
         self.dialog.sendButtonClicked.connect(self.send_button_dialog_clicked)
         # self.dialogBox.hideDialog()
 
@@ -136,14 +188,21 @@ class MainWindow(QMainWindow):
         for qrElem in qrData:
             qrCodeDisplay.displayQrCode(qrElem[0])
 
-    def resizeEvent(self, event):
-        if self.ui.centralwidget is not None:
-            try:
-                self.ui.centralwidget.adjustSize()
-            except RuntimeError as e:
-                print("Error adjusting size:", e)
-        super().resizeEvent(event)
+    # def resizeEvent(self, event):
+    #     if self.ui.centralwidget is not None:
+    #         try:
+    #             self.ui.centralwidget.adjustSize()
+    #         except RuntimeError as e:
+    #             print("Error adjusting size:", e)
+    #     super().resizeEvent(event)
 
+
+    def set_expanding_size_policy(self, widget):
+        """
+        Set the size policy of all child widgets of 'widget' to Expanding.
+        """
+        for child in widget.findChildren(QWidget):
+            child.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
     def openFileDialog(self, fileType):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")

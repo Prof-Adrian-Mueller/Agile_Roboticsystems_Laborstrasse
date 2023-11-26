@@ -21,6 +21,9 @@ class CustomTitleBar(QWidget):
         layout.addWidget(app_logo)
 
         layout.addStretch(1)
+        app_title = QLabel("Dashboard UI")
+        layout.addWidget(app_title)
+        layout.addStretch(1)
 
         # Minimize button
         minimize_btn = QPushButton("-")
@@ -33,14 +36,18 @@ class CustomTitleBar(QWidget):
         close_btn.clicked.connect(self.parent.close)
         close_btn.setObjectName("closeButton")
         layout.addWidget(close_btn)
+    
 
     def mousePressEvent(self, event):
         if self.draggable and event.button() == Qt.MouseButton.LeftButton:
             self.startPos = event.globalPosition()
             self.clickPos = event.position()
+            self.isResizing = self.isInResizeArea(event.position())
 
     def mouseMoveEvent(self, event):
-        if self.draggable and event.buttons() & Qt.MouseButton.LeftButton:
+        if self.isResizing:
+            self.resizeWindow(event)
+        elif self.draggable and event.buttons() & Qt.MouseButton.LeftButton:
             if self.startPos:
                 move = event.globalPosition() - self.startPos
                 self.parent.move(self.parent.pos() + move.toPoint())  # Convert move to QPoint
@@ -49,6 +56,29 @@ class CustomTitleBar(QWidget):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.startPos = None
+            self.isResizing = False
 
+    def isInResizeArea(self, pos):
+        rect = self.rect()
+        cornerSize = 10  # Size of the corner area for resizing
+        if pos.x() >= rect.width() - cornerSize and pos.y() >= rect.height() - cornerSize:
+            return True
+        return False
+
+    def resizeWindow(self, event):
+        if self.isResizing:
+            mousePos = event.globalPosition().toPoint()
+            windowRect = self.parent.frameGeometry()
+            newWidth = max(self.parent.minimumWidth(), mousePos.x() - windowRect.left())
+            newHeight = max(self.parent.minimumHeight(), mousePos.y() - windowRect.top())
+            self.parent.resize(newWidth, newHeight)
+            
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            if self.parent.isMaximized():
+                self.parent.showNormal()  # Restores the window if it's maximized
+            else:
+                self.parent.showMaximized()  # Maximizes the window
+            
     def setDraggable(self, draggable):
         self.draggable = draggable

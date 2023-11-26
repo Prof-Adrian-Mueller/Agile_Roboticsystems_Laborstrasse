@@ -24,18 +24,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def generate_qr_code(self):
-        # Open a file dialog to get the 6-digit number
         number = '000001'
-
         # Check if the number is 6 digits
         if len(number) == 6 and number.isdigit():
             # Generate the QR code
             img = qrcode.make(number)
 
-            # Save the QR code to a file
             img.save("qrcode.png")
-
-            # Load the QR code into a QPixmap and display it
             pixmap = QPixmap("qrcode.png")
             self.label.setPixmap(pixmap)
 
