@@ -2,47 +2,39 @@ import subprocess
 import sys
 import time
 import threading
-from doBot_Steuerung import SteuerungControl
 
 class InterprocessCommunication:
-    def __init__(self, is_debug=False):
+    def __init__(self, is_debug=True):
         self.is_debug = is_debug
-
-    def send_message(self, message):
-        sys.stdout.write(f"Sending message: {message}\n")
-        sys.stdout.flush()
 
     def receive_message(self):
         line = sys.stdin.readline().strip()
-        sys.stdout.write(f"Received message: {line}\n")
-        sys.stdout.flush()
+        print(f"Received: {line}\n")
         return line
 
     def run_child_process(self):
         if self.is_debug:
-            sys.stdout.write("INPUT ANZAHL_TUBES\n")
-            sys.stdout.flush()
+            print("INPUT ANZAHL_TUBES\n")
 
             while True:
                 received_message = self.receive_message()
-
+                print(received_message)
                 if received_message == 'exit':
                     print('Child process Exited!')
                     sys.exit(0)
 
     def run(self):
         if self.is_debug:
-            print("E&T Started!")
+            print("E&T Started! \n Type 'exit' to stop the process.")
 
             # Start the child process in a separate thread
             child_thread = threading.Thread(target=self.run_child_process)
             child_thread.start()
-
-            self.send_message("exit")
             child_thread.join()
 
         else:
             print("Starting steuerung")
+            from Main.doBot_Steuerung import SteuerungControl
             steuerung = SteuerungControl()
             steuerung.steuerung()
 
@@ -53,4 +45,5 @@ if __name__ == "__main__":
         ipc.run()
     except KeyboardInterrupt:
         print("Interrupt received, stopping child process...")
-        ipc.worker_thread.stop_child_process()
+        print('Child process Exited!')
+        sys.exit(0)

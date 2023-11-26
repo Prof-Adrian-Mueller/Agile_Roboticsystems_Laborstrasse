@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidge
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
-from GUI.CliInOutManager import CliInOutManager
+from GUI.CliInOutWorkerThreadManager import CliInOutWorkerThreadManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
 from GUI.Custom.ArrayOverlay import ArrowOverlay
@@ -25,7 +25,6 @@ from GUI.ModalDialogAdapter import ModalDialogAdapter
 
 from GUI.Navigation import Ui_MainWindow
 import GUI.resource_rc
-from Main.WorkerThread import WorkerThread
 from PyQt6.QtCore import QProcess
 
 class MainWindow(QMainWindow):
@@ -51,10 +50,6 @@ class MainWindow(QMainWindow):
         self.process = any
        
         self.ui_db = DBUIAdapter()
-
-        self.worker_thread = WorkerThread()
-        self.worker_thread.messageSignal.connect(self.handle_message)
-        self.worker = WorkerThread()
         # self.worker.start()
 
         #Custom Titlebar
@@ -97,8 +92,8 @@ class MainWindow(QMainWindow):
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
 
         #Cli stdin stdout
-        self.cliManager = CliInOutManager(self.ui)
-        self.ui.sendBtnInputFromCli.clicked.connect(self.cliManager.send_input)
+        self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
+        self.ui.sendBtnInputFromCli.clicked.connect(self.cliInOutWorkerThreadManager.send_input)
 
         #Experiment Data
         experimentTableLayout = QVBoxLayout()
@@ -149,8 +144,6 @@ class MainWindow(QMainWindow):
                 print("Error adjusting size:", e)
         super().resizeEvent(event)
 
-    def sendButtonClicked(self, text):
-        print(f'Send button clicked! Text: {text}')
         
     def openFileDialog(self, fileType):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
@@ -192,11 +185,13 @@ class MainWindow(QMainWindow):
         if self.ui.startEnTBtn.text() == "Start":
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
             self.ui.startEnTBtn.setText("Stop")
-            self.worker_thread.start()
+            self.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
+            self.cliInOutWorkerThreadManager.startProcess()
                      
         else:
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
-            self.worker_thread.stop_child_process()
+            self.cliInOutWorkerThreadManager.stopProcess()
+            self.cliInOutWorkerThreadManager.displayDefault("Process has been stopped.")
             print("E&T process Terminated!")
             self.ui.startEnTBtn.setText("Start")
 
