@@ -132,6 +132,8 @@ Monitoring/logs
 Monitoring/Logs.zip
 .vscode/settings.json
 venv_n/
+<<<<<<< Updated upstream
+=======
 QRCodeImages/
 laborstreet_management
 DBService/DefaultTemplate/.~lock.Experiment.xlsx\#
@@ -143,3 +145,4 @@ DBService/DefaultTemplate/.~lock.Experiment.xlsx\#
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+>>>>>>> Stashed changes
