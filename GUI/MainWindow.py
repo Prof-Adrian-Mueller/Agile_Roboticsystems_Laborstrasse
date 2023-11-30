@@ -4,7 +4,9 @@ import sys
 import typing
 import os
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QSizePolicy, QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout,QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView,QHeaderView, QScrollArea, QFileDialog
+from PyQt6.QtWidgets import QSizePolicy, QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout, \
+    QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView, \
+    QHeaderView, QScrollArea, QFileDialog
 from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
 from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
 import pandas as pd
@@ -18,6 +20,7 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomWidget import CustomWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
+from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentVorbereitung import ExperimentVorbereitung
 from GUI.Menu.Settings import Settings
@@ -28,62 +31,15 @@ import GUI.resource_rc
 from PyQt6.QtCore import QProcess
 
 from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QPainter, QPolygon
 from PyQt6.QtWidgets import QWidget
-
-class ResizeGripWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.setCursor(Qt.CursorShape.SizeFDiagCursor)  # Diagonal resize cursor
-        self.setToolTip("Drag to resize")
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        points = QPolygon([
-            QPoint(self.width() - 16, self.height() - 16),
-            QPoint(self.width() - 1, self.height() - 16),
-            QPoint(self.width() - 16, self.height() - 1)
-        ])
-
-        # Draw the triangle
-        painter.drawPolygon(points)
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clickPosition = event.globalPosition().toPoint()
-
-    def mouseMoveEvent(self, event):
-        if event.buttons() & Qt.MouseButton.LeftButton and self.parent:
-            # Calculate the new size
-            currentPos = event.globalPosition().toPoint()
-            diff = currentPos - self.clickPosition
-            newWidth = self.parent.width() + diff.x()
-            newHeight = self.parent.height() + diff.y()
-
-            # Update the main window size
-            self.parent.resize(newWidth, newHeight)
-
-            # Update click position
-            self.clickPosition = currentPos
-            
-            # Reposition the triangle
-            if self.parent.isMaximized():
-                self.setGeometry(self.parent.width() - 16, self.parent.height() - 16, 16, 16)
-            else:
-                self.setGeometry(newWidth - 16, newHeight - 16, 16, 16)
-
-    def setDraggable(self, draggable):
-        self.draggable = draggable
-
+from GUI.ResizeGripWidget import ResizeGripWidget
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        #UI Mainwindow
+        # UI Mainwindow
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -92,18 +48,18 @@ class MainWindow(QMainWindow):
         # self.set_expanding_size_policy(self.ui.mainContentWidget)
         # self.showMaximized()
         # self.setCentralWidget(self.ui.centralwidget)
-        
+
         self.resizeGrip = ResizeGripWidget(self)
         self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
         self.resizeGrip.show()
-        
+
         # self.setGeometry(100, 100, 800, 600)
         self.process = any
-       
+
         self.ui_db = DBUIAdapter()
         # self.worker.start()
 
-        #Custom Titlebar
+        # Custom Titlebar
         title_bar = CustomTitleBar(self)
         self.setMenuWidget(title_bar)
         self.setWindowTitle("Dashboard UI")
@@ -112,27 +68,35 @@ class MainWindow(QMainWindow):
 
         self.dialogBoxContents = []
 
-        #drag & drop
+        # drag & drop
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
-        self.ui.importAreaDragDrop = DragDropWidget(self.ui.importPage,self.ui_db)
+        self.ui.importAreaDragDrop = DragDropWidget(self.ui.importPage, self.ui_db)
         self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
         self.ui.importAreaDragDrop.setGeometry(QRect(130, 90, 461, 261))
         self.ui.importAreaDragDrop.setStyleSheet(u"background-color:#666;")
         self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
 
-        #Custom ModalDialogBox
-        self.dialog = CustomDialog(self.ui.centralwidget)
+        # Custom ModalDialogBox
+        self.dialog = CustomDialog(self)
         self.dialog.sendButtonClicked.connect(self.send_button_dialog_clicked)
         # self.dialogBox.hideDialog()
 
         self.apply_stylesheet()
 
-        self.ui.homeBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.homePage)))
-        self.ui.statistik.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.statistikPage)))
-        self.ui.importBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.impotPage)))
-        self.ui.qrGenBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.qrGenPage)))
-        self.ui.settingsBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.settingsPage)))
-        self.ui.cliBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.cliPage)))
+        self.ui.homeBtn.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.homePage)))
+        self.ui.statistik.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.statistikPage)))
+        self.ui.importBtn.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.importPage)))
+        self.ui.qrGenBtn.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.qrGenPage)))
+        self.ui.settingsBtn.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.settingsPage)))
+        self.ui.cliBtn.clicked.connect(
+            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.cliPage)))
+        self.ui.experimentPreparationBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(
+            self.ui.stackedWidget.indexOf(self.ui.experimentPreparationPage)))
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
@@ -140,14 +104,14 @@ class MainWindow(QMainWindow):
         self.ui.plasmidMetaDataImport.clicked.connect(self.importPlasmidMetaDaten)
 
         widgetLiveLayout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
-        customWidget = CustomWidget(self.ui.widgetLive)  
+        customWidget = CustomWidget(self.ui.widgetLive)
         widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
 
-        #Cli stdin stdout
+        # Cli stdin stdout
         self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
         self.ui.sendBtnInputFromCli.clicked.connect(self.cliInOutWorkerThreadManager.send_input)
 
-        #Experiment Data
+        # Experiment Data
         experimentTableLayout = QVBoxLayout()
         generator = DummyDataGenerator()
         generator.generate_random_entries_experiment(15)
@@ -163,39 +127,34 @@ class MainWindow(QMainWindow):
         plasmidTableLayout.addWidget(plasmidTable)
         self.ui.plasmidMetadatenView.setLayout(plasmidTableLayout)
 
-        #settings
+        # settings
         self.settings = Settings(self.ui, self)
         self.ui.windowResizeSlider.valueChanged.connect(self.settings.resize_window)
-         
-        #ExperimentVorbereitung Pages
+
+        # ExperimentVorbereitung Pages
         self.experimentVorbereitung = ExperimentVorbereitung(self.ui, self)
         self.ui.vorbereitungPrev.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungPrev_2.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungPrev_4.clicked.connect(self.experimentVorbereitung.prevPage)
         self.ui.vorbereitungPrev_5.clicked.connect(self.experimentVorbereitung.prevPage)
-        self.ui.vorbereitungNext.clicked.connect(self.experimentVorbereitung.nextPage)
+        self.ui.vorbereitungNext.clicked.connect(
+            lambda: self.experimentVorbereitung.nextPageWithControl("CreateExperiment"))
         self.ui.vorbereitungWeiter_2.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_3.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_5.clicked.connect(self.experimentVorbereitung.nextPage)
         self.ui.vorbereitungWeiter_6.clicked.connect(self.experimentVorbereitung.nextPage)
 
+        # Display Plasmid Tubes
+        self.plasmidTubesList = DisplayPlasmidTubes(self.ui, self)
+
         self.ui.experimentImportierenVorbereitung.clicked.connect(lambda: self.openFileDialog('experiment'))
         self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
 
-        #Display QR Codes
+        # Display QR Codes
         qrCodeDisplay = DisplayQRCode(self.ui, self)
         qrData = self.ui_db.adapter.get_next_qr_codes(8)
         for qrElem in qrData:
             qrCodeDisplay.displayQrCode(qrElem[0])
-
-    # def resizeEvent(self, event):
-    #     if self.ui.centralwidget is not None:
-    #         try:
-    #             self.ui.centralwidget.adjustSize()
-    #         except RuntimeError as e:
-    #             print("Error adjusting size:", e)
-    #     super().resizeEvent(event)
-
 
     def set_expanding_size_policy(self, widget):
         """
@@ -203,7 +162,11 @@ class MainWindow(QMainWindow):
         """
         for child in widget.findChildren(QWidget):
             child.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        
+
+    def removeDialogBoxContents(self):
+        if self.dialogBoxContents.count:
+            self.dialog.removeItems(self.dialogBoxContents)
+
     def openFileDialog(self, fileType):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
         if fileName:
@@ -211,9 +174,8 @@ class MainWindow(QMainWindow):
             try:
                 # df = pd.read_excel(fileName)
                 # TODO show message in dialogbox
-                if self.dialogBoxContents.count:
-                    self.dialog.removeItems(self.dialogBoxContents)
-               
+                self.removeDialogBoxContents()
+
                 if fileType == 'experiment':
                     message = self.ui_db.insert_experiment_data(fileName)
                 elif fileType == 'plasmid':
@@ -223,14 +185,17 @@ class MainWindow(QMainWindow):
                 else:
                     displayMsg = "No Display Text"
                 self.dialogBoxContents.append(self.dialog.addContent(f"{displayMsg}", ContentType.OUTPUT))
-              
+
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
-                self.dialogBoxContents.append(self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}", ContentType.OUTPUT))
+                self.dialogBoxContents.append(
+                    self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}",
+                                           ContentType.OUTPUT))
                 self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
             finally:
                 print(f'Successfully imported Excel file: {fileName}')
-                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
+                self.dialogBoxContents.append(
+                    self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
             self.dialog.show()
 
     def eventFilter(self, source, event):
@@ -239,14 +204,14 @@ class MainWindow(QMainWindow):
         return super().eventFilter(source, event)
 
     def startEnTProcess(self):
-        #TODO Start monitoring app using python process
-        
+        # TODO Start monitoring app using python process
+
         if self.ui.startEnTBtn.text() == "Start":
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
             self.ui.startEnTBtn.setText("Stop")
             self.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
             self.cliInOutWorkerThreadManager.startProcess()
-                     
+
         else:
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
             self.cliInOutWorkerThreadManager.stopProcess()
@@ -258,23 +223,25 @@ class MainWindow(QMainWindow):
         # TODO show this message in display box
         print(message + " recieved from client")
         message_split = message.split()
-        if message_split[0] == "INPUT":         
+        if message_split[0] == "INPUT":
             if self.dialogBoxContents:
                 print(self.dialogBoxContents)
                 self.dialog.removeItems(self.dialogBoxContents)
-            self.dialogBoxContents.append(self.dialog.addContent(f"Bitte {message_split[1]} eingeben: ", ContentType.INPUT))
-            
+            self.dialogBoxContents.append(
+                self.dialog.addContent(f"Bitte {message_split[1]} eingeben: ", ContentType.INPUT))
+
             if not self.dialog.isVisible():
                 self.dialog.show()
 
     def send_button_dialog_clicked(self):
         text = self.dialog.lineEditTextChanged
-        self.worker_thread.send_message("ANZAHL_TUBES "+text)
+        self.worker_thread.send_message("ANZAHL_TUBES " + text)
         if self.dialogBoxContents:
             self.dialog.removeItems(self.dialogBoxContents)
-        self.dialogBoxContents.append(self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
+        self.dialogBoxContents.append(
+            self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
         return text
-    
+
     def importPlasmidMetaDaten(self):
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
         if fileName:
@@ -285,19 +252,22 @@ class MainWindow(QMainWindow):
                 if self.dialogBoxContents.count:
                     self.dialog.removeItems(self.dialogBoxContents)
                 print(f'Successfully imported Excel file: {fileName}')
-                self.dialogBoxContents.append(self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
+                self.dialogBoxContents.append(
+                    self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
                 message = self.ui_db.insert_metadaten(fileName)
                 if message is not None:
                     displayMsg = " ".join(str(item) for item in message)
                 else:
                     displayMsg = "No Display Text"
                 self.dialogBoxContents.append(self.dialog.addContent(f"{displayMsg}", ContentType.OUTPUT))
-              
+
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
-                self.dialogBoxContents.append(self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}", ContentType.OUTPUT))
+                self.dialogBoxContents.append(
+                    self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}",
+                                           ContentType.OUTPUT))
                 self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
-    
+
     def apply_stylesheet(self):
         print(os.getcwd())
         if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):
@@ -307,12 +277,13 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(stylesheet)
         else:
             print("Stylesheet File is either missing or not readable")
-            
+
     def add_qr_generation_info(self):
         nrOfQr = self.ui.qrNrInputBox.text()
         data = self.ui_db.create_qr_code(int(nrOfQr))
         if data:
-            qr_code_generated = "Folgende QR Codes sind generiert: \n" + "\n".join([f"{qr_code.qr_code} - {qr_code.datum}" for qr_code in data])
+            qr_code_generated = "Folgende QR Codes sind generiert: \n" + "\n".join(
+                [f"{qr_code.qr_code} - {qr_code.datum}" for qr_code in data])
             self.ui.infoBoxQr.setText(qr_code_generated)
         else:
             self.ui.infoBoxQr.setText("No QR codes were generated.")
@@ -323,5 +294,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    
+
     sys.exit(app.exec())

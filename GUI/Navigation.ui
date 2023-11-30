@@ -61,6 +61,9 @@
         <layout class="QVBoxLayout" name="leftNavigationVerticalLayout">
          <item>
           <widget class="QPushButton" name="homeBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Home&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -72,6 +75,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="statistik">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Statistik&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -83,6 +89,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="importBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -94,6 +103,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="qrGenBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate QR Codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -107,7 +119,24 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="cliBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Command Line Interface&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/icons/img/command-line.svg</normaloff>:/icons/img/command-line.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="settingsBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -118,13 +147,13 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="cliBtn">
+          <widget class="QPushButton" name="experimentPreparationBtn">
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
-             <normaloff>:/icons/img/command-line.svg</normaloff>:/icons/img/command-line.svg</iconset>
+             <normaloff>:/icons/img/dna.svg</normaloff>:/icons/img/dna.svg</iconset>
            </property>
           </widget>
          </item>
@@ -154,7 +183,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="sizePolicy">
@@ -181,8 +210,8 @@
             <rect>
              <x>20</x>
              <y>0</y>
-             <width>791</width>
-             <height>671</height>
+             <width>831</width>
+             <height>701</height>
             </rect>
            </property>
            <property name="tabShape">
@@ -210,7 +239,7 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <widget class="QWidget" name="vorbereitungPage1">
+               <widget class="QWidget" name="vorbereitungExperimentPage">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -244,7 +273,23 @@
                       <string>Experiment ID</string>
                      </property>
                     </widget>
-                    <widget class="QLineEdit" name="experimentIdLE"/>
+                    <widget class="QLineEdit" name="experimentIdLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Experiment ID eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -257,7 +302,23 @@
                       <string>Name</string>
                      </property>
                     </widget>
-                    <widget class="QLineEdit" name="nameLE"/>
+                    <widget class="QLineEdit" name="nameLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -270,7 +331,23 @@
                       <string>Vorname</string>
                      </property>
                     </widget>
-                    <widget class="QLineEdit" name="vornameLE"/>
+                    <widget class="QLineEdit" name="vornameLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vorname eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -280,10 +357,84 @@
                     </property>
                     <widget class="QLabel" name="label_12">
                      <property name="text">
-                      <string>Anzahl</string>
+                      <string>Anzahl Plasmid</string>
                      </property>
                     </widget>
-                    <widget class="QLineEdit" name="anzahlLE"/>
+                    <widget class="QLineEdit" name="anzahlPlasmidLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Plasmid eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSplitter" name="splitter_6">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QLabel" name="label_16">
+                     <property name="text">
+                      <string>Anzahl Tubes</string>
+                     </property>
+                    </widget>
+                    <widget class="QLineEdit" name="anzahlTubesLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Tube eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSplitter" name="splitter_7">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QLabel" name="label_18">
+                     <property name="text">
+                      <string>Liste von Plasmid</string>
+                     </property>
+                    </widget>
+                    <widget class="QLineEdit" name="plasmidListEV_LE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Tube eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -296,7 +447,20 @@
                       <string>Datum</string>
                      </property>
                     </widget>
-                    <widget class="QDateTimeEdit" name="datumLE"/>
+                    <widget class="QDateEdit" name="datumLE">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>400</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -382,6 +546,207 @@
                   </item>
                  </layout>
                 </widget>
+               </widget>
+               <widget class="QWidget" name="vorbereitungPlasmidListPage">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <widget class="QWidget" name="layoutWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>751</width>
+                   <height>621</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_11">
+                  <item alignment="Qt::AlignHCenter">
+                   <widget class="QLabel" name="label_17">
+                    <property name="text">
+                     <string>Liste von Tubes für jede Plasmid eingeben</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="plasmidProbeList"/>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <item>
+                     <spacer name="horizontalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item alignment="Qt::AlignBottom">
+                     <widget class="QPushButton" name="vorbereitungPrev_4">
+                      <property name="minimumSize">
+                       <size>
+                        <width>200</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>200</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Zurück</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignBottom">
+                     <widget class="QPushButton" name="vorbereitungWeiter_5">
+                      <property name="minimumSize">
+                       <size>
+                        <width>200</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>200</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Weiter</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+               <widget class="QWidget" name="vorbereitungPage3">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                   <item>
+                    <layout class="QVBoxLayout" name="qrCodesListForExp">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>List of QR Codes</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="Line" name="line">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <item>
+                      <spacer name="horizontalSpacer_3">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item alignment="Qt::AlignBottom">
+                      <widget class="QPushButton" name="vorbereitungPrev_2">
+                       <property name="minimumSize">
+                        <size>
+                         <width>200</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>200</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Zurück</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item alignment="Qt::AlignBottom">
+                      <widget class="QPushButton" name="vorbereitungWeiter_3">
+                       <property name="minimumSize">
+                        <size>
+                         <width>200</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>200</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Weiter</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>12</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
                </widget>
                <widget class="QWidget" name="vorbereitungPage2">
                 <property name="sizePolicy">
@@ -489,77 +854,6 @@
                  </layout>
                 </widget>
                </widget>
-               <widget class="QWidget" name="vorbereitungPage4">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <widget class="QWidget" name="horizontalLayoutWidget_4">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>460</y>
-                   <width>701</width>
-                   <height>41</height>
-                  </rect>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_8">
-                  <item>
-                   <spacer name="horizontalSpacer_5">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="vorbereitungPrev_4">
-                    <property name="minimumSize">
-                     <size>
-                      <width>200</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>200</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Zurück</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="vorbereitungWeiter_5">
-                    <property name="minimumSize">
-                     <size>
-                      <width>200</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>200</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Weiter</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
                <widget class="QWidget" name="vorbereitungPage5">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -630,93 +924,6 @@
                   </item>
                  </layout>
                 </widget>
-               </widget>
-               <widget class="QWidget" name="vorbereitungPage3">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_9">
-                 <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_4">
-                   <item>
-                    <layout class="QVBoxLayout" name="qrCodesListForExp">
-                     <item alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_4">
-                       <property name="text">
-                        <string>List of QR Codes</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="Line" name="line">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_6">
-                     <item>
-                      <spacer name="horizontalSpacer_3">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item alignment="Qt::AlignBottom">
-                      <widget class="QPushButton" name="vorbereitungPrev_2">
-                       <property name="minimumSize">
-                        <size>
-                         <width>200</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>200</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Zurück</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item alignment="Qt::AlignBottom">
-                      <widget class="QPushButton" name="vorbereitungWeiter_3">
-                       <property name="minimumSize">
-                        <size>
-                         <width>200</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>200</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Weiter</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
                </widget>
               </widget>
              </item>
@@ -984,6 +1191,65 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="experimentPreparationPage">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <widget class="QFrame" name="cliPageFrameframe_2">
+           <property name="geometry">
+            <rect>
+             <x>-16</x>
+             <y>0</y>
+             <width>871</width>
+             <height>699</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>800</width>
+             <height>614</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <item>
+             <widget class="QWidget" name="cliOutputArea_2" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetMinimumSize</enum>
+              </property>
+              <item alignment="Qt::AlignBottom">
+               <widget class="QLineEdit" name="inputTextFromCli_2"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="sendBtnInputFromCli_2">
+                <property name="text">
+                 <string>Send</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
          <widget class="QWidget" name="importPage">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1157,7 +1423,7 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>10</x>
