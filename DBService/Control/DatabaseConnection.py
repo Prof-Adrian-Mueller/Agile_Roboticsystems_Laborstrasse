@@ -20,12 +20,69 @@ class DatabaseConnection:
             self.conn.close()
 
     def create_table(self):
+        print("Hello, World!-------------------------------------------------------")
+
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS TubeQrcode (
                 qr_code INTEGER PRIMARY KEY,
                 datum DATE
             )
+    
             ''')
+    def create_plasmid_table(self):
+        print("in create")
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Plasmid (
+                plasmid_nr TEXT PRIMARY KEY,
+                vektor TEXT,
+                "insert" TEXT,
+                sequenz_nr TEXT,
+                name TEXT,
+                datum_maxi DATE,
+                quelle TEXT,
+                konstruktion_datum DATE
+            )
+            ''')         
+    def create_experiment_table(self):
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Experiment (
+                exp_id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255),
+                vorname VARCHAR(255),
+                anz_tubes INT,
+                video_id VARCHAR(255),
+                datum DATE,
+                anz_fehler INT,
+                bemerkung TEXT
+            )
+            ''')
+    def crt_experiment(self):
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Experiment (
+                exp_id INTEGER PRIMARY KEY,
+                name TEXT,
+                vorname TEXT,
+                anz_tubes INTEGER,
+                datum DATE
+            )
+            ''')
+            print("Tabelle 'Experiment' wurde erstellt.")        
+  
 
+    def create_tubes_table(self):
+        print("Erstelle Tabelle 'Tubes'")
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS Tubes (
+                qr_code INTEGER PRIMARY KEY,
+                exp_id INTEGER,
+                plasmid_nr TEXT,
+                FOREIGN KEY (exp_id) REFERENCES Experiment(exp_id),
+                FOREIGN KEY (plasmid_nr) REFERENCES Plasmid(plasmid_nr)
+            )
+            ''')
 

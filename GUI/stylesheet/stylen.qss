@@ -152,48 +152,6 @@ QTableWidget {
     padding-bottom: 10px;
 }
 
-/* QTableWidget::item {
-    padding: 5px;
-    border: none;
-    height: 50px;
-    background-color: blue;
-    min-height: 100px;
-    max-height: 100px;
-}
-
-QTableWidget::item:selected {
-    background-color: none;
-    color: #FFFFFF;
-}
-
-QTableWidget::horizontalHeader {
-    background-color: none;
-    padding: 5px;
-    border: none;
-    height: 50px;
-}
-
-QTableWidget::verticalHeader {
-    background-color: #b81010;
-    padding: 5px;
-    border: none;
-    height: 50px;
-}
-
-QHeaderView::section:horizontal {
-    border: fuchsia;
-    background-color: none;
-    padding: 5px;
-    font-size: 12pt;
-}
-
-QHeaderView::section:vertical {
-    border: none;
-    background-color: aquamarine;
-    padding: 5px;
-    font-size: 12pt;
-} */
-
 #tableWidgetLiveAction {
     background-color: none;
 }
@@ -332,4 +290,35 @@ QWidget#itemRowLiveData QPushButton {
     max-width:25px;
     border-radius:20px;
     margin-left:20px;
+}
+
+QWidget#clioutputwidgetdesign {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    border: 1px solid #666;
+    margin-bottom: 1px;
+    min-height: 20px;
+}
+
+QWidget#clioutputwidgetdesign QLabel {
+    background-color: #000000;
+    color: #FFFFFF;
+    border: none;
+}
+
+QWidget#displayQrCode {
+    border: 1px solid bisque;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+}
+
+QWidget#displayQrCode QPushButtons {
+    max-width: fit-content;
+    min-width: 15px;
+}
+QLabel#qrCodeLabel {
+    font-style: oblique;
+    font-size: medium;
 }

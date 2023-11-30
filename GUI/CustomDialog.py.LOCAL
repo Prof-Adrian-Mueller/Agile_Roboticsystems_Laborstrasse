@@ -47,6 +47,11 @@ class CustomDialog(QDialog):
     sendButtonClicked = pyqtSignal(str)
     def __init__(self, parent=None, max_percentage=0.75):
         super().__init__(parent, Qt.WindowType.FramelessWindowHint)
+        self.setMinimumWidth(600)
+        self.scroll_area = None
+        self.layout = None
+        self.titleBar = None
+        self.row_widgets = None
         self.max_percentage = max_percentage
         self.init_ui()
         
