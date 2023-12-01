@@ -1,6 +1,20 @@
 import pandas as pd
 
 class TubeMetaDatenImporter:
+    """
+    Diese Klasse dient zum Importieren von Metadaten zu Plasmiden aus einer Excel-Datei.
+
+    Der Importer liest die Daten aus der angegebenen Excel-Datei und speichert die Informationen
+    zu verschiedenen Attributen von Plasmiden wie Plasmidnummer, Vektor, Insert, Sequenznummer,
+    Name, Datum der Maxi-Präparation, Quelle und Konstruktionsdatum.
+
+    Die Klasse erwartet, dass die Excel-Datei spezifische Spaltennamen enthält, die den Attributen
+    eines Plasmids entsprechen.
+
+    Methoden:
+    - __init__: Initialisiert den Importer mit dem Pfad zur Excel-Datei.
+    - import_data: Liest die Daten aus der Excel-Datei und speichert sie in entsprechenden Listen.
+    """
     def __init__(self, file_path):
         self.file_path = file_path
         self.plasmid_nr = []
@@ -16,7 +30,7 @@ class TubeMetaDatenImporter:
         # Excel-Datei importieren
         df = pd.read_excel(self.file_path)
 
-        # Überprüfen, ob die benötigten Spalten vorhanden sind
+        # Überprüfe, ob die benötigten Spalten vorhanden sind
         required_columns = ['Plasmid_nr', 'Vektor', 'Insert', 'Sequnez_nr', 'Name', 'Datum_maxi', 'Quelle', 'Konstruktion_datum']
         for column in required_columns:
             if column not in df.columns:

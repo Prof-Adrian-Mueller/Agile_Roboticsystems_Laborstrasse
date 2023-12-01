@@ -4,6 +4,19 @@ from Model.Experiment import Experiment
 
 
 class ExperimentImporter:
+    """
+    Diese Klasse dient zum Importieren von Experimentdaten aus einer Excel-Datei in das Labormanagementsystem.
+
+    Der Importer liest die Daten aus der angegebenen Excel-Datei, erstellt für jede Zeile ein Experiment-Objekt
+    und speichert diese in einer Liste. Anschließend werden die Experimente in die Datenbank eingefügt.
+
+    Die Klasse erwartet, dass die Excel-Datei spezifische Spaltennamen enthält, die den Attributen eines Experiments
+    entsprechen, wie exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler und bemerkung.
+
+    Methoden:
+    - __init__: Initialisiert den Importer mit einem Datenbankadapter und dem Pfad zur Excel-Datei.
+    - import_data: Liest die Daten aus der Excel-Datei, erstellt Experiment-Objekte und fügt sie in die Datenbank ein.
+    """
     def __init__(self, adapter, file_path):
         self.adapter = adapter
         self.file_path = file_path
