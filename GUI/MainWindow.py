@@ -1,22 +1,19 @@
-from multiprocessing import process
-import subprocess
 import sys
-import typing
 import os
+import sys
+
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QSizePolicy, QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout, \
-    QGridLayout, QStackedWidget, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView, \
-    QHeaderView, QScrollArea, QFileDialog
-from PyQt6.QtGui import QPainter, QPen, QIcon, QPixmap, QMouseEvent
-from PyQt6.QtCore import Qt, QSize, QObject, QEvent, QTimer, QThread, QRect, QPoint
-import pandas as pd
+from PyQt6.QtCore import QEvent, QRect
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QSizePolicy, QApplication, QMainWindow, QVBoxLayout, \
+    QFileDialog
+from PyQt6.QtWidgets import QWidget
+
+from DBService.DBUIAdapter import DBUIAdapter
 from GUI.CliInOutWorkerThreadManager import CliInOutWorkerThreadManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
-from GUI.Custom.ArrayOverlay import ArrowOverlay
-from GUI.Custom.CustomTableWidget import CustomTableWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
-from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomWidget import CustomWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.CustomDialog import ContentType, CustomDialog
@@ -24,51 +21,48 @@ from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentVorbereitung import ExperimentVorbereitung
 from GUI.Menu.Settings import Settings
-from GUI.ModalDialogAdapter import ModalDialogAdapter
-
 from GUI.Navigation import Ui_MainWindow
-import GUI.resource_rc
-from PyQt6.QtCore import QProcess
-
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtWidgets import QWidget
 from GUI.ResizeGripWidget import ResizeGripWidget
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
 
 class MainWindow(QMainWindow):
+    """
+    This is the Main Window for all the Graphical User Interface to Work and bind together. Most of the Initializations are stated here.
+    """
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        # UI Mainwindow
+        # UI Mainwindow Configuration
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.homeBtn.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
-        # self.set_expanding_size_policy(self.ui.mainContentWidget)
-        # self.showMaximized()
-        # self.setCentralWidget(self.ui.centralwidget)
-
         self.resizeGrip = ResizeGripWidget(self)
         self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
         self.resizeGrip.show()
+        self.apply_stylesheet()
 
         # self.setGeometry(100, 100, 800, 600)
         self.process = any
 
+        # Database Service Connection Adapter
         self.ui_db = DBUIAdapter()
-        # self.worker.start()
 
         # Custom Titlebar
         title_bar = CustomTitleBar(self)
         self.setMenuWidget(title_bar)
         self.setWindowTitle("Dashboard UI")
-        # Makes the window frameless
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
+        # Save all the contents of the dialog box, before adding anything , it is better idea to remove contents
+        # which are saved here
         self.dialogBoxContents = []
 
-        # drag & drop
+        # drag & drop import concept
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
         self.ui.importAreaDragDrop = DragDropWidget(self.ui.importPage, self.ui_db)
         self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
@@ -81,8 +75,7 @@ class MainWindow(QMainWindow):
         self.dialog.sendButtonClicked.connect(self.send_button_dialog_clicked)
         # self.dialogBox.hideDialog()
 
-        self.apply_stylesheet()
-
+        # Connect all the buttons to its respective button
         self.ui.homeBtn.clicked.connect(
             lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.homePage)))
         self.ui.statistik.clicked.connect(
@@ -103,9 +96,9 @@ class MainWindow(QMainWindow):
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
         self.ui.plasmidMetaDataImport.clicked.connect(self.importPlasmidMetaDaten)
 
-        widgetLiveLayout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
-        customWidget = CustomWidget(self.ui.widgetLive)
-        widgetLiveLayout.addWidget(customWidget)  # Add the custom widget to the layout of widgetLive
+        widget_live_layout = QVBoxLayout(self.ui.widgetLive)  # Add a layout to your existing widget
+        custom_widget = CustomWidget(self.ui.widgetLive)
+        widget_live_layout.addWidget(custom_widget)  # Add the custom widget to the layout of widgetLive
 
         # Cli stdin stdout
         self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
@@ -164,10 +157,16 @@ class MainWindow(QMainWindow):
             child.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     def removeDialogBoxContents(self):
+        """
+        Removes all the Contents of the Dialog Box. It is better to call this method before showing new contents in the Box.
+        """
         if self.dialogBoxContents.count:
             self.dialog.removeItems(self.dialogBoxContents)
 
     def openFileDialog(self, fileType):
+        """
+        Shows a Window File Selector UI Widget to select an Excel File to be imported.
+        """
         fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
         if fileName:
             print(f'Selected file: {fileName}')
@@ -204,6 +203,9 @@ class MainWindow(QMainWindow):
         return super().eventFilter(source, event)
 
     def startEnTProcess(self):
+        """
+        Start the Monitoring App, change button color on the current situation of the Process.
+        """
         # TODO Start monitoring app using python process
 
         if self.ui.startEnTBtn.text() == "Start":
@@ -269,6 +271,9 @@ class MainWindow(QMainWindow):
                 self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
 
     def apply_stylesheet(self):
+        """
+        Load Stylesheet from the file and implement it to the UI.
+        """
         print(os.getcwd())
         if os.path.isfile('GUI/stylesheet/stylen.qss') and os.access('GUI/stylesheet/stylen.qss', os.R_OK):
             print("File exists and is readable")
@@ -294,5 +299,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-
     sys.exit(app.exec())

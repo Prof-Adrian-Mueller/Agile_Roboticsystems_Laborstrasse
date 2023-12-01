@@ -2,9 +2,16 @@ from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtGui import QPainter, QPolygon
 from PyQt6.QtWidgets import QWidget
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
 
 
 class ResizeGripWidget(QWidget):
+    """
+    Resize the Main Window by draging the Traingle on Buttom Right Corner.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.draggable = None
@@ -42,7 +49,7 @@ class ResizeGripWidget(QWidget):
 
             # Update click position
             self.clickPosition = currentPos
-            
+
             # Reposition the triangle
             if self.parent.isMaximized():
                 self.setGeometry(self.parent.width() - 16, self.parent.height() - 16, 16, 16)

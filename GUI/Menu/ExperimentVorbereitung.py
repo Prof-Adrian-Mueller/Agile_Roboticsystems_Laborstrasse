@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -7,20 +6,28 @@ from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
 class ExperimentVorbereitung:
+    """
+    This is an Example comment.
+    """
     sendButtonClicked = pyqtSignal(str)
+
     def __init__(self, ui: Ui_MainWindow, main_window):
         self.ui = ui
         self.main_window = main_window
         self.ui.experimentIdLE.textChanged.connect(self.checkExperimentID)
-
         self.dialog = CustomDialog(self.ui.centralwidget)
 
         # Set the datumLE to current Date
         today = datetime.datetime.today()
         qdate = QDate(today.year, today.month, today.day)
         self.ui.datumLE.setDate(qdate)
-        
 
     def checkExperimentID(self, text):
         print(text)

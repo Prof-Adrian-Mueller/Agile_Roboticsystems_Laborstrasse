@@ -6,8 +6,17 @@ from GUI.Navigation import Ui_MainWindow
 import sys
 import os
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
 
 class CliInOutWorkerThreadManager(QWidget):
+    """
+    Standard Input/Output/Error redirection to GUI.
+    """
+
     def __init__(self, ui_main: Ui_MainWindow):
         super().__init__()
         self.defaultWidget = None
@@ -43,6 +52,9 @@ class CliInOutWorkerThreadManager(QWidget):
         h_layout.addWidget(self.defaultLabel)
 
     def startProcess(self):
+        """
+        Start the monitoring application.
+        """
         if not self.isProcessStarted():
             self.process = QProcess()
             self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
@@ -73,6 +85,9 @@ class CliInOutWorkerThreadManager(QWidget):
             self.ui.inputTextFromCli.clear()
 
     def appendOutput(self, text):
+        """
+        Appends text to CLI Interface on GUI.
+        """
         widget = QWidget()
         widget.setObjectName("clioutputwidgetdesign")
         self.outputLayout.addWidget(widget)
@@ -83,9 +98,15 @@ class CliInOutWorkerThreadManager(QWidget):
         h_layout.addWidget(label)
 
     def normalOutputWritten(self):
+        """
+        Display output text on CLI GUI
+        """
         new_text = self.process.readAllStandardOutput().data().decode().strip()
         self.appendOutput(new_text)
 
     def errorOutputWritten(self):
+        """
+        Display error text on CLI GUI
+        """
         new_text = self.process.readAllStandardError().data().decode().strip()
         self.appendOutput(new_text)

@@ -9,8 +9,16 @@ from PyQt6.QtCore import Qt
 from GUI.Navigation import Ui_MainWindow
 from PyQt6 import sip
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
 
 class DisplayPlasmidTubes(QWidget):
+    """
+    Shows the List of Plasmid and an Input field which accepts Probe Nr as a List in comma Separated Values like 5,6,9.
+    """
     def __init__(self, ui: Ui_MainWindow, main_window):
         super().__init__()
         self.ui = ui
