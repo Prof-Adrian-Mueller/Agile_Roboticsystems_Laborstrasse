@@ -59,30 +59,40 @@ class DatabaseConnection:
                 bemerkung TEXT
             )
             ''')
+      
     def crt_experiment(self):
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS Experiment (
-                exp_id INTEGER PRIMARY KEY,
+                exp_id TEXT PRIMARY KEY,
                 name TEXT,
                 vorname TEXT,
                 anz_tubes INTEGER,
+                anz_plasmid INTEGER,
                 datum DATE
             )
             ''')
-            print("Tabelle 'Experiment' wurde erstellt.")        
-  
-
+            print("Tabelle 'Experiment' wurde erstellt.")
     def create_tubes_table(self):
         print("Erstelle Tabelle 'Tubes'")
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS Tubes (
                 qr_code INTEGER PRIMARY KEY,
-                exp_id INTEGER,
+                probe_nr INTEGER,
+                exp_id TEXT,
                 plasmid_nr TEXT,
                 FOREIGN KEY (exp_id) REFERENCES Experiment(exp_id),
                 FOREIGN KEY (plasmid_nr) REFERENCES Plasmid(plasmid_nr)
             )
             ''')
-
+    def create_laborant_table(self):
+        with self as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS Laborant (
+                    name TEXT,
+                    vorname TEXT,
+                    anz_exp INTEGER
+                )
+            ''')
+            print("Tabelle 'Laborant' wurde erstellt.")
