@@ -1,7 +1,17 @@
 from PyQt6.QtWidgets import QWidget
 from DBService.DBUIAdapter import DBUIAdapter
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
 class DragDropWidget(QWidget):
+    """
+    Drag and Drop Feature, still in Progress.
+    """
+
     def __init__(self, parent=None, db_ui=DBUIAdapter):
         super().__init__(parent)
         self.setAcceptDrops(True)

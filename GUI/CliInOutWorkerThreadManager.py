@@ -6,9 +6,21 @@ from GUI.Navigation import Ui_MainWindow
 import sys
 import os
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
 class CliInOutWorkerThreadManager(QWidget):
+    """
+    Standard Input/Output/Error redirection to GUI.
+    """
+
     def __init__(self, ui_main: Ui_MainWindow):
         super().__init__()
+        self.defaultWidget = None
+        self.defaultLabel = None
         self.ui = ui_main
         self.process = None
         self.layout = QVBoxLayout(self.ui.cliOutputArea)
@@ -26,25 +38,23 @@ class CliInOutWorkerThreadManager(QWidget):
         # Set size policy for text area
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.ui.cliOutputArea.setSizePolicy(self.sizePolicy)
-        
-        self.displayDefault("Process has not been still started.")
-            
-    def displayDefault(self, message):
-        if not self.isProcessStarted():
-            self.defaultWidget = QWidget()
-            self.defaultWidget.setObjectName("clioutputwidgetdesign")
-            self.outputLayout.addWidget(self.defaultWidget)
-            h_layout = QHBoxLayout(self.defaultWidget)
 
-            self.defaultLabel = QLabel(message)
-            self.defaultLabel.setWordWrap(True)
-            h_layout.addWidget(self.defaultLabel)
-        else:
-            self.outputLayout.removeWidget(self.defaultWidget)
-            self.defaultWidget.deleteLater()
-            self.defaultWidget = None
-        
+        self.displayDefault("Process has not been still started.")
+
+    def displayDefault(self, message):
+        self.defaultWidget = QWidget()
+        self.defaultWidget.setObjectName("clioutputwidgetdesign")
+        self.outputLayout.addWidget(self.defaultWidget)
+        h_layout = QHBoxLayout(self.defaultWidget)
+
+        self.defaultLabel = QLabel(message)
+        self.defaultLabel.setWordWrap(True)
+        h_layout.addWidget(self.defaultLabel)
+
     def startProcess(self):
+        """
+        Start the monitoring application.
+        """
         if not self.isProcessStarted():
             self.process = QProcess()
             self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
@@ -56,13 +66,13 @@ class CliInOutWorkerThreadManager(QWidget):
         else:
             self.appendOutput("Process has already been started.")
 
-    
     def stopProcess(self):
         if self.isProcessStarted():
-             self.process.write("exit".encode())
-             
+            self.process.write('exit\n'.encode())
+            self.ui.inputTextFromCli.clear()
+
     def isProcessStarted(self):
-        return self.process is not None and self.process.state() == QProcess.ProcessState.Running
+        return self.process and self.process.state() == QProcess.ProcessState.Running
 
     def send_input(self):
         input_text = self.ui.inputTextFromCli.text() + '\n'
@@ -70,10 +80,14 @@ class CliInOutWorkerThreadManager(QWidget):
             self.process.write(input_text.encode())
             self.ui.inputTextFromCli.clear()  # Clear the input field
         else:
-            self.appendOutput("The subprocess has been already terminated, please start the process in order to send message.")
+            self.appendOutput(
+                "The subprocess has been already terminated, please start the process in order to send message.")
             self.ui.inputTextFromCli.clear()
 
     def appendOutput(self, text):
+        """
+        Appends text to CLI Interface on GUI.
+        """
         widget = QWidget()
         widget.setObjectName("clioutputwidgetdesign")
         self.outputLayout.addWidget(widget)
@@ -84,9 +98,15 @@ class CliInOutWorkerThreadManager(QWidget):
         h_layout.addWidget(label)
 
     def normalOutputWritten(self):
+        """
+        Display output text on CLI GUI
+        """
         new_text = self.process.readAllStandardOutput().data().decode().strip()
         self.appendOutput(new_text)
 
     def errorOutputWritten(self):
+        """
+        Display error text on CLI GUI
+        """
         new_text = self.process.readAllStandardError().data().decode().strip()
         self.appendOutput(new_text)
