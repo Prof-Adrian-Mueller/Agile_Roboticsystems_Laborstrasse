@@ -3,7 +3,16 @@ import sys
 import time
 import threading
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
 class InterprocessCommunication:
+    """
+    Process to be run by GUI. Could Send and Receive Message to GUI.
+    """
     def __init__(self, is_debug=True):
         self.is_debug = is_debug
 
@@ -37,6 +46,7 @@ class InterprocessCommunication:
             from Main.doBot_Steuerung import SteuerungControl
             steuerung = SteuerungControl()
             steuerung.steuerung()
+
 
 if __name__ == "__main__":
     ipc = InterprocessCommunication()

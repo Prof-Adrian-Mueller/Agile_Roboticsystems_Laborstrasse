@@ -1,11 +1,18 @@
 from enum import Enum
-from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QScrollArea, QWidget, QHBoxLayout, QLineEdit
+from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QScrollArea, QWidget, QHBoxLayout, \
+    QLineEdit
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
-import GUI.resource_rc
+import GUI.resource
 from PyQt6 import sip
 
-class CustomTitleBar(QWidget):
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
+class CustomTitleBarForDialogBox(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QHBoxLayout(self)
@@ -22,7 +29,6 @@ class CustomTitleBar(QWidget):
                 font-weight: bold;  # Bold font
             }
         """)
-        
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -39,17 +45,27 @@ class CustomTitleBar(QWidget):
         self._dragging = False
         event.accept()
 
+
 class ContentType(Enum):
     INPUT = 1,
     OUTPUT = 2
 
+
 class CustomDialog(QDialog):
+    """
+    Main Dialog Box to show any Error or Message
+    """
     sendButtonClicked = pyqtSignal(str)
+
     def __init__(self, parent=None, max_percentage=0.75):
         super().__init__(parent, Qt.WindowType.FramelessWindowHint)
+        self.setMinimumWidth(600)
+        self.scroll_area = None
+        self.layout = None
+        self.titleBar = None
+        self.row_widgets = None
         self.max_percentage = max_percentage
         self.init_ui()
-        
 
     def init_ui(self):
         self.layout = QVBoxLayout(self)
@@ -61,11 +77,8 @@ class CustomDialog(QDialog):
         """)
         self.row_widgets = []
         # Custom Title Bar
-        self.titleBar = CustomTitleBar(self)
+        self.titleBar = CustomTitleBarForDialogBox(self)
         self.layout.addWidget(self.titleBar)
-
-        # self.send_button = QPushButton("Send")
-        # self.input_line_edit_data = QLineEdit(self)
 
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -73,7 +86,7 @@ class CustomDialog(QDialog):
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget_contents)
         self.scroll_area.setWidget(self.scroll_area_widget_contents)
         self.scroll_area.setWidgetResizable(True)
-        self.layout.addWidget(self.scroll_area)     
+        self.layout.addWidget(self.scroll_area)
 
         # Close Button
         self.close_button = QPushButton("Close", self)
@@ -84,18 +97,20 @@ class CustomDialog(QDialog):
         self.update_size()
 
         self.lineEditTextChanged = ""
-        
 
     def clear(self):
         for row_widget in self.row_widgets:
             for child in row_widget.children():
                 if isinstance(child, QLineEdit) and child is self.input_line_edit:
-                    continue  
+                    continue
 
             self.scroll_area_layout.removeWidget(row_widget)
             row_widget.deleteLater()
 
     def removeItems(self, row_data):
+        """
+        Remove contents of the Dialog Box
+        """
         for row_widget in row_data:
             # Check if the widget is valid and not deleted
             if row_widget is not None and not sip.isdeleted(row_widget):
@@ -108,8 +123,7 @@ class CustomDialog(QDialog):
                 if row_widget in self.row_widgets:
                     self.row_widgets.remove(row_widget)
 
-
-    def addContent(self, content,content_type = ContentType):
+    def addContent(self, content, content_type=ContentType):
         row_widget = QWidget()
         row_box = QHBoxLayout()
         if content_type == ContentType.OUTPUT:
@@ -149,11 +163,11 @@ class CustomDialog(QDialog):
     def emitTextChanged(self, text):
         self.lineEditTextChanged = text
 
-
     def update_size(self):
         self.setFixedWidth(int(self.parent().width() * 0.8))
         self.setMaximumHeight(int(self.parent().height() * 0.8))
-            
+
+
 if __name__ == "__main__":
     import sys
 

@@ -9,12 +9,25 @@ from PyQt6.QtCore import Qt
 from GUI.Navigation import Ui_MainWindow
 
 
+__author__ = 'Ujwal Subedi'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '01/12/2023'
+
+
 class DisplayQRCode(QWidget):
+
     def __init__(self, ui: Ui_MainWindow, main_window):
+        """
+        Generates Image of a QR Code and shows in a Row List View.
+
+        Args:
+            ui: Ui_MainWindow object initialized in main window
+            main_window: Default main window object
+        """
         super().__init__()
         self.ui = ui
         self.main_window = main_window
-
 
         scroll = QScrollArea(self)
         self.ui.qrCodesListForExp.addWidget(scroll)
@@ -25,8 +38,10 @@ class DisplayQRCode(QWidget):
         scroll.setWidget(frame)
         self.outputLayout = QVBoxLayout(frame)
 
-
     def displayQrCode(self, number):
+        """
+        Display generated QR Images and Text to respective Row.
+        """
         pixmap = self.generate_qr_code(number)
         if pixmap is not None:
             layoutField = QLabel()
@@ -34,6 +49,9 @@ class DisplayQRCode(QWidget):
             self.appendOutput(layoutField, number)
 
     def generate_qr_code(self, number):
+        """
+        Generate QR Image and send back for respective
+        """
         # Check if the number is 6 digits
         if len(number) == 6 and number.isdigit():
             # Generate the QR code
@@ -42,7 +60,7 @@ class DisplayQRCode(QWidget):
             # Create the directory if it doesn't exist
             if not os.path.exists("QRCodeImages"):
                 os.makedirs("QRCodeImages")
-                
+
             img.save(f"QRCodeImages/qrcode{number}.png")
             pixmap = QPixmap(f"QRCodeImages/qrcode{number}.png")
             pixmap_resized = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
@@ -51,7 +69,7 @@ class DisplayQRCode(QWidget):
             print("Invalid number. Please enter a 6-digit number.")
             return None
 
-    def appendOutput(self, label: QLabel,qrCodeNr):
+    def appendOutput(self, label: QLabel, qrCodeNr):
         widget = QWidget()
         widget.setObjectName("displayQrCode")
         self.outputLayout.addWidget(widget)
@@ -76,7 +94,3 @@ class DisplayQRCode(QWidget):
         h_layout.addWidget(plasmidNr)
         h_layout.addWidget(speichern)
         h_layout.addWidget(drucken)
-
-
-        
-
