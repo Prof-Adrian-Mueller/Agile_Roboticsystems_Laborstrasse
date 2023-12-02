@@ -3,6 +3,8 @@
 1. [ ] Code Cleanup & Code Comments
 2. [ ] PC Transformer2023 Prio 1
 3. [ ] Relative Folder Structure fix for Labor PC
+4. [ ] Layout View for Experiment, Plasmid, Tubes using Mock Data
+5. [ ] Export of Data , downloadable Excel File
 
 ## Wissam Alamareen
 1. [ ] Return all Experiments of a Labor Assistant using laborant id
