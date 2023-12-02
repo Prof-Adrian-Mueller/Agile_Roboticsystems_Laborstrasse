@@ -1,7 +1,4 @@
-import numpy as np
-import pandas as pd
-
-from GUI.CustomDialog import ContentType, CustomDialog
+from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -12,7 +9,7 @@ __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
 
-class ExperimentVorbereitung:
+class ExperimentPreparation:
     """
     This is an Example comment.
     """
@@ -109,3 +106,15 @@ class ExperimentVorbereitung:
         current_index = self.ui.vorbereitungStackedTab.currentIndex()
         if current_index > 0:
             self.ui.vorbereitungStackedTab.setCurrentIndex(current_index - 1)
+
+    def map_prev_next(self, ui):
+        ui.vorbereitungPrev.clicked.connect(self.prevPage)
+        ui.vorbereitungPrev_2.clicked.connect(self.prevPage)
+        ui.vorbereitungPrev_4.clicked.connect(self.prevPage)
+        ui.vorbereitungPrev_5.clicked.connect(self.prevPage)
+        ui.vorbereitungNext.clicked.connect(
+            lambda: self.nextPageWithControl("CreateExperiment"))
+        ui.vorbereitungWeiter_2.clicked.connect(self.nextPage)
+        ui.vorbereitungWeiter_3.clicked.connect(self.nextPage)
+        ui.vorbereitungWeiter_5.clicked.connect(self.nextPage)
+        ui.vorbereitungWeiter_6.clicked.connect(self.nextPage)
