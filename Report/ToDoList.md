@@ -33,6 +33,7 @@
     - Show all the provided Plasmid Nr as a List 
         -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
 2. [ ] Adding filter to Experiment Creation Form
+3. [ ] Implement Borg Singleton for shared cache
 
 ### Wissam Alamareen
 1. [ ] Check if Experiment Exists

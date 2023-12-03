@@ -622,7 +622,7 @@
                      </widget>
                     </item>
                     <item alignment="Qt::AlignBottom">
-                     <widget class="QPushButton" name="vorbereitungWeiter_5">
+                     <widget class="QPushButton" name="probe_to_plasmid_next">
                       <property name="minimumSize">
                        <size>
                         <width>200</width>
