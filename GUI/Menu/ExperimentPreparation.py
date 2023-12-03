@@ -1,4 +1,6 @@
+from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
+from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -6,14 +8,14 @@ import datetime
 __author__ = 'Ujwal Subedi'
 __date__ = '01/12/2023'
 __version__ = '1.0'
-__last_changed__ = '01/12/2023'
+__last_changed__ = '03/12/2023'
 
 from GUI.Storage.BorgSingleton import ExperimentSingleton
 
 
 class ExperimentPreparation:
     """
-    This is an Example comment.
+    Experiment Preparation window functionalities.
     """
     sendButtonClicked = pyqtSignal(str)
 
@@ -23,6 +25,8 @@ class ExperimentPreparation:
         self.main_window = main_window
         self.ui.experimentIdLE.textChanged.connect(self.checkExperimentID)
         self.dialog = CustomDialog(self.ui.centralwidget)
+        self.ui_database = DBUIAdapter()
+        self.qr_code_generator = DisplayQRCode(self.ui, self.main_window)
 
         # Set the datumLE to current Date
         today = datetime.datetime.today()
@@ -43,25 +47,47 @@ class ExperimentPreparation:
             # TODO: verify if plasmid exists
             print("weiter clicked " + page_data)
             # self.main_window.plasmidTubesList.displayPlasmidTubes("test")
-            # self.nextPage()
-            try:
-                self.experiment_creation(page_data)
-            except Exception as ex:
-                display_msg = "Could not create Experiment.\n"
-                self.main_window.dialogBoxContents.append(
-                    self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
-                self.main_window.dialog.show()
+            self.nextPage()
+            # try:
+            #     self.experiment_creation(page_data)
+            # except Exception as ex:
+            #     display_msg = "Could not create Experiment.\n"
+            #     self.main_window.dialogBoxContents.append(
+            #         self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
+            #     self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
             # TODO: add data to tubes table
             print("AddProbeToPlasmid")
-            if self.check_duplicates(self.experiment_data.plasmid_tubes):
-                display_msg = "Experiment has duplicates, please reenter!"
-            else:
-                display_msg = "No Duplicates!"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.main_window.removeDialogBoxContents()
+            self.nextPage()
+            # if self.check_duplicates(self.experiment_data.plasmid_tubes):
+            #     display_msg = "Experiment has duplicates, please reenter!"
+            #     self.show_message_in_dialog(display_msg)
+            # else:
+            #     display_msg = "All the values look good.\n"
+            #     count_tubes = []
+            #     try:
+            #         for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
+            #             self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
+            #             print(plasmid + " - " + ', '.join(map(str, tubes_list)))
+            #             display_msg += f"Created Tubes successfully for \n{plasmid} : {tubes_list}. \n"
+            #             count_tubes.append(tubes_list)
+            #             print(plasmid + " - " + ', '.join(map(str, self.ui_database.adapter.get_all_tubes())))
+            #
+            #         qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
+            #         for qr_code in qr_codes_list:
+            #             print(qr_code)
+            #
+            #     except Exception as ex:
+            #         display_msg = f"Could not create tubes. \n{ex}"
+            #     self.nextPage()
+            #     self.show_message_in_dialog(display_msg)
+
+    def show_message_in_dialog(self, display_msg):
+        self.main_window.dialogBoxContents.append(
+            self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+        self.main_window.dialog.show()
 
     def prevPage(self):
         print("prev clicked")
@@ -70,10 +96,13 @@ class ExperimentPreparation:
             self.ui.vorbereitungStackedTab.setCurrentIndex(current_index - 1)
 
     def check_duplicates(self, tubes):
+        flat_list = []
         for key, value in tubes.items():
-            if isinstance(value, list) and len(value) != len(set(value)):
-                return True
-        return False
+            if isinstance(value, list):
+                flat_list.extend(value)
+            else:
+                flat_list.append(value)
+        return len(flat_list) != len(set(flat_list))
 
     def experiment_creation(self, page_data):
         print("weiter clicked " + page_data)
@@ -91,49 +120,37 @@ class ExperimentPreparation:
         self.main_window.removeDialogBoxContents()
 
         # Check for empty fields
-        emptyFields = [key for key, value in data.items() if not value]
-        if emptyFields:
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"Eingabe Felder sollen nicht leer sein.", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+        empty_fields = [key for key, value in data.items() if not value]
+        if empty_fields:
+            self.show_message_in_dialog(f"Eingabe Felder sollen nicht leer sein.")
             return
 
         # Check if 'anz_plasmid' and 'anz_tubes' are integers
         if not (data['anz_plasmid'].isdigit() and data['anz_tubes'].isdigit()):
             display_msg = "Anzahl Plasmid und Anzahl Tubes sollen Zahlen sein. Bitte Zahlen eingeben.\n"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.show_message_in_dialog(display_msg)
             return
 
         if int(data['anz_tubes']) % 2 != 0:
             display_msg = "Anzahl Tubes soll eine gerade Zahl sein.\n"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.show_message_in_dialog(display_msg)
             return
 
         if int(data['anz_tubes']) > 32 and int(data['anz_tubes']) > 32:
             display_msg = "Anzahl Tubes oder Anzahl Plasmid sollen nicht größer als 32 sein.\n"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.show_message_in_dialog(display_msg)
             return
 
         # Check if the count of plasmids matches 'anz_plasmid'
         if len(plasmid_list) != int(data['anz_plasmid']):
             display_msg = "Anzahl von Plasmid und Plasmid Liste stimmen nicht zu. \n"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.show_message_in_dialog(display_msg)
             return
 
         # Check if 'anz_plasmid' is not greater than 'anz_tubes'
         if int(data['anz_plasmid']) > int(data['anz_tubes']):
             display_msg = "Anzahl von Plasmid soll größer als Anzahl von Tubes sein.\n"
-            self.main_window.dialogBoxContents.append(
-                self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
-            self.main_window.dialog.show()
+            self.show_message_in_dialog(display_msg)
             return
 
         # If all checks pass, go to the next page

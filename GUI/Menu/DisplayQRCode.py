@@ -1,13 +1,14 @@
 import os
 import qrcode
+from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
+
 from GUI.Navigation import Ui_MainWindow
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QIcon, QPainter, QImage
 from PyQt6.QtCore import QProcess
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QApplication, QSizePolicy, QScrollArea, QFrame
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit
 from PyQt6.QtCore import Qt
 from GUI.Navigation import Ui_MainWindow
-
 
 __author__ = 'Ujwal Subedi'
 __date__ = '01/12/2023'
@@ -28,11 +29,10 @@ class DisplayQRCode(QWidget):
         super().__init__()
         self.ui = ui
         self.main_window = main_window
-
         scroll = QScrollArea(self)
-        self.ui.qrCodesListForExp.addWidget(scroll)
+        self.ui.qr_code_list_content.addWidget(scroll)
         scroll.setWidgetResizable(True)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)  # Disable horizontal scrolling
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         frame = QFrame(scroll)
         scroll.setWidget(frame)
@@ -42,11 +42,11 @@ class DisplayQRCode(QWidget):
         """
         Display generated QR Images and Text to respective Row.
         """
-        pixmap = self.generate_qr_code(number)
+        pixmap, img_location = self.generate_qr_code(number)
         if pixmap is not None:
             layoutField = QLabel()
             layoutField.setPixmap(pixmap)
-            self.appendOutput(layoutField, number)
+            self.appendOutput(layoutField, number, img_location)
 
     def generate_qr_code(self, number):
         """
@@ -60,28 +60,25 @@ class DisplayQRCode(QWidget):
             # Create the directory if it doesn't exist
             if not os.path.exists("QRCodeImages"):
                 os.makedirs("QRCodeImages")
-
-            img.save(f"QRCodeImages/qrcode{number}.png")
+            img_location = f"QRCodeImages/qrcode{number}.png"
+            img.save(img_location)
             pixmap = QPixmap(f"QRCodeImages/qrcode{number}.png")
             pixmap_resized = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
-            return pixmap_resized
+            return pixmap_resized, img_location
         else:
             print("Invalid number. Please enter a 6-digit number.")
             return None
 
-    def appendOutput(self, label: QLabel, qrCodeNr):
+    def appendOutput(self, label: QLabel, qr_code_nr, img_location):
         widget = QWidget()
         widget.setObjectName("displayQrCode")
         self.outputLayout.addWidget(widget)
-        # Create the buttons and line edit
-        speichern = QPushButton("Speichern")
-        drucken = QPushButton("Drucken")
-        plasmidNr = QLineEdit()
-        plasmidNr.setPlaceholderText("Plasmid Nr eingeben")
-        plasmidNr.setFixedWidth(120)
+        drucken, speichern = self.buttons_initialize(img_location)
+        probe_nr_text = QLabel("Probe Nr Placeholder")
+        probe_nr_text.setFixedWidth(120)
         qrCodeLabel = QLabel()
         qrCodeLabel.setObjectName("qrCodeLabel")
-        qrCodeLabel.setText(qrCodeNr)
+        qrCodeLabel.setText(qr_code_nr)
         h_layout = QHBoxLayout(widget)
         qrVerticalBox = QVBoxLayout()
         qrVerticalBox.addWidget(label)
@@ -91,6 +88,69 @@ class DisplayQRCode(QWidget):
         v_widget.setLayout(qrVerticalBox)
         # Add the QWidget to the QHBoxLayout
         h_layout.addWidget(v_widget)
-        h_layout.addWidget(plasmidNr)
+        h_layout.addWidget(probe_nr_text)
         h_layout.addWidget(speichern)
         h_layout.addWidget(drucken)
+
+    def buttons_initialize(self, img_location):
+        # Create the buttons and line edit
+        speichern = QPushButton("")
+        icon1 = QIcon()
+        icon1.addPixmap(QPixmap(":/icons/img/save.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+        speichern.setIcon(icon1)
+        speichern.setObjectName("functional_buttons")
+        speichern.setFixedHeight(30)
+        speichern.setFixedWidth(30)
+        speichern.clicked.connect(lambda: self.save_qr_image_as_pdf(img_location))
+
+        icon2 = QIcon()
+        drucken = QPushButton("")
+        icon2.addPixmap(QPixmap(":/icons/img/print.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+        drucken.setIcon(icon2)
+        drucken.setObjectName("functional_buttons")
+        drucken.setFixedHeight(30)
+        drucken.setFixedWidth(30)
+        drucken.clicked.connect(lambda: self.print_qr_image(img_location))
+        return drucken, speichern
+
+    def print_qr_image(self, img_location):
+        try:
+            # Create a QPrinter object
+            printer = QPrinter()
+
+            # Load the image file
+            image = QImage()
+            image.load(img_location)
+
+            # Create a QPainter object
+            painter = QPainter()
+
+            # Begin painting onto the printer
+            painter.begin(printer)
+
+            # Draw the image onto the printer
+            painter.drawImage(0, 0, image)
+
+            # End painting
+            painter.end()
+        except Exception as ex:
+            print(ex)
+
+    def save_qr_image_as_pdf(self, pixmap):
+        # Create a QPrinter object
+        printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+
+        # Create a QPainter object and begin painting on the printer
+        painter = QPainter(printer)
+
+        # Draw the QPixmap on the printer
+        rect = painter.viewport()
+        size = pixmap.size()
+        size.scale(rect.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        painter.setViewport(rect.x(), rect.y(), size.width(), size.height())
+        painter.setWindow(pixmap.rect())
+        painter.drawPixmap(0, 0, pixmap)
+
+        # End painting
+        painter.end()
+        # os.system(f"lp -o fit-to-page {file_path}")

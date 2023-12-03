@@ -322,3 +322,10 @@ QLabel#qrCodeLabel {
     font-style: oblique;
     font-size: medium;
 }
+
+#functional_buttons {
+    /* max-width: 30;
+    max-height: 30;
+    min-height: 30;
+    min-height: 30; */
+}

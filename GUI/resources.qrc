@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/print.svg</file>
+    <file>img/save.svg</file>
     <file>img/qr-code-scanner.svg</file>
     <file>img/scan-qr-code.svg</file>
     <file>img/command-line.svg</file>
@@ -16,4 +18,5 @@
     <file>img/settings.svg</file>
     <file>img/stream.svg</file>
   </qresource>
+  <qresource prefix="newPrefix"/>
 </RCC>
