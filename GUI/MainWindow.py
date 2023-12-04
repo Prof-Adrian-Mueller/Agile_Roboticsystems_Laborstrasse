@@ -12,7 +12,7 @@ from GUI.CliInOutWorkerThreadManager import CliInOutWorkerThreadManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
-from GUI.Custom.CustomWidget import CustomWidget
+from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.LeftNavigation import LeftNavigation
@@ -20,6 +20,7 @@ from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
 from GUI.Menu.Settings import Settings
+from GUI.Menu.TubeInformation import TubeInformation
 from GUI.Navigation import Ui_MainWindow
 from GUI.ResizeGripWidget import ResizeGripWidget
 
@@ -85,8 +86,8 @@ class MainWindow(QMainWindow):
 
         # Live view widget
         widget_live_layout = QVBoxLayout(self.ui.widgetLive)
-        custom_widget = CustomWidget(self.ui.widgetLive)
-        widget_live_layout.addWidget(custom_widget)
+        self.custom_live_widget = CustomLiveWidget(self.ui.widgetLive)
+        widget_live_layout.addWidget(self.custom_live_widget)
 
         # Cli stdin stdout
         self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
@@ -125,9 +126,18 @@ class MainWindow(QMainWindow):
 
         # Display QR Codes
         qr_code_display = DisplayQRCode(self.ui, self)
-        qr_data = self.ui_db.adapter.get_next_qr_codes(8)
-        for qrElem in qr_data:
-            qr_code_display.displayQrCode(qrElem[0])
+        # qr_data = self.ui_db.adapter.get_next_qr_codes(8)
+        # for qrElem in qr_data:
+        #     qr_code_display.displayQrCode(qrElem[0])
+
+        # Display TubeInformation
+        self.tube_info = TubeInformation(self.ui, self)
+        self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
+
+    def show_message_in_dialog(self, display_msg):
+        self.dialogBoxContents.append(
+            self.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+        self.dialog.show()
 
     def set_expanding_size_policy(self, widget):
         """

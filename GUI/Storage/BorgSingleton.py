@@ -28,6 +28,27 @@ class ExperimentSingleton(BorgSingleton):
         if date is not None:
             self.date = date
 
+    def get_all_tubes(self):
+        """
+        Merge all the tubes into a list.
+        """
+        all_tubes = set()
+        if self.plasmid_tubes is not None:
+            for tubes in self.plasmid_tubes.values():
+                all_tubes.update(tubes)
+        return list(all_tubes)
+
+    def clear_cache(self):
+        """
+        Clear the cache by setting all attributes to None.
+        """
+        self.firstname = None
+        self.lastname = None
+        self.experiment_id = None
+        self.plasmids = None
+        self.plasmid_tubes = None
+        self.date = None
+
     def __str__(self):
         return f'ExperimentSingleton(firstname={self.firstname}, lastname={self.lastname}, experimentId={self.experiment_id}, plasmids={self.plasmids}, tubes={self.plasmid_tubes}, date={self.date})'
 

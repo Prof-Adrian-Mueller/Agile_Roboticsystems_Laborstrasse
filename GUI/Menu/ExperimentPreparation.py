@@ -47,42 +47,42 @@ class ExperimentPreparation:
             # TODO: verify if plasmid exists
             print("weiter clicked " + page_data)
             # self.main_window.plasmidTubesList.displayPlasmidTubes("test")
-            self.nextPage()
-            # try:
-            #     self.experiment_creation(page_data)
-            # except Exception as ex:
-            #     display_msg = "Could not create Experiment.\n"
-            #     self.main_window.dialogBoxContents.append(
-            #         self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
-            #     self.main_window.dialog.show()
+            # self.nextPage()
+            try:
+                self.experiment_creation(page_data)
+            except Exception as ex:
+                display_msg = "Could not create Experiment.\n"
+                self.main_window.dialogBoxContents.append(
+                    self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
+                self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
             # TODO: add data to tubes table
             print("AddProbeToPlasmid")
-            self.main_window.removeDialogBoxContents()
-            self.nextPage()
-            # if self.check_duplicates(self.experiment_data.plasmid_tubes):
-            #     display_msg = "Experiment has duplicates, please reenter!"
-            #     self.show_message_in_dialog(display_msg)
-            # else:
-            #     display_msg = "All the values look good.\n"
-            #     count_tubes = []
-            #     try:
-            #         for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
-            #             self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
-            #             print(plasmid + " - " + ', '.join(map(str, tubes_list)))
-            #             display_msg += f"Created Tubes successfully for \n{plasmid} : {tubes_list}. \n"
-            #             count_tubes.append(tubes_list)
-            #             print(plasmid + " - " + ', '.join(map(str, self.ui_database.adapter.get_all_tubes())))
-            #
-            #         qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
-            #         for qr_code in qr_codes_list:
-            #             print(qr_code)
-            #
-            #     except Exception as ex:
-            #         display_msg = f"Could not create tubes. \n{ex}"
-            #     self.nextPage()
-            #     self.show_message_in_dialog(display_msg)
+            # self.main_window.removeDialogBoxContents()
+            # self.nextPage()
+            if self.check_duplicates(self.experiment_data.plasmid_tubes):
+                display_msg = "Experiment has duplicates, please reenter!"
+                self.show_message_in_dialog(display_msg)
+            else:
+                display_msg = "All the values look good.\n"
+                count_tubes = []
+                try:
+                    for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
+                        self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
+                        print(plasmid + " - " + ', '.join(map(str, tubes_list)))
+                        display_msg += f"Created Tubes successfully for \n{plasmid} : {tubes_list}. \n"
+                        count_tubes.append(tubes_list)
+                        print(plasmid + " - " + ', '.join(map(str, self.ui_database.adapter.get_all_tubes())))
+                        self.main_window.custom_live_widget.display_tubes_data()
+                    # qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
+                    # for qr_code in qr_codes_list:
+                    #     print(qr_code)
+
+                except Exception as ex:
+                    display_msg = f"Could not create tubes. \n{ex}"
+                self.nextPage()
+                self.show_message_in_dialog(display_msg)
 
     def show_message_in_dialog(self, display_msg):
         self.main_window.dialogBoxContents.append(
@@ -105,7 +105,8 @@ class ExperimentPreparation:
         return len(flat_list) != len(set(flat_list))
 
     def experiment_creation(self, page_data):
-        print("weiter clicked " + page_data)
+        # Clear Cache before saving
+        self.experiment_data.clear_cache()
         plasmid_list = [str(plasmid) for plasmid in self.ui.plasmidListEV_LE.text().split(',')]
         data = {
             "exp_id": self.ui.experimentIdLE.text(),

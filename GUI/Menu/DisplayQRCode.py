@@ -2,6 +2,7 @@ import os
 import qrcode
 from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 
+from GUI.Custom.CustomDialog import ContentType
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtGui import QPixmap, QIcon, QPainter, QImage
 from PyQt6.QtCore import QProcess
@@ -70,27 +71,35 @@ class DisplayQRCode(QWidget):
             return None
 
     def appendOutput(self, label: QLabel, qr_code_nr, img_location):
-        widget = QWidget()
-        widget.setObjectName("displayQrCode")
-        self.outputLayout.addWidget(widget)
-        drucken, speichern = self.buttons_initialize(img_location)
-        probe_nr_text = QLabel("Probe Nr Placeholder")
-        probe_nr_text.setFixedWidth(120)
-        qrCodeLabel = QLabel()
-        qrCodeLabel.setObjectName("qrCodeLabel")
-        qrCodeLabel.setText(qr_code_nr)
-        h_layout = QHBoxLayout(widget)
-        qrVerticalBox = QVBoxLayout()
-        qrVerticalBox.addWidget(label)
-        qrVerticalBox.addWidget(qrCodeLabel)
-        # Create a QWidget and set the QVBoxLayout on it
-        v_widget = QWidget()
-        v_widget.setLayout(qrVerticalBox)
-        # Add the QWidget to the QHBoxLayout
-        h_layout.addWidget(v_widget)
-        h_layout.addWidget(probe_nr_text)
-        h_layout.addWidget(speichern)
-        h_layout.addWidget(drucken)
+        try:
+            widget = QWidget()
+            widget.setObjectName("displayQrCode")
+            self.outputLayout.addWidget(widget)
+            drucken, speichern = self.buttons_initialize(img_location)
+            probe_nr_text = QLabel("Probe Nr Placeholder")
+            probe_nr_text.setFixedWidth(120)
+            qrCodeLabel = QLabel()
+            qrCodeLabel.setObjectName("qrCodeLabel")
+            qrCodeLabel.setText(qr_code_nr)
+            h_layout = QHBoxLayout(widget)
+            qrVerticalBox = QVBoxLayout()
+            qrVerticalBox.addWidget(label)
+            qrVerticalBox.addWidget(qrCodeLabel)
+            # Create a QWidget and set the QVBoxLayout on it
+            v_widget = QWidget()
+            v_widget.setLayout(qrVerticalBox)
+            # Add the QWidget to the QHBoxLayout
+            h_layout.addWidget(v_widget)
+            h_layout.addWidget(probe_nr_text)
+            h_layout.addWidget(speichern)
+            h_layout.addWidget(drucken)
+        except Exception as ex:
+            self.show_message_in_dialog(ex)
+
+    def show_message_in_dialog(self, display_msg):
+        self.main_window.dialogBoxContents.append(
+            self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+        self.main_window.dialog.show()
 
     def buttons_initialize(self, img_location):
         # Create the buttons and line edit

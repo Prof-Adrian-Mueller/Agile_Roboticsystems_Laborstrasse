@@ -329,3 +329,46 @@ QLabel#qrCodeLabel {
     min-height: 30;
     min-height: 30; */
 }
+
+#tube_info_table {
+    background: transparent;
+    border-bottom: 1px dashed white;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+#tube_info_table td, tr, th {
+    border-bottom: 1px dashed white;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#tube_info_table QHeaderView::section {
+    border: none;
+}
+
+#tube_info_table QTableCornerButton::section {
+    border: none;
+}
+
+#tube_info_table QTableWidgetItem {
+    border: none;
+}
+
+#more_btn {
+    background-color: #3d3e40;
+    color: #FFFFFF;
+    font-weight: bold;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#more_btn:hover {
+    background-color: #5c5c5e;
+}
+
+#more_btn:pressed {
+    background-color: #201e21;
+}
