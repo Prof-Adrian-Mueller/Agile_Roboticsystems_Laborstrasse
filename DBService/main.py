@@ -11,7 +11,7 @@ ui_db = DBUIAdapter()
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 
 # die Methode erwartet name und nachname von laborant, anzahl der Plasmidnr, anzahl der Tubes und Datum der erstellung des Experiments
-ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+# ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
 # SEITE 2
 # Tubes zu dem Experiment hinzufügen
@@ -29,7 +29,7 @@ ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 #     print(tube)
 
 # Diese methode erwartet exp_id und dann liefert daten von  Expriment zurück
-# print(ui_db.adapter.get_experiment_by_id("max1"))
+print(ui_db.adapter.get_experiment_by_id("max1"))
 
 # Methode insert_tube
 # ui_db.adapter.insert_tube('000006',6,'maxi1','PHB 377')
