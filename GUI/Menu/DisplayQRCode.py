@@ -16,6 +16,8 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
+from GUI.Storage.BorgSingleton import TubesSingleton
+
 
 class DisplayQRCode(QWidget):
 
@@ -30,6 +32,7 @@ class DisplayQRCode(QWidget):
         super().__init__()
         self.ui = ui
         self.main_window = main_window
+        self.tubes_information = TubesSingleton()
         scroll = QScrollArea(self)
         self.ui.qr_code_list_content.addWidget(scroll)
         scroll.setWidgetResizable(True)
@@ -39,15 +42,15 @@ class DisplayQRCode(QWidget):
         scroll.setWidget(frame)
         self.outputLayout = QVBoxLayout(frame)
 
-    def displayQrCode(self, number):
+    def displayQrCode(self, qr_code, tube_nr, plasmid_nr):
         """
         Display generated QR Images and Text to respective Row.
         """
-        pixmap, img_location = self.generate_qr_code(number)
+        pixmap, img_location = self.generate_qr_code(qr_code)
         if pixmap is not None:
-            layoutField = QLabel()
-            layoutField.setPixmap(pixmap)
-            self.appendOutput(layoutField, number, img_location)
+            layout_field = QLabel()
+            layout_field.setPixmap(pixmap)
+            self.appendOutput(layout_field, qr_code, tube_nr, plasmid_nr, img_location)
 
     def generate_qr_code(self, number):
         """
@@ -70,13 +73,13 @@ class DisplayQRCode(QWidget):
             print("Invalid number. Please enter a 6-digit number.")
             return None
 
-    def appendOutput(self, label: QLabel, qr_code_nr, img_location):
+    def appendOutput(self, label: QLabel, qr_code_nr, tube_nr, plasmid_nr, img_location):
         try:
             widget = QWidget()
             widget.setObjectName("displayQrCode")
             self.outputLayout.addWidget(widget)
             drucken, speichern = self.buttons_initialize(img_location)
-            probe_nr_text = QLabel("Probe Nr Placeholder")
+            probe_nr_text = QLabel(str(tube_nr))
             probe_nr_text.setFixedWidth(120)
             qrCodeLabel = QLabel()
             qrCodeLabel.setObjectName("qrCodeLabel")

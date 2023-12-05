@@ -47,7 +47,6 @@ class DisplayPlasmidTubes(QWidget):
                 widget.setParent(None)
                 sip.delete(widget)
 
-
         print(self.experiment_data)
         starting_info_txt = QLabel(
             f"Experiment Id: {self.experiment_data.experiment_id} | {self.experiment_data.firstname}, {self.experiment_data.lastname}")
@@ -65,9 +64,11 @@ class DisplayPlasmidTubes(QWidget):
         widget.setObjectName("displayPlasmidTubes")
         self.outputLayout.addWidget(widget)
         # Create the buttons and line edit
-        plasmid_nr = QLabel(plasmid_nr)
+        plasmid_nr_label = QLabel(plasmid_nr)
         probe_nr_input = QLineEdit()
-        probe_nr_input.editingFinished.connect(lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))
+        print(plasmid_nr)
+        probe_nr_input.editingFinished.connect(
+            lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))
 
         probe_nr_input.setPlaceholderText("Probe Nr eingeben. Bsp : 1,3,4,7")
         # probe_nr_input.setFixedWidth(120)
@@ -77,14 +78,17 @@ class DisplayPlasmidTubes(QWidget):
         v_widget = QWidget()
         # Add the QWidget to the QHBoxLayout
         h_layout.addWidget(v_widget)
-        h_layout.addWidget(plasmid_nr)
+        h_layout.addWidget(plasmid_nr_label)
         h_layout.addWidget(probe_nr_input)
 
     def save_tubes_to_plasmid(self, text, plasmid_nr):
         # add tubes in the borg list for each plasmid
+        print("input probe")
+        print(text)
+        print(plasmid_nr)
         try:
-            self.experiment_data.plasmid_tubes[plasmid_nr.text()] = [int(num) for num in text.split(',')]
-            print(self.experiment_data)
+            self.experiment_data.plasmid_tubes[plasmid_nr] = [int(num) for num in text.split(',')]
+            print(self.experiment_data.plasmid_tubes)
         except Exception as ex:
             self.main_window.dialogBoxContents.append(
                 self.main_window.dialog.addContent(f"Please check the Input. \n{ex}", ContentType.OUTPUT))

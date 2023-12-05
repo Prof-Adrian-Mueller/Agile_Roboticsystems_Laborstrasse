@@ -12,10 +12,6 @@ class TubeInformation(QWidget):
         self.main_window = main_window
         # combo_option_class_type
 
-
-
-
-
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
         if tubeid_input_text:

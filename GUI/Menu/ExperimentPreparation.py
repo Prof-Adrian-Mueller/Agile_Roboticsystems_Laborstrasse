@@ -10,7 +10,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '03/12/2023'
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton
 
 
 class ExperimentPreparation:
@@ -20,9 +20,11 @@ class ExperimentPreparation:
     sendButtonClicked = pyqtSignal(str)
 
     def __init__(self, ui: Ui_MainWindow, main_window):
+        self.tube_information = TubesSingleton()
         self.experiment_data = ExperimentSingleton()
         self.ui = ui
         self.main_window = main_window
+        self.qr_code_display = DisplayQRCode(self.ui, self.main_window)
         self.ui.experimentIdLE.editingFinished.connect(lambda: self.checkExperimentID(self.ui.experimentIdLE.text()))
         self.ui.nameLE.editingFinished.connect(lambda: self.create_experiment_id(self.ui.nameLE.text()))
         self.dialog = CustomDialog(self.ui.centralwidget)
@@ -82,7 +84,9 @@ class ExperimentPreparation:
         elif page_data == 'AddProbeToPlasmid':
             # TODO: add data to tubes table
             print("AddProbeToPlasmid")
-            # self.main_window.removeDialogBoxContents()
+            self.tube_information.clear_cache()
+            self.main_window.removeDialogBoxContents()
+
             # self.nextPage()
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
                 display_msg = "Experiment has duplicates, please reenter!"
@@ -94,10 +98,19 @@ class ExperimentPreparation:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
                         self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
                         print(plasmid + " - " + ', '.join(map(str, tubes_list)))
-                        display_msg += f"Created Tubes successfully for \n{plasmid} : {tubes_list}. \n"
+                        display_msg += f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
                         count_tubes.append(tubes_list)
-                        print(plasmid + " - " + ', '.join(map(str, self.ui_database.adapter.get_all_tubes())))
-                        self.main_window.custom_live_widget.display_tubes_data()
+
+                    tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
+                    probe_list = []
+                    for tube in tube_info_data:
+                        self.tube_information.add_tube(tube['probe_nr'], tube['qr_code'],
+                                                       tube['plasmid_nr'])
+                        probe_list.append(tube['qr_code'])
+                    print(self.tube_information)
+                    self.main_window.display_qr_from_main(probe_list)
+                    # TODO layout anpassen
+                    self.main_window.custom_live_widget.display_tubes_data()
                     # qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
                     # for qr_code in qr_codes_list:
                     #     print(qr_code)
@@ -128,9 +141,10 @@ class ExperimentPreparation:
         return len(flat_list) != len(set(flat_list))
 
     def experiment_creation(self, page_data):
-        # Clear Cache before saving
         global exp_data
+        # Clear Cache before saving
         self.experiment_data.clear_cache()
+
         plasmid_list = [str(plasmid) for plasmid in self.ui.plasmidListEV_LE.text().split(',')]
         # If all checks pass, go to the next page
         # Create empty list for each plasmid and saving in dict
@@ -205,7 +219,8 @@ class ExperimentPreparation:
                 self.ui.experimentIdLE.setText(str(exp_data))
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
-                                                           plasmid_tubes=data['anz_tubes'], date=data['date'])
+                                                           date=data['date'])
+
             else:
                 print(f"{exp_id_data} is not None")
                 print(exp_id_data)
@@ -215,9 +230,10 @@ class ExperimentPreparation:
                 self.ui.experimentIdLE.setText(str(exp_data))
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
-                                                           plasmid_tubes=data['anz_tubes'], date=data['date'])
+                                                           date=data['date'])
 
             print(self.experiment_data)
+            print(self.tube_information)
         except Exception as ex:
             print(f"An error occurred: {ex}")
 

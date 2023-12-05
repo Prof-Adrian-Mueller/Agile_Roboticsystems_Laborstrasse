@@ -27,6 +27,8 @@ class ExperimentSingleton(BorgSingleton):
             self.plasmid_tubes = plasmid_tubes
         if date is not None:
             self.date = date
+        if not hasattr(self, 'plasmid_tubes') or self.plasmid_tubes is None:
+            self.plasmid_tubes = {}
 
     def get_all_tubes(self):
         """
@@ -46,11 +48,25 @@ class ExperimentSingleton(BorgSingleton):
         self.lastname = None
         self.experiment_id = None
         self.plasmids = None
-        self.plasmid_tubes = None
+        self.plasmid_tubes = {}
         self.date = None
 
     def __str__(self):
         return f'ExperimentSingleton(firstname={self.firstname}, lastname={self.lastname}, experimentId={self.experiment_id}, plasmids={self.plasmids}, tubes={self.plasmid_tubes}, date={self.date})'
+
+
+class Tube(BorgSingleton):
+    """
+        Class to store Tube Data in Application Runtime
+    """
+
+    def __init__(self, qr_code=None, plasmid_nr=None):
+        BorgSingleton.__init__(self)
+        self.qr_code = qr_code
+        self.plasmid_nr = plasmid_nr
+
+    def __str__(self):
+        return f'Tube(qr_code={self.qr_code}, plasmid_nr={self.plasmid_nr})'
 
 
 class TubesSingleton(BorgSingleton):
@@ -65,7 +81,10 @@ class TubesSingleton(BorgSingleton):
             self.tubes = {}
 
     def add_tube(self, tube, qr_code, plasmid_nr):
-        self.tubes[tube] = {'qr_code': qr_code, 'plasmid_nr': plasmid_nr}
+        self.tubes[tube] = Tube(qr_code, plasmid_nr)
+
+    def clear_cache(self):
+        self.tubes = {}
 
     def __str__(self):
         return f'TubesSingleton(tubes={self.tubes})'

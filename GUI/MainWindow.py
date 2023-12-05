@@ -29,6 +29,8 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
+from GUI.Storage.BorgSingleton import TubesSingleton
+
 
 class MainWindow(QMainWindow):
     """
@@ -124,15 +126,18 @@ class MainWindow(QMainWindow):
         self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
         self.ui.plasmidMetaDataImport.clicked.connect(lambda: self.openFileDialog('plasmid'))
 
-        # Display QR Codes
-        qr_code_display = DisplayQRCode(self.ui, self)
-        # qr_data = self.ui_db.adapter.get_next_qr_codes(8)
-        # for qrElem in qr_data:
-        #     qr_code_display.displayQrCode(qrElem[0])
-
         # Display TubeInformation
         self.tube_info = TubeInformation(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
+
+    def display_qr_from_main(self, qr_code_list):
+        tube_information = TubesSingleton()
+        print("----Main----")
+        qr_code_display = DisplayQRCode(self.ui, self)
+        for tube in tube_information.tubes:
+            print(tube_information.tubes[tube].qr_code)
+            qr_code_display.displayQrCode(tube_information.tubes[tube].qr_code)
+        # Display QR Codes
 
     def show_message_in_dialog(self, display_msg):
         self.dialogBoxContents.append(

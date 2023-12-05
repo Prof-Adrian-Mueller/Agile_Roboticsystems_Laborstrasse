@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
         self.homePage.setSizePolicy(sizePolicy)
         self.homePage.setObjectName("homePage")
         self.tabWidgetHome = QtWidgets.QTabWidget(parent=self.homePage)
-        self.tabWidgetHome.setGeometry(QtCore.QRect(0, 0, 851, 701))
+        self.tabWidgetHome.setGeometry(QtCore.QRect(0, 0, 841, 701))
         self.tabWidgetHome.setTabShape(QtWidgets.QTabWidget.TabShape.Rounded)
         self.tabWidgetHome.setObjectName("tabWidgetHome")
         self.vorbereitungTab = QtWidgets.QWidget()
@@ -684,7 +684,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidgetHome.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

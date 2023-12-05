@@ -10,7 +10,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton
 
 
 class CustomLiveWidget(QWidget):
