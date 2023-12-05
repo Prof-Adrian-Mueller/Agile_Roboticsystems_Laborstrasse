@@ -15,11 +15,11 @@ ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
 # SEITE 2
 # Tubes zu dem Experiment hinzufügen
-probe_nr_list = [1, 2, 3, 4, 5]
+# probe_nr_list = [1, 2, 3, 4, 5]
 # # # probe_nr_list = [6,7]
 # # # #  probe_nr_list2 = [8,9]
 
-ui_db.adapter.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
+# ui_db.adapter.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 
 # SEITE 3
 
@@ -29,7 +29,7 @@ ui_db.adapter.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 #     print(tube)
 
 # Diese methode erwartet exp_id und dann liefert daten von  Expriment zurück
-print(ui_db.adapter.get_experiment_by_id("max1"))
+# print(ui_db.adapter.get_experiment_by_id("max1"))
 
 # Methode insert_tube
 # ui_db.adapter.insert_tube('000006',6,'maxi1','PHB 377')

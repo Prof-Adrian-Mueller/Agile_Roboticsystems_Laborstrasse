@@ -143,3 +143,10 @@ DBService/DefaultTemplate/.~lock.Experiment.xlsx\#
 .idea/inspectionProfiles/Project_Default.xml
 .idea/misc.xml
 .idea/vcs.xml
+/.idea/.gitignore
+/.idea/Agile_Roboticsystems_Laborstrasse.iml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/laborstreet_management

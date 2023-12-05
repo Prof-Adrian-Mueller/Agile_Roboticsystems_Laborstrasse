@@ -46,16 +46,48 @@ class DatabaseAdapter:
                 tubes_list.append(tube_dict)
 
             return tubes_list
+        
+    def get_tubes_by_exp_id(self, exp_id):
+        with self.db as conn:
+            # SQL-Abfrage, um alle Tubes für die gegebene Experiment-ID zu holen
+            cursor = conn.execute("SELECT * FROM Tubes WHERE exp_id = ?", (exp_id,))
+            tubes = cursor.fetchall()
+
+            # Konvertieren Sie die Ergebnisse in eine Liste von Dictionaries
+            tubes_list = []
+            for tube in tubes:
+                formatted_qr_code = f"{tube[0]:06d}"  # Fügt führende Nullen hinzu, um eine Länge von 6 zu erreichen
+
+                tube_dict = {
+                    'qr_code': formatted_qr_code,
+                    'probe_nr': tube[1],
+                    'exp_id': tube[2],
+                    'plasmid_nr': tube[3]
+                }
+                tubes_list.append(tube_dict)
+
+            return tubes_list
+        
 
     def drop_table_tube_qrcode(self):
         with self.db as conn:
             # Löschen der Tabelle TubeQrcode
             conn.execute("DROP TABLE IF EXISTS TubeQrcode")
 
-    def insert_data(self, tubeQrcode):
+    def insert_data(self, tubeQrcode):  
         with self.db as conn:
             conn.execute("INSERT INTO TubeQrcode (qr_code, datum) VALUES (?, ?)",
                          (tubeQrcode.qr_code, tubeQrcode.datum))
+
+    def get_last_qr_code(self):
+        if not self.does_table_exist("TubeQrcode"):
+            print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
+            self.db.create_table()
+        else:
+            print("Tabelle 'TubeQrcode' existiert bereits.")
+        with self.db as conn:
+            row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
+            return int(row[0]) if row[0] else 0
 
     def get_last_qr_code(self):
         if not self.does_table_exist("TubeQrcode"):
@@ -120,6 +152,7 @@ class DatabaseAdapter:
             konstruktion_datum))
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum):
+        self.add_laborant(name,vorname)
         exp_anzahl = self.get_experiment_count_for_laborant(name)
         if exp_anzahl is not None:
             print("Experiments_anzahl: " + str(exp_anzahl))
@@ -130,7 +163,8 @@ class DatabaseAdapter:
 
         if not self.does_table_exist("Experiment"):
             print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
-            self.db.crt_experiment()
+            # self.db.crt_experiment()
+            self.db.create_experiment_table()
 
         with self.db as conn:
             cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (exp_id,))
@@ -292,17 +326,14 @@ class DatabaseAdapter:
                     UPDATE Experiment
                     SET name = ?, vorname = ?, anz_tubes = ?, video_id = ?, datum = ?, anz_fehler = ?, bemerkung = ?
                     WHERE exp_id = ?
-                ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str,
-                      experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
+                ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
             else:
                 # ein neues Experiment einfügen
                 conn.execute('''
                     INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler, bemerkung)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str,
-                experiment.anz_fehler, experiment.bemerkung))
-
+                ''', (experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung))
+   
     def delete_all_experiments(self):
         with self.db as conn:
             # alle Einträge in der Tabelle Experiment löschen
