@@ -1236,7 +1236,7 @@
                   <enum>QLayout::SetMinimumSize</enum>
                  </property>
                  <item>
-                  <widget class="QComboBox" name="comboBox">
+                  <widget class="QComboBox" name="combo_option_class_type">
                    <property name="minimumSize">
                     <size>
                      <width>100</width>

@@ -13,14 +13,14 @@ class ExperimentSingleton(BorgSingleton):
     Singleton Class to store Experiment Data in Application Runtime
     """
 
-    def __init__(self, firstname=None, lastname=None, experiment_id=None, plasmids=None, plasmid_tubes=None, date=None):
+    def __init__(self, firstname=None, lastname=None, exp_id=None, plasmids=None, plasmid_tubes=None, date=None):
         BorgSingleton.__init__(self)
         if firstname is not None:
             self.firstname = firstname
         if lastname is not None:
             self.lastname = lastname
-        if experiment_id is not None:
-            self.experiment_id = experiment_id
+        if exp_id is not None:
+            self.experiment_id = exp_id
         if plasmids is not None:
             self.plasmids = plasmids
         if plasmid_tubes is not None:

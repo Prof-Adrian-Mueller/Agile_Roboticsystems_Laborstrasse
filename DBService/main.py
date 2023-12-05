@@ -2,7 +2,7 @@
 import pandas as pd
 from sqlite3 import Date
 from Control.ExcelImporter import ExcelImporter
-from DBUIAdapter import DBUIAdapter
+from DBService.DBUIAdapter import DBUIAdapter
   
 
 
@@ -11,7 +11,7 @@ ui_db = DBUIAdapter()
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 
 # die Methode erwartet name und nachname von laborant, anzahl der Plasmidnr, anzahl der Tubes und Datum der erstellung des Experiments
-# ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
 # SEITE 2
 # Tubes zu dem Experiment hinzufügen

@@ -151,7 +151,7 @@ class DatabaseAdapter:
             plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
             konstruktion_datum))
 
-    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum):
+    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
         self.add_laborant(name,vorname)
         exp_anzahl = self.get_experiment_count_for_laborant(name)
         if exp_anzahl is not None:
@@ -159,7 +159,10 @@ class DatabaseAdapter:
         else:
             print("Kein Laborant mit dem Namen " + name + " gefunden.")
 
-        exp_id = f"{name}{exp_anzahl + 1}"
+        if not exp_id_param:
+            exp_id = f"{name}{exp_anzahl + 1}"
+        else:
+            exp_id = exp_id_param
 
         if not self.does_table_exist("Experiment"):
             print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
@@ -191,6 +194,7 @@ class DatabaseAdapter:
                     WHERE name = ?
                 ''', (name,))
                 print(f"Experimentanzahl für Laborant {name} wurde um 1 erhöht.")
+        return exp_id
 
     def get_experiment_count_for_laborant(self, name):
         with self.db as conn:

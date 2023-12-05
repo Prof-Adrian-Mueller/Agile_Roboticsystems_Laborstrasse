@@ -10,6 +10,7 @@ class TubeInformation(QWidget):
         super().__init__()
         self.ui = ui
         self.main_window = main_window
+        # combo_option_class_type
 
 
 
