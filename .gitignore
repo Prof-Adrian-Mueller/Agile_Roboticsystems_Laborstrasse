@@ -132,3 +132,10 @@ Monitoring/logs
 Monitoring/Logs.zip
 .vscode/settings.json
 venv_n/
+/.idea/.gitignore
+/.idea/Agile_Roboticsystems_Laborstrasse.iml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/laborstreet_management
