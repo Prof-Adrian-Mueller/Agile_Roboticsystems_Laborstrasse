@@ -566,6 +566,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
         self.comboBox = QtWidgets.QComboBox(parent=self.cliOutputArea_2)
+        self.comboBox.setMinimumSize(QtCore.QSize(100, 0))
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.comboBox.addItem("")

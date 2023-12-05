@@ -23,7 +23,7 @@ class ExperimentPreparation:
         self.experiment_data = ExperimentSingleton()
         self.ui = ui
         self.main_window = main_window
-        self.ui.experimentIdLE.textChanged.connect(self.checkExperimentID)
+        self.ui.experimentIdLE.editingFinished.connect(lambda: self.checkExperimentID(self.ui.experimentIdLE.text()))
         self.dialog = CustomDialog(self.ui.centralwidget)
         self.ui_database = DBUIAdapter()
         self.qr_code_generator = DisplayQRCode(self.ui, self.main_window)
