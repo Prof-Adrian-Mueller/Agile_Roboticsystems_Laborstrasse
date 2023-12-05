@@ -5,6 +5,7 @@
 3. [ ] Relative Folder Structure fix for Labor PC
 4. [ ] Layout View for Experiment, Plasmid, Tubes using Mock Data
 5. [ ] Export of Data , downloadable Excel File
+6. [ ] update README 
 
 ## Wissam Alamareen
 1. [ ] Return all Experiments of a Labor Assistant using laborant id

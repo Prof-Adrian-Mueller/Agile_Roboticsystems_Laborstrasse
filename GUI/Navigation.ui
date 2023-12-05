@@ -1236,6 +1236,25 @@
                   <enum>QLayout::SetMinimumSize</enum>
                  </property>
                  <item>
+                  <widget class="QComboBox" name="comboBox">
+                   <item>
+                    <property name="text">
+                     <string>Experiment</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Tube</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Plasmid</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QLineEdit" name="tube_info_tubeid_input"/>
                  </item>
                  <item>

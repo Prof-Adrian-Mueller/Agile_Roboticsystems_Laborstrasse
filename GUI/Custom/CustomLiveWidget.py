@@ -33,6 +33,7 @@ class CustomLiveWidget(QWidget):
         scroll.setWidget(frame)
 
         self.layout = QVBoxLayout(frame)
+        self.design_layout(self.layout, 1)
 
     def display_tubes_data(self):
         print('-------\n' + str(self.experiment_data))
@@ -52,10 +53,18 @@ class CustomLiveWidget(QWidget):
         buttons = [QPushButton(f'{j + 1}') for j in range(3)]
         for button in buttons:
             h_layout.addWidget(button)
-        if len(buttons) > 1:
-            arrow = ArrowWidget(buttons[0], buttons[1])
-            arrow.setStyleSheet("margin:10px;background-color:#FF0000;")
-            h_layout.addWidget(arrow)
+            arrow_right_label = QLabel()
+            pixmap = QPixmap(":/icons/img/arrow-right.svg")
+            scaled_pixmap = pixmap.scaled(150, 20, Qt.AspectRatioMode.KeepAspectRatio)
+            arrow_right_label.setPixmap(scaled_pixmap)
+            h_layout.addWidget(arrow_right_label)
+
+            arrow_left_label = QLabel()
+            pixmap = QPixmap(":/icons/img/arrow-left.svg")
+            scaled_pixmap = pixmap.scaled(150, 20, Qt.AspectRatioMode.KeepAspectRatio)
+            arrow_left_label.setPixmap(scaled_pixmap)
+            h_layout.addWidget(arrow_left_label)
+
         more_btn = QPushButton(" > ")
         more_btn.setObjectName("more_btn")
         more_btn.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)

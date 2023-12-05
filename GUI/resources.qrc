@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/arrow-left.svg</file>
     <file>img/print.svg</file>
     <file>img/save.svg</file>
     <file>img/qr-code-scanner.svg</file>
