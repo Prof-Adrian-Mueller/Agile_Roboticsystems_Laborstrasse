@@ -42,7 +42,7 @@ class DisplayQRCode(QWidget):
         scroll.setWidget(frame)
         self.outputLayout = QVBoxLayout(frame)
 
-    def displayQrCode(self, qr_code, tube_nr, plasmid_nr):
+    def displayQrCode(self, qr_code):
         """
         Display generated QR Images and Text to respective Row.
         """
@@ -50,7 +50,7 @@ class DisplayQRCode(QWidget):
         if pixmap is not None:
             layout_field = QLabel()
             layout_field.setPixmap(pixmap)
-            self.appendOutput(layout_field, qr_code, tube_nr, plasmid_nr, img_location)
+            self.appendOutput(layout_field, qr_code, "tube_nr", "plasmid_nr", img_location)
 
     def generate_qr_code(self, number):
         """

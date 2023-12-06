@@ -134,9 +134,9 @@ class MainWindow(QMainWindow):
         tube_information = TubesSingleton()
         print("----Main----")
         qr_code_display = DisplayQRCode(self.ui, self)
-        for tube in tube_information.tubes:
-            print(tube_information.tubes[tube].qr_code)
-            qr_code_display.displayQrCode(tube_information.tubes[tube].qr_code)
+        for tube in qr_code_list:
+            # print(tube_information.tubes[tube].qr_code)
+            qr_code_display.displayQrCode(tube)
         # Display QR Codes
 
     def show_message_in_dialog(self, display_msg):
