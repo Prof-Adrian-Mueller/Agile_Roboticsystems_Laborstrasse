@@ -96,4 +96,4 @@ class DatabaseConnection:
                     anz_exp INTEGER
                 )
             ''')
-            print("Tabelle 'Laborant' wurde erstellt.")
+            # print("Tabelle 'Laborant' wurde erstellt.")

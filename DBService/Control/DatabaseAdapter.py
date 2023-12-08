@@ -117,11 +117,11 @@ class DatabaseAdapter:
 
     def insert_plasmid(self, plasmid):
      # Überprüfen, ob die Tabelle existiert
-        if not self.does_table_exist("Plasmid"):
-            print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
-            self.db.create_plasmid_table()
-        else:
-            print("Tabelle 'Plasmid' existiert bereits.")
+        # if not self.does_table_exist("Plasmid"):
+        #     print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
+        #     self.db.create_plasmid_table()
+        # else:
+        #     print("Tabelle 'Plasmid' existiert bereits.")
 
         with self.db as conn:
             # Überprüfen und konvertieren Sie den Datentyp von plasmid.name
@@ -220,6 +220,7 @@ class DatabaseAdapter:
 
     def add_laborant(self, name, vorname):
                 experimentsanzahl=0
+
                 # Überprüfen, ob die Tabelle existiert
                 if not self.does_table_exist("Laborant"):
                     print("Tabelle 'Laborant' existiert nicht. Sie wird erstellt.")
@@ -343,7 +344,7 @@ class DatabaseAdapter:
             # Optional: Konvertiere die Ergebnisse in eine Liste von Experiment-Objekten
             experiment_list = []
             for exp in experiments:
-                experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3], video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
+                experiment_obj = Experimente(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3], video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
                 experiment_list.append(experiment_obj)
 
             return experiment_list

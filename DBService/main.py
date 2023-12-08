@@ -2,12 +2,59 @@
 import pandas as pd
 from sqlite3 import Date
 from Control.ExcelImporter import ExcelImporter
+from Control.TubeAdapter import TubeAdapter
+from Control.DatabaseConnection import DatabaseConnection
+from Control.LaborantAdapter import LaborantAdapter
+from Control.MetaAdapter import MetaAdapter
 from DBUIAdapter import DBUIAdapter
+from  Control.ExperimentAdapter import ExperimentAdapter
   
 
 
 
 ui_db = DBUIAdapter()
+
+ex_adapter=ExperimentAdapter()
+tube_adapter=TubeAdapter()
+
+# ex_adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+# probe_nr_list = [1, 2, 3, 4, 5]
+# tube_adapter.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
+
+
+# tubes_for_exp=tube_adapter.get_tubes_by_exp_id("max1")
+# for tube in tubes_for_exp:
+#     print(tube)
+
+
+# tubes_for_exp=tube_adapter.get_tubes()
+# for tube in tubes_for_exp:
+#     print(tube)
+
+# print(ex_adapter.get_experiment_by_id("max2"))
+
+# all_experiments = ex_adapter.get_all_experiments()
+#     # Verarbeiten oder anzeigen Sie die Experimente
+# for experiment in all_experiments:
+#         print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
+
+# ex_adapter.delete_all_experiment()
+
+
+# insert metadaten----------------------------------------------------------------------
+meta_adapter=MetaAdapter()
+# meta_adapter.insert_metadaten()
+# meta_adapter.select_all_from_plasmid()
+# meta_adapter.delete_plasmid("PHB 371 ")
+
+# völlständige Daten eines Experiments
+tubes_data=ex_adapter.get_tubes_data_for_experiment("max1")
+for tube_data in tubes_data:
+    print(tube_data)
+    print()  
+
+
+
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 
 # die Methode erwartet name und nachname von laborant, anzahl der Plasmidnr, anzahl der Tubes und Datum der erstellung des Experiments
@@ -29,7 +76,7 @@ ui_db = DBUIAdapter()
 #     print(tube)
 
 # Diese methode erwartet exp_id und dann liefert daten von  Expriment zurück
-print(ui_db.adapter.get_experiment_by_id("max1"))
+# print(ui_db.adapter.get_experiment_by_id("max1"))
 
 # Methode insert_tube
 # ui_db.adapter.insert_tube('000006',6,'maxi1','PHB 377')
@@ -102,6 +149,7 @@ print(ui_db.adapter.get_experiment_by_id("max1"))
 
 # ui_db.insert_metadaten()
 # ui_db.adapter.select_all_from_plasmid()
+
 
 # +++++++++++++++++++++++++++++++++
 
