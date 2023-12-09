@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/flask.svg</file>
     <file>img/arrow-left.svg</file>
     <file>img/print.svg</file>
     <file>img/save.svg</file>

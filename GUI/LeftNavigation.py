@@ -21,3 +21,4 @@ class LeftNavigation:
             lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.cliPage)))
         self.ui.experimentPreparationBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(
             self.ui.stackedWidget.indexOf(self.ui.experimentPreparationPage)))
+        self.ui.experiment_info_btn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.experiment_info_view)))

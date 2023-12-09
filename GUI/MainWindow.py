@@ -4,7 +4,7 @@ import sys
 from PyQt6 import QtCore
 from PyQt6.QtCore import QEvent, QRect
 from PyQt6.QtWidgets import QSizePolicy, QApplication, QMainWindow, QVBoxLayout, \
-    QFileDialog
+    QFileDialog, QStackedLayout
 from PyQt6.QtWidgets import QWidget
 
 from DBService.DBUIAdapter import DBUIAdapter
@@ -30,6 +30,7 @@ __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
 from GUI.Storage.BorgSingleton import TubesSingleton
+from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
 
 
 class MainWindow(QMainWindow):
@@ -78,6 +79,11 @@ class MainWindow(QMainWindow):
         self.dialog = CustomDialog(self)
         self.dialog.sendButtonClicked.connect(self.send_button_dialog_clicked)
         # self.dialogBox.hideDialog()
+
+        # Experiment Table with Tubes view
+        # expViewTest = ExperimentDashboard(self.ui.experiment_info_view)
+        # expViewTest.experiment_selected.connect(lambda data: print(f"Experiment selected: {data}"))
+        self.setupExperimentView()
 
         left_navigation = LeftNavigation(self.ui)
         left_navigation.map_buttons_to_pages()
@@ -129,6 +135,32 @@ class MainWindow(QMainWindow):
         # Display TubeInformation
         self.tube_info = TubeInformation(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
+
+    def setupExperimentView(self):
+        try:
+            main_layout = QVBoxLayout(self.ui.experiment_info_view)
+            stacked_layout = QStackedLayout()  # Create a stacked layout
+
+            # Create the dashboard and details widgets
+            dashboard = ExperimentTubesInfoDashboard()
+            details = ExperimentTubesDetails()
+
+            # Add widgets to the stacked layout
+            stacked_layout.addWidget(dashboard)
+            stacked_layout.addWidget(details)
+
+            # Connect signals to switch views
+            dashboard.experiment_selected.connect(
+                lambda data: self.show_experiment_details(data, details, stacked_layout))
+            details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
+
+            main_layout.addLayout(stacked_layout)
+        except Exception as ex:
+            print(ex)
+
+    def show_experiment_details(self, data, details_widget, stacked_layout):
+        details_widget.update_details(data)
+        stacked_layout.setCurrentIndex(1)
 
     def display_qr_from_main(self, qr_code_list):
         tube_information = TubesSingleton()

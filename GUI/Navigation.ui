@@ -74,6 +74,20 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="experiment_info_btn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Statistik&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/icons/img/flask.svg</normaloff>:/icons/img/flask.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="statistik">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Statistik&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -193,7 +207,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="homePage">
           <property name="sizePolicy">
@@ -1130,6 +1144,7 @@
            </property>
           </widget>
          </widget>
+         <widget class="QWidget" name="experiment_info_view"/>
          <widget class="QWidget" name="cliPage">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
