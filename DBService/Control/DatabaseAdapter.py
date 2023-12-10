@@ -1,6 +1,6 @@
 from DBService.Model.Experiment import Experiment
 from DBService.Model.Experimente import Experimente
-
+import pandas as pd
 
 class DatabaseAdapter:
     def __init__(self, db):

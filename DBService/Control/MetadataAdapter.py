@@ -9,9 +9,9 @@ from Control.DatabaseConnection import DatabaseConnection
  # TODO
     # get metadaten bei Plasmid_nr
     # zurückgeben=>alle metadaten von Plasmid_nr
-class MetaAdapter:
-    def __init__(self):
-        self.db = DatabaseConnection("laborstreet_management")
+class MetadataAdapter:
+    def __init__(self,db):
+        self.db =db
         self.database_adapter = DatabaseAdapter(self.db)
         self.ensure_tables_exist()
        

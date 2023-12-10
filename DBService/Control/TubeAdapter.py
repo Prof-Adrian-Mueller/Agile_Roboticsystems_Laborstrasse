@@ -5,8 +5,8 @@ from Control.DatabaseConnection import DatabaseConnection
     # zurückgeben=> exp_id plasmidnr,qr_code
 
 class TubeAdapter:
-    def __init__(self):
-        self.db = DatabaseConnection("laborstreet_management")
+    def __init__(self,db):
+        self.db = db
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
            
@@ -74,7 +74,6 @@ class TubeAdapter:
   
 
     def get_tubes(self):
-        print("in")
         with self.db as conn:
             # SQL-Abfrage, um alle Tubes für die gegebene Experiment-ID zu holen
             cursor = conn.execute("SELECT * FROM Tubes")
@@ -93,7 +92,7 @@ class TubeAdapter:
                 }
                 tubes_list.append(tube_dict)
 
-            return tubes_list    
+                return tubes_list    
         
 
 
