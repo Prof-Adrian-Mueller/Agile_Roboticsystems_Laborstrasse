@@ -154,31 +154,6 @@ class ExperimentAdapter:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return []
 
-
-    # def delete_experiment(self, exp_id):
-    #     try:
-    #         with self.db as conn:
-    #             # Überprüfen, ob das Experiment Tubes hat
-    #             cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE exp_id = ?", (exp_id,))
-    #             tube_count = cursor.fetchone()[0]
-
-    #             if tube_count > 0:
-    #                 # Löschen aller Tubes, die mit dem Experiment verknüpft sind
-    #                 conn.execute("DELETE FROM Tubes WHERE exp_id = ?", (exp_id,))
-    #                 print(f"Alle Tubes für Experiment-ID {exp_id} wurden gelöscht.")
-    #             else:
-    #                 print(f"Keine Tubes für Experiment-ID {exp_id} gefunden.")
-
-    #             # Löschen des Experiments
-    #             conn.execute("DELETE FROM Experiment WHERE exp_id = ?", (exp_id,))
-    #             print(f"Experiment mit ID {exp_id} wurde gelöscht.")
-
-    #     except Exception as e:
-    #         print(f"Ein Fehler ist aufgetreten: {e}")
-
-
-
-
     def delete_experiment(self, exp_id):
         try:
             with self.db as conn:

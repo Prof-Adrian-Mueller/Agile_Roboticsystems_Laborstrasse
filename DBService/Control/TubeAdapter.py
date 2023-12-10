@@ -93,7 +93,37 @@ class TubeAdapter:
                 tubes_list.append(tube_dict)
 
                 return tubes_list    
-        
+
+
+    def get_tube_data_by_probe_nr(self, probe_nr):
+        with self.db as conn:
+            # SQL-Abfrage, um die Daten des Tubes zu holen
+            cursor = conn.execute('''
+                SELECT 
+                    qr_code, 
+                    probe_nr, 
+                    exp_id, 
+                    plasmid_nr
+                FROM Tubes 
+                WHERE probe_nr = ?
+            ''', (probe_nr,))
+            tube_data = cursor.fetchone()
+
+            # Überprüfen, ob Daten gefunden wurden
+            if tube_data:
+                # Formatieren des qr_code
+                formatted_qr_code = f"{tube_data[0]:06d}"
+                # Erstellen eines Dictionary mit den Tube-Daten
+                tube_data_dict = {
+                    'qr_code': formatted_qr_code,
+                    'probe_nr': tube_data[1],
+                    'exp_id': tube_data[2],
+                    'plasmid_nr': tube_data[3]
+                }
+                return tube_data_dict
+            else:
+                print(f"Kein Tube mit Probe-Nr. {probe_nr} gefunden.")
+                return None   
 
 
    
