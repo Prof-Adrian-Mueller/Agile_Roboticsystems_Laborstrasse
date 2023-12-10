@@ -6,8 +6,9 @@ from Model.Experimente import Experimente
 
 
 class ExperimentAdapter:
-    def __init__(self):
-        self.db = DatabaseConnection("laborstreet_management")
+    def __init__(self,db):
+        self.db=db
+        # self.db = DatabaseConnection("laborstreet_management")
         self.database_adapter = DatabaseAdapter(self.db)
         self.ensure_tables_exist()
         self.laborant_adapter=LaborantAdapter(self.db)
@@ -110,43 +111,99 @@ class ExperimentAdapter:
             conn.execute('DELETE FROM Experiment')
             print("Alle Experimente wurden gelöscht.")
 
+
     def get_tubes_data_for_experiment(self, exp_id):
-        with self.db as conn:
-            # SQL-Abfrage, um die Daten zu holen
-            cursor = conn.execute('''
-                SELECT 
-                    t.probe_nr, 
-                    t.qr_code, 
-                    t.plasmid_nr, 
-                    p.vektor, 
-                    p."insert", 
-                    p.name, 
-                    e.vorname, 
-                    e.exp_id, 
-                    e.datum, 
-                    e.anz_fehler
-                FROM Tubes t
-                INNER JOIN Plasmid p ON t.plasmid_nr = p.plasmid_nr
-                INNER JOIN Experiment e ON t.exp_id = e.exp_id
-                WHERE t.exp_id = ?
-            ''', (exp_id,))
-            tubes_data = cursor.fetchall()
+        try:
+            with self.db as conn:
+                cursor = conn.execute('''
+                    SELECT 
+                        t.probe_nr, 
+                        t.qr_code, 
+                        t.plasmid_nr, 
+                        p.vektor, 
+                        p."insert", 
+                        p.name, 
+                        e.vorname, 
+                        e.exp_id, 
+                        e.datum, 
+                        e.anz_fehler
+                    FROM Tubes t
+                    INNER JOIN Plasmid p ON t.plasmid_nr = p.plasmid_nr
+                    INNER JOIN Experiment e ON t.exp_id = e.exp_id
+                    WHERE t.exp_id = ?
+                ''', (exp_id,))
+                tubes_data = cursor.fetchall()
 
-            # Konvertiere die Ergebnisse in eine Liste von Dictionaries
-            tubes_data_list = []
-            for data in tubes_data:
-                tube_data_dict = {
-                    'probe_nr': data[0],
-                    'qr_code': f"{data[1]:06d}",
-                    'plasmid_nr': data[2],
-                    'vektor': data[3],
-                    'insert': data[4],
-                    'name': data[5],
-                    'vorname': data[6],
-                    'exp_id': data[7],
-                    'datum': data[8],
-                    'anz_fehler': data[9]
-                }
-                tubes_data_list.append(tube_data_dict)
+                tubes_data_list = []
+                for data in tubes_data:
+                    tube_data_dict = {
+                        'probe_nr': data[0],
+                        'qr_code': f"{data[1]:06d}",
+                        'plasmid_nr': data[2],
+                        'vektor': data[3],
+                        'insert': data[4],
+                        'name': data[5],
+                        'vorname': data[6],
+                        'exp_id': data[7],
+                        'datum': data[8],
+                        'anz_fehler': data[9]
+                    }
+                    tubes_data_list.append(tube_data_dict)
+                return tubes_data_list
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")
+            return []
 
-            return tubes_data_list        
+
+    # def delete_experiment(self, exp_id):
+    #     try:
+    #         with self.db as conn:
+    #             # Überprüfen, ob das Experiment Tubes hat
+    #             cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE exp_id = ?", (exp_id,))
+    #             tube_count = cursor.fetchone()[0]
+
+    #             if tube_count > 0:
+    #                 # Löschen aller Tubes, die mit dem Experiment verknüpft sind
+    #                 conn.execute("DELETE FROM Tubes WHERE exp_id = ?", (exp_id,))
+    #                 print(f"Alle Tubes für Experiment-ID {exp_id} wurden gelöscht.")
+    #             else:
+    #                 print(f"Keine Tubes für Experiment-ID {exp_id} gefunden.")
+
+    #             # Löschen des Experiments
+    #             conn.execute("DELETE FROM Experiment WHERE exp_id = ?", (exp_id,))
+    #             print(f"Experiment mit ID {exp_id} wurde gelöscht.")
+
+    #     except Exception as e:
+    #         print(f"Ein Fehler ist aufgetreten: {e}")
+
+
+
+
+    def delete_experiment(self, exp_id):
+        try:
+            with self.db as conn:
+                # Überprüfe, ob das Experiment existiert
+                cursor = conn.execute("SELECT COUNT(*) FROM Experiment WHERE exp_id = ?", (exp_id,))
+                experiment_exists = cursor.fetchone()[0] > 0
+
+                if not experiment_exists:
+                    print(f"Kein Experiment mit ID {exp_id} gefunden.")
+                    return
+
+                # Überprüfe, ob das Experiment Tubes hat
+                cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE exp_id = ?", (exp_id,))
+                tube_count = cursor.fetchone()[0]
+
+                if tube_count > 0:
+                    # Löschen aller Tubes, die mit dem Experiment verknüpft sind
+                    conn.execute("DELETE FROM Tubes WHERE exp_id = ?", (exp_id,))
+                    print(f"Alle Tubes für Experiment-ID {exp_id} wurden gelöscht.")
+                else:
+                    print(f"Keine Tubes für Experiment-ID {exp_id} gefunden.")
+
+                # Löschen des Experiments
+                conn.execute("DELETE FROM Experiment WHERE exp_id = ?", (exp_id,))
+                print(f"Experiment mit ID {exp_id} wurde gelöscht.")
+
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")

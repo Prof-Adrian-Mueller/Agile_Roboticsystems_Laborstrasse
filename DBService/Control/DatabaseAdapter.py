@@ -1,5 +1,7 @@
 from Model.Experiment import Experiment
 from Model.Experimente import Experimente
+import pandas as pd
+
 class DatabaseAdapter:
     def __init__(self, db):
         self.db = db
@@ -130,6 +132,7 @@ class DatabaseAdapter:
             # Konvertiert Datumswerte in Strings
             datum_maxi = plasmid.datum_maxi.strftime('%Y-%m-%d') if plasmid.datum_maxi is not None else None
             konstruktion_datum = plasmid.konstruktion_datum.strftime('%Y-%m-%d') if plasmid.konstruktion_datum is not None else None
+            
             
             # Füge das Plasmid in die Datenbank ein
             conn.execute('''
