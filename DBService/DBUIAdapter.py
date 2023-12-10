@@ -1,11 +1,11 @@
-from Control.DatabaseConnection import DatabaseConnection
-from Control.DatabaseAdapter import DatabaseAdapter
-from Control.ExcelImporter import ExcelImporter
-from Control.ExperimentImporter import ExperimentImporter
-from Control.ExperimentAdapter import ExperimentAdapter
-from Control.TubeAdapter import TubeAdapter
-from Control.MetadataAdapter import MetadataAdapter
-from QRGenAdapter import QRGenAdapter
+from DBService.Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.ExcelImporter import ExcelImporter
+from DBService.Control.ExperimentImporter import ExperimentImporter
+from DBService.Control.ExperimentAdapter import ExperimentAdapter
+from DBService.Control.TubeAdapter import TubeAdapter
+from DBService.Control.MetadataAdapter import MetadataAdapter
+from DBService.QRGenAdapter import QRGenAdapter
 import tkinter as tk
 from tkinter import filedialog
 
@@ -35,10 +35,10 @@ class DBUIAdapter:
         return(self.experiment_adapter.get_experiment_by_id(exp_id))
     def get_all_experiments(self):
         return(self.experiment_adapter.get_all_experiments())
-    def insert_metadaten(self):
-        self.metadata_adapter.insert_metadaten()
+    def insert_metadaten(self, file_path):
+        self.metadata_adapter.insert_metadaten(file_path)
     def select_all_from_plasmid(self):
-        self.metadata_adapter.select_all_from_plasmid()   
+        return self.metadata_adapter.select_all_from_plasmid()
 
     def get_tubes_data_for_experiment(self,exp_id):
         return self.experiment_adapter.get_tubes_data_for_experiment(exp_id)

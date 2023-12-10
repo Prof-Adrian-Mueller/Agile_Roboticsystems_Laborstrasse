@@ -1,8 +1,8 @@
-from Control.DatabaseConnection import DatabaseConnection
-from Control.DatabaseAdapter import DatabaseAdapter
-from Control.LaborantAdapter import LaborantAdapter
-from Model.Experiment import Experiment
-from Model.Experimente import Experimente
+from DBService.Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.LaborantAdapter import LaborantAdapter
+from DBService.Model.Experiment import Experiment
+from DBService.Model.Experimente import Experimente
 
 
 class ExperimentAdapter:
@@ -133,7 +133,7 @@ class ExperimentAdapter:
                     WHERE t.exp_id = ?
                 ''', (exp_id,))
                 tubes_data = cursor.fetchall()
-
+                print(tubes_data)
                 tubes_data_list = []
                 for data in tubes_data:
                     tube_data_dict = {
@@ -149,6 +149,7 @@ class ExperimentAdapter:
                         'anz_fehler': data[9]
                     }
                     tubes_data_list.append(tube_data_dict)
+                print(tubes_data_list)
                 return tubes_data_list
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")

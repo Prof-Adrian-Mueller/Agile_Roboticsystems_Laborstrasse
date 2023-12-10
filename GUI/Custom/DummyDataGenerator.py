@@ -65,4 +65,3 @@ class DummyDataGenerator:
 generator = DummyDataGenerator()
 generator.generate_random_entries_experiment(15)
 df = generator.to_dataframe_experiment()
-print(df)

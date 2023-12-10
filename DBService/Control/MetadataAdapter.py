@@ -1,9 +1,9 @@
 
 import tkinter as tk
 from tkinter import filedialog
-from Control.ExcelImporter import ExcelImporter
-from Control.DatabaseAdapter import DatabaseAdapter
-from Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.ExcelImporter import ExcelImporter
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.DatabaseConnection import DatabaseConnection
 
 
  # TODO
@@ -24,8 +24,8 @@ class MetadataAdapter:
             print("Tabelle 'Plasmid' wurde erstellt.")
 
 
-    def insert_metadaten(self):
-        file_path=self.select_file()
+    def insert_metadaten(self, file_path):
+        # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.database_adapter,file_path)
             self.importer.import_data()
@@ -43,9 +43,11 @@ class MetadataAdapter:
     def select_all_from_plasmid(self):
         print("_______________Plasmid__________")
         with self.db as conn:
+            data = []
             rows = conn.execute("SELECT * FROM Plasmid").fetchall()
             for row in rows:
-                print(row)
+                data.append(row)
+            return data
    
     def delete_plasmid(self, plasmid_nr):
         with self.db as conn:

@@ -1,7 +1,7 @@
 
        
 
-from Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.DatabaseAdapter import DatabaseAdapter
 
 
 class LaborantAdapter:

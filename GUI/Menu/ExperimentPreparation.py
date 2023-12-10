@@ -214,8 +214,8 @@ class ExperimentPreparation:
             if exp_id_data is None:
                 print(f"{exp_id_data} is None")
                 exp_data = self.ui_database.adapter.add_experiment(data['firstname'], data['lastname'],
-                                                                   data['anz_tubes'],
-                                                                   data['anz_plasmid'], date_str, None)
+                                                           data['anz_tubes'],
+                                                           data['anz_plasmid'], date_str, None)
                 self.ui.experimentIdLE.setText(str(exp_data))
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
@@ -224,9 +224,9 @@ class ExperimentPreparation:
             else:
                 print(f"{exp_id_data} is not None")
                 print(exp_id_data)
-                exp_data = self.ui_database.adapter.add_experiment(data['firstname'], data['lastname'],
-                                                                   data['anz_tubes'],
-                                                                   data['anz_plasmid'], date_str, experiment_id)
+                exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
+                                                           data['anz_tubes'],
+                                                           data['anz_plasmid'], date_str, experiment_id)
                 self.ui.experimentIdLE.setText(str(exp_data))
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],

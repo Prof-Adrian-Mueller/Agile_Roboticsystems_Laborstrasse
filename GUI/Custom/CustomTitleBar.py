@@ -35,10 +35,10 @@ class CustomTitleBar(QWidget):
                                       Qt.TransformationMode.SmoothTransformation)
         app_logo.setPixmap(scaled_pixmap)
         self.layout_logo.addWidget(app_logo)
-        self.layout_logo.addStretch(1)
+        self.layout_logo.addStretch(10)
         layout.addLayout(self.layout_logo)
 
-        layout.addStretch(5)
+        layout.addStretch(1)
         app_title = QLabel("Dashboard UI")
         layout.addWidget(app_title)
         layout.addStretch(1)

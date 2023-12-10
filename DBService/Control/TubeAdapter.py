@@ -1,4 +1,4 @@
-from Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.DatabaseConnection import DatabaseConnection
 
  # TODO   
     # get tubedate by tubeId
