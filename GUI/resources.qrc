@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/back-custom.svg</file>
+    <file>img/keyboard-backspace.svg</file>
     <file>img/flask.svg</file>
     <file>img/arrow-left.svg</file>
     <file>img/print.svg</file>
@@ -20,5 +22,6 @@
     <file>img/settings.svg</file>
     <file>img/stream.svg</file>
   </qresource>
+  <qresource prefix="newPrefix"/>
   <qresource prefix="newPrefix"/>
 </RCC>

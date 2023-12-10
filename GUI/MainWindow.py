@@ -59,8 +59,8 @@ class MainWindow(QMainWindow):
         self.ui_db = DBUIAdapter()
 
         # Custom Titlebar
-        title_bar = CustomTitleBar(self)
-        self.setMenuWidget(title_bar)
+        self.title_bar = CustomTitleBar(self)
+        self.setMenuWidget(self.title_bar)
         self.setWindowTitle("Dashboard UI")
 
         # Save all the contents of the dialog box, before adding anything , it is better idea to remove contents
@@ -142,8 +142,8 @@ class MainWindow(QMainWindow):
             stacked_layout = QStackedLayout()  # Create a stacked layout
 
             # Create the dashboard and details widgets
-            dashboard = ExperimentTubesInfoDashboard()
-            details = ExperimentTubesDetails()
+            dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
+            details = ExperimentTubesDetails(main_window=self)
 
             # Add widgets to the stacked layout
             stacked_layout.addWidget(dashboard)

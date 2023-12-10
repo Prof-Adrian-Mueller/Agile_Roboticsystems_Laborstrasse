@@ -1,38 +1,61 @@
-from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtCore import pyqtSignal, Qt, QSize
+from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap
 from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWidget, QTableWidgetItem,
                              QAbstractItemView)
+from PyQt6.uic.properties import QtGui
+
+from GUI.button_back_design_test import CustomBackButton
 
 
 class ExperimentTubesDetails(QWidget):
     back_to_dashboard = pyqtSignal()  # Signal to indicate when to go back to the dashboard
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
+        self.main_window = main_window
         self.initUI()
 
     def initUI(self):
         layout = QVBoxLayout(self)
+        # Back button
+        # self.back_button = QPushButton("", self)
+        # self.back_button.clicked.connect(self.on_back_clicked)
+        # pixmap = QPixmap(":/icons/img/arrow-left.svg")
+        # scaled_pixmap = pixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio,
+        #                               Qt.TransformationMode.SmoothTransformation)
+        # icon1 = QIcon()
+        # icon1.addPixmap(scaled_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
+        # self.back_button.setIcon(icon1)
+        # When creating the button:
+        icon_pixmap = QPixmap(":/icons/img/arrow-left.svg").scaled(
+            200, 200, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
+        )
+        self.back_button = CustomBackButton('Zurück', icon_pixmap, self)
+        self.back_button.setStyleSheet("background:#FF0000;")
+        self.back_button.setGeometry(50, 20, 100, 50)
+        self.back_button.clicked.connect(self.on_back_clicked)
+
+        # layout.addWidget(back_button, alignment=Qt.AlignmentFlag.AlignLeft)
+
         self.title = QLabel('Experiment Details', self)
         layout.addWidget(self.title)
 
-        # Back button
-        back_button = QPushButton('Back', self)
-        back_button.clicked.connect(self.on_back_clicked)
-        layout.addWidget(back_button)
 
     def update_details(self, experiment_data):
         self.title.setText(f"Experiment ID: {experiment_data['id']}")
+        self.main_window.title_bar.add_back_btn(self.back_button)
 
     def on_back_clicked(self):
+        self.back_button.setParent(None)
         self.back_to_dashboard.emit()
 
 
 class ExperimentTubesInfoDashboard(QWidget):
     experiment_selected = pyqtSignal(dict)  # Signal to indicate an experiment is selected
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
+        self.main_window = main_window
         self.initUI()
 
     def initUI(self):
@@ -60,6 +83,10 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         # Connect the cell click signal
         self.experiments_table.cellClicked.connect(self.row_selected)
+
+        # back_button = QPushButton('Back', self)
+        # self.main_window.title_bar.add_back_btn(back_button)
+
 
     def populate_table(self):
         self.experiments_data = [

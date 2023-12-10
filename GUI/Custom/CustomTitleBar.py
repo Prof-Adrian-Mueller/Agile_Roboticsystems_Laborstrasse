@@ -15,6 +15,7 @@ class CustomTitleBar(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.layout_logo = None
         self.parent = parent
         self.draggable = True
         self.startPos = None
@@ -24,6 +25,8 @@ class CustomTitleBar(QWidget):
 
     def initUI(self):
         layout = QHBoxLayout(self)
+        self.layout_logo = QHBoxLayout(self)
+
 
         # App logo
         app_logo = QLabel(self)
@@ -31,9 +34,11 @@ class CustomTitleBar(QWidget):
         scaled_pixmap = pixmap.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
                                       Qt.TransformationMode.SmoothTransformation)
         app_logo.setPixmap(scaled_pixmap)
-        layout.addWidget(app_logo)
+        self.layout_logo.addWidget(app_logo)
+        self.layout_logo.addStretch(1)
+        layout.addLayout(self.layout_logo)
 
-        layout.addStretch(1)
+        layout.addStretch(5)
         app_title = QLabel("Dashboard UI")
         layout.addWidget(app_title)
         layout.addStretch(1)
@@ -49,6 +54,11 @@ class CustomTitleBar(QWidget):
         close_btn.clicked.connect(self.parent.close)
         close_btn.setObjectName("closeButton")
         layout.addWidget(close_btn)
+
+    def add_back_btn(self, button: QPushButton):
+        self.layout_logo.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft)
+        button.setStyleSheet("margin-left: 10px;")
+        button.setObjectName("back_btn")
 
     def mousePressEvent(self, event):
         if self.draggable and event.button() == Qt.MouseButton.LeftButton:
