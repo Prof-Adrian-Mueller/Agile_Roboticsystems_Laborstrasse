@@ -148,6 +148,11 @@ class MainWindow(QMainWindow):
         self.tube_info = TubeInformation(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
 
+
+        # reorganise layout
+        # self.ui.vorbereitungStackedTab.setParent(self.ui.statistikPage)
+
+
     def save_cache(self, arg, value):
         arg = "user_preferences"
         value = {"experiment_id": value, "language": "en"}

@@ -18,6 +18,8 @@
 3. [x] QR Code Generator Layout in UI
 4. [x] Navigation Left Menu Layout
 5. [x] Cross-process communication
+6. [x] Added Experiment Tubes Table to show Experiment Info about Current Experiment
+7. [x] Added Json-based Application Caching to Save previous application data for the startup
 
 ### Wissam Alamareen
 1. [x] Experiment creation or import
