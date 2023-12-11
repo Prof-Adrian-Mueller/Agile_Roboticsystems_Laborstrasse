@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/refresh-double.svg</file>
     <file>img/back-custom.svg</file>
     <file>img/keyboard-backspace.svg</file>
     <file>img/flask.svg</file>

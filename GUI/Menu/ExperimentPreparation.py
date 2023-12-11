@@ -221,8 +221,9 @@ class ExperimentPreparation:
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
-                self.current_experiment = CurrentExperimentSingleton(exp_data)
-                print(self.main_window.save_cache("exp_id",self.experiment_data.experiment_id))
+                self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
+                print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
+                self.main_window.cache_data = self.main_window.load_cache()
                 print("Exp-data : "+exp_data)
             else:
                 print(f"{exp_id_data} is not None")
@@ -235,8 +236,9 @@ class ExperimentPreparation:
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
-                self.current_experiment = CurrentExperimentSingleton(exp_data)
+                self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print("Exp-data : "+exp_data)
+                self.main_window.cache_data = self.main_window.load_cache()
 
             print(self.experiment_data)
             print(self.tube_information)

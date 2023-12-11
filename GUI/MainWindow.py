@@ -29,7 +29,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
-from GUI.Storage.BorgSingleton import TubesSingleton
+from GUI.Storage.BorgSingleton import TubesSingleton, CurrentExperimentSingleton
 from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
 from GUI.Storage.Cache import Cache
 from GUI.Storage.CacheModel import CacheModel
@@ -45,7 +45,16 @@ class MainWindow(QMainWindow):
 
         # UI Mainwindow Configuration
         self.cache = Cache("application_cache.json")
-        self.cache_data = self.load_cache()
+        try:
+            self.cache_data = self.load_cache()
+            if self.cache_data:
+                if self.cache_data.experiment_id:
+                    self.current_experiment = CurrentExperimentSingleton(self.cache_data.experiment_id)
+        except Exception as ex:
+            print(ex)
+            self.cache_data = None
+
+
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -86,8 +95,6 @@ class MainWindow(QMainWindow):
         # self.dialogBox.hideDialog()
 
         # Experiment Table with Tubes view
-        # expViewTest = ExperimentDashboard(self.ui.experiment_info_view)
-        # expViewTest.experiment_selected.connect(lambda data: print(f"Experiment selected: {data}"))
         self.setupExperimentView()
 
         left_navigation = LeftNavigation(self.ui)
@@ -147,13 +154,16 @@ class MainWindow(QMainWindow):
         self.cache.save({f"{arg}": value})
 
     def load_cache(self):
-        preferences = self.cache.load()
-        if preferences:
-            # Assuming preferences is a dictionary with the key "user_preferences"
-            user_prefs = preferences.get("user_preferences", {})
-            cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"), language=user_prefs.get("language"))
-            print(cache_data)
-            return cache_data
+        try:
+            preferences = self.cache.load()
+            if preferences:
+                # Assuming preferences is a dictionary with the key "user_preferences"
+                user_prefs = preferences.get("user_preferences", {})
+                cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"), language=user_prefs.get("language"))
+                print(cache_data)
+                return cache_data
+        except Exception as ex:
+            print(ex)
         return None
 
     def setupExperimentView(self):

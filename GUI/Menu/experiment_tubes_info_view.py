@@ -116,7 +116,7 @@ class ExperimentTubesInfoDashboard(QWidget):
         super().__init__(parent)
         self.main_window = main_window
         self.ui_db = self.main_window.ui_db
-        print(main_window.cache_data.experiment_id)
+
         if main_window.cache_data:
             self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
                 main_window.cache_data.experiment_id)
@@ -137,8 +137,23 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
 
-        refresh_btn = QPushButton("Refresh")
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/refresh-double.svg"), QIcon.Mode.Normal,
+                       QIcon.State.Off)
+
+        refresh_btn = QPushButton("")
         refresh_btn.clicked.connect(self.refresh_data)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+
+        refresh_btn.setToolTip("Refresh")
+        refresh_btn.setIcon(icon)
         h_layout.addWidget(refresh_btn)
 
         layout.addLayout(h_layout)
@@ -190,36 +205,42 @@ class ExperimentTubesInfoDashboard(QWidget):
 
     def refresh_data(self):
         try:
-            if hasattr(CurrentExperimentSingleton,
-                       'experiment_id') and self.current_experiment.experiment_id is not None:
-                print("From Refresh Data " + self.current_experiment.experiment_id)
-                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
-                    self.current_experiment.experiment_id)
-            if self.experiments_table.rowCount() == 0:
-                self.main_window.removeDialogBoxContents()
-                self.main_window.show_message_in_dialog("Empty Table, No Data!")
-            # if self.experiments_data_singleton.experiment_id:
+            self.main_window.cache_data = self.main_window.load_cache()
+            if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
+                                                       'experiment_id') and self.current_experiment.experiment_id is not None):
+                self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
+                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.current_experiment.experiment_id)
+                self.populate_table()
+            else:
+                self.current_experiment = self.main_window.cache_data.experiment_id
         except Exception as ex:
-            print(ex)
+            self.main_window.removeDialogBoxContents()
+            self.main_window.show_message_in_dialog(ex)
 
     def populate_table(self):
-        if self.experiments_data:
-            for i, experiment in enumerate(self.experiments_data):
-                self.experiments_table.setItem(i, 0, QTableWidgetItem(str(experiment['probe_nr'])))
-                self.experiments_table.setItem(i, 1, QTableWidgetItem(experiment['qr_code']))
-                self.experiments_table.setItem(i, 2, QTableWidgetItem(experiment['plasmid_nr']))
-                self.experiments_table.setItem(i, 3, QTableWidgetItem(experiment['vektor']))
-                self.experiments_table.setItem(i, 4, QTableWidgetItem(experiment['insert']))
-                self.experiments_table.setItem(i, 5, QTableWidgetItem(experiment['name']))
-                self.experiments_table.setItem(i, 6, QTableWidgetItem(experiment['vorname']))
-                self.experiments_table.setItem(i, 7, QTableWidgetItem(experiment['exp_id']))
-                self.experiments_table.setItem(i, 8, QTableWidgetItem(experiment['datum']))
-                self.experiments_table.setItem(i, 9, QTableWidgetItem(str(experiment['anz_fehler'])))
-        else:
-            # Check if the table is empty
-            if self.experiments_table.rowCount() == 0:
-                self.main_window.removeDialogBoxContents()
-                self.main_window.show_message_in_dialog("Empty Table, No Data!")
+        try:
+            if self.experiments_data:
+                self.experiments_table.setRowCount(0)
+                for i, experiment in enumerate(self.experiments_data):
+                    self.experiments_table.insertRow(i)
+                    self.experiments_table.setItem(i, 0, QTableWidgetItem(str(experiment['probe_nr'])))
+                    self.experiments_table.setItem(i, 1, QTableWidgetItem(experiment['qr_code']))
+                    self.experiments_table.setItem(i, 2, QTableWidgetItem(experiment['plasmid_nr']))
+                    self.experiments_table.setItem(i, 3, QTableWidgetItem(experiment['vektor']))
+                    self.experiments_table.setItem(i, 4, QTableWidgetItem(experiment['insert']))
+                    self.experiments_table.setItem(i, 5, QTableWidgetItem(experiment['name']))
+                    self.experiments_table.setItem(i, 6, QTableWidgetItem(experiment['vorname']))
+                    self.experiments_table.setItem(i, 7, QTableWidgetItem(experiment['exp_id']))
+                    self.experiments_table.setItem(i, 8, QTableWidgetItem(experiment['datum']))
+                    self.experiments_table.setItem(i, 9, QTableWidgetItem(str(experiment['anz_fehler'])))
+            else:
+                # Check if the table is empty
+                if self.experiments_table.rowCount() == 0:
+                    self.main_window.removeDialogBoxContents()
+                    self.main_window.show_message_in_dialog("Empty Table, No Data!")
+        except Exception as ex:
+            print(ex)
+            print(ex.with_traceback())
 
     def row_selected(self, row, column):
         experiment_data = self.experiments_data[row]
