@@ -31,6 +31,8 @@ __last_changed__ = '01/12/2023'
 
 from GUI.Storage.BorgSingleton import TubesSingleton
 from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
+from GUI.Storage.Cache import Cache
+from GUI.Storage.CacheModel import CacheModel
 
 
 class MainWindow(QMainWindow):
@@ -42,6 +44,8 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         # UI Mainwindow Configuration
+        self.cache = Cache("application_cache.json")
+        self.cache_data = self.load_cache()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -66,6 +70,7 @@ class MainWindow(QMainWindow):
         # Save all the contents of the dialog box, before adding anything , it is better idea to remove contents
         # which are saved here
         self.dialogBoxContents = []
+
 
         # drag & drop import concept
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
@@ -135,6 +140,21 @@ class MainWindow(QMainWindow):
         # Display TubeInformation
         self.tube_info = TubeInformation(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
+
+    def save_cache(self, arg, value):
+        arg = "user_preferences"
+        value = {"experiment_id": value, "language": "en"}
+        self.cache.save({f"{arg}": value})
+
+    def load_cache(self):
+        preferences = self.cache.load()
+        if preferences:
+            # Assuming preferences is a dictionary with the key "user_preferences"
+            user_prefs = preferences.get("user_preferences", {})
+            cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"), language=user_prefs.get("language"))
+            print(cache_data)
+            return cache_data
+        return None
 
     def setupExperimentView(self):
         try:

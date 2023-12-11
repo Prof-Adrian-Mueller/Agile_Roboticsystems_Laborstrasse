@@ -20,8 +20,8 @@ class DBUIAdapter:
         # self.importer=ExcelImporter(self.adapter, file_path = 'D:\\Bachelorarbeit\\Plasmid_l.xlsx')
         self.importer = None  # Initialisieren Sie den Importer später
 
-    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum):
-        self.experiment_adapter.add_experiment(name, vorname, anz_tubes,anz_plasmid, datum)
+    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id):
+        return self.experiment_adapter.add_experiment(name, vorname, anz_tubes, anz_plasmid, datum, exp_id)
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
         self.tube_adapter.insert_tubes(probe_nr_list, exp_id, plasmid_nr)

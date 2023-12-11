@@ -1,13 +1,18 @@
-from PyQt6.QtCore import pyqtSignal, Qt, QSize
-from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap
+from PyQt6.QtCore import pyqtSignal, Qt, QSize, QTimer
+from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap, QCursor
 from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QAbstractItemView)
+                             QAbstractItemView, QHeaderView, QApplication, QMessageBox, QSystemTrayIcon, QToolTip,
+                             QHBoxLayout)
 from PyQt6.uic.properties import QtGui
 
+from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
 from GUI.button_back_design_test import CustomBackButton
 
 
 class ExperimentTubesDetails(QWidget):
+    """
+    Load Experiment Details after clicking on the table item.
+    """
     back_to_dashboard = pyqtSignal()  # Signal to indicate when to go back to the dashboard
 
     def __init__(self, parent=None, main_window=None):
@@ -17,7 +22,6 @@ class ExperimentTubesDetails(QWidget):
         self.title = None
         self.main_window = main_window
         self.initUI()
-
 
     def initUI(self):
         layout = QVBoxLayout(self)
@@ -32,12 +36,13 @@ class ExperimentTubesDetails(QWidget):
 
         # layout.addWidget(back_button, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        self.title = QLabel('Experiment Details', self)
         layout = QVBoxLayout(self)
+        self.title = QLabel('Experiment Details')
         layout.addWidget(self.title)
+        layout.addStretch(1)
 
         # Initialize the details table
-        self.initialize_details_table()
+        self.details_table = self.initialize_details_table()
         layout.addWidget(self.details_table)
 
     def clear_layout(self, layout):
@@ -47,8 +52,21 @@ class ExperimentTubesDetails(QWidget):
                 child.widget().deleteLater()
 
     def initialize_details_table(self):
-        self.details_table = QTableWidget(10, 2)  # 10 rows, 2 columns
-        self.details_table.setHorizontalHeaderLabels(['Field', 'Value'])
+        details_table = QTableWidget(10, 2)  # 10 rows, 2 columns
+        details_table.setHorizontalHeaderLabels(['Field', 'Value'])
+        details_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        details_table.cellDoubleClicked.connect(self.copy_to_clipboard)
+        return details_table
+
+    def copy_to_clipboard(self, row, column):
+        item = self.details_table.item(row, column)
+        if item is not None:
+            try:
+                QApplication.clipboard().setText(item.text())
+                QToolTip.showText(QCursor.pos(), "Copied")
+                QTimer.singleShot(5000, QToolTip.hideText)
+            except Exception as ex:
+                print(ex)
 
     def update_details(self, experiment_data):
         try:
@@ -73,6 +91,14 @@ class ExperimentTubesDetails(QWidget):
                 item_value.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.details_table.setItem(i, 1, item_value)
 
+            header = self.details_table.horizontalHeader()
+
+            # Set the left column to resize to contents
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+
+            # Set the right column to stretch to fill the table width
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+
             # Add the table to the layout
             self.layout().addWidget(self.details_table)
         except Exception as ex:
@@ -88,24 +114,62 @@ class ExperimentTubesInfoDashboard(QWidget):
 
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
-        self.db_ui = None
         self.main_window = main_window
+        self.ui_db = self.main_window.ui_db
+        print(main_window.cache_data.experiment_id)
+        if main_window.cache_data:
+            self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                main_window.cache_data.experiment_id)
+        else:
+            self.experiments_data = None
+        self.experiments_table = None
+        self.db_ui = None
+
         self.initUI()
 
     def initUI(self):
-        self.ui_db = self.main_window.ui_db
-        layout = QVBoxLayout(self)
 
+        layout = QVBoxLayout(self)
         # Header area
+        h_layout = QHBoxLayout()
         header_label = QLabel('Experiments Overview')
-        layout.addWidget(header_label)
+        h_layout.addWidget(header_label)
+
+        h_layout.addStretch(1)  # This will push the following widgets to the right
+
+        refresh_btn = QPushButton("Refresh")
+        refresh_btn.clicked.connect(self.refresh_data)
+        h_layout.addWidget(refresh_btn)
+
+        layout.addLayout(h_layout)
+        self.setLayout(layout)
+        self.current_experiment = CurrentExperimentSingleton()
+        # self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment("Ujwal2")
+        # try:
+        #     self.experiments_data_singleton = ExperimentSingleton()
+        #     if self.experiments_data_singleton.experiment_id:
+        #         self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.experiments_data_singleton.experiment_id)
+        # except Exception as ex:
+        #     print(ex)
+
+        row = 0 if self.experiments_data is None else len(self.experiments_data)
 
         # Creates the experiments table
-        self.experiments_table = QTableWidget(10, 10)
+        self.experiments_table = QTableWidget(row, 10)
         self.experiments_table.setHorizontalHeaderLabels(
             ['Probe Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
              'Anz Fehler'])
+
+        header = self.experiments_table.horizontalHeader()
+
+        # Set all columns to stretch to fill the table width
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+        # Set the last column to resize to contents
+        header.setSectionResizeMode(9, QHeaderView.ResizeMode.ResizeToContents)
+
         self.populate_table()
+
         layout.addWidget(self.experiments_table)
 
         # Set the selection behavior to select the entire row
@@ -124,21 +188,38 @@ class ExperimentTubesInfoDashboard(QWidget):
         # back_button = QPushButton('Back', self)
         # self.main_window.title_bar.add_back_btn(back_button)
 
+    def refresh_data(self):
+        try:
+            if hasattr(CurrentExperimentSingleton,
+                       'experiment_id') and self.current_experiment.experiment_id is not None:
+                print("From Refresh Data " + self.current_experiment.experiment_id)
+                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                    self.current_experiment.experiment_id)
+            if self.experiments_table.rowCount() == 0:
+                self.main_window.removeDialogBoxContents()
+                self.main_window.show_message_in_dialog("Empty Table, No Data!")
+            # if self.experiments_data_singleton.experiment_id:
+        except Exception as ex:
+            print(ex)
+
     def populate_table(self):
-
-        self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment("Ujwal2")
-
-        for i, experiment in enumerate(self.experiments_data):
-            self.experiments_table.setItem(i, 0, QTableWidgetItem(str(experiment['probe_nr'])))
-            self.experiments_table.setItem(i, 1, QTableWidgetItem(experiment['qr_code']))
-            self.experiments_table.setItem(i, 2, QTableWidgetItem(experiment['plasmid_nr']))
-            self.experiments_table.setItem(i, 3, QTableWidgetItem(experiment['vektor']))
-            self.experiments_table.setItem(i, 4, QTableWidgetItem(experiment['insert']))
-            self.experiments_table.setItem(i, 5, QTableWidgetItem(experiment['name']))
-            self.experiments_table.setItem(i, 6, QTableWidgetItem(experiment['vorname']))
-            self.experiments_table.setItem(i, 7, QTableWidgetItem(experiment['exp_id']))
-            self.experiments_table.setItem(i, 8, QTableWidgetItem(experiment['datum']))
-            self.experiments_table.setItem(i, 9, QTableWidgetItem(str(experiment['anz_fehler'])))
+        if self.experiments_data:
+            for i, experiment in enumerate(self.experiments_data):
+                self.experiments_table.setItem(i, 0, QTableWidgetItem(str(experiment['probe_nr'])))
+                self.experiments_table.setItem(i, 1, QTableWidgetItem(experiment['qr_code']))
+                self.experiments_table.setItem(i, 2, QTableWidgetItem(experiment['plasmid_nr']))
+                self.experiments_table.setItem(i, 3, QTableWidgetItem(experiment['vektor']))
+                self.experiments_table.setItem(i, 4, QTableWidgetItem(experiment['insert']))
+                self.experiments_table.setItem(i, 5, QTableWidgetItem(experiment['name']))
+                self.experiments_table.setItem(i, 6, QTableWidgetItem(experiment['vorname']))
+                self.experiments_table.setItem(i, 7, QTableWidgetItem(experiment['exp_id']))
+                self.experiments_table.setItem(i, 8, QTableWidgetItem(experiment['datum']))
+                self.experiments_table.setItem(i, 9, QTableWidgetItem(str(experiment['anz_fehler'])))
+        else:
+            # Check if the table is empty
+            if self.experiments_table.rowCount() == 0:
+                self.main_window.removeDialogBoxContents()
+                self.main_window.show_message_in_dialog("Empty Table, No Data!")
 
     def row_selected(self, row, column):
         experiment_data = self.experiments_data[row]

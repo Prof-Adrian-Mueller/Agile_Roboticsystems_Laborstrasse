@@ -7,6 +7,14 @@ class BorgSingleton:
     def __init__(self):
         self.__dict__ = self._shared_state
 
+class CurrentExperimentSingleton(BorgSingleton):
+    def __init__(self, experiment_id=None):
+        BorgSingleton.__init__(self)
+        if experiment_id is not None:
+            self.experiment_id = experiment_id
+
+    def __str__(self):
+        return f"CurrentExperimentSingleton(experiment_id={self.experiment_id})"
 
 class ExperimentSingleton(BorgSingleton):
     """

@@ -6,14 +6,12 @@ from DBService.Model.Experimente import Experimente
 
 
 class ExperimentAdapter:
-    def __init__(self,db):
-        self.db=db
+    def __init__(self, db):
+        self.db = db
         # self.db = DatabaseConnection("laborstreet_management")
         self.database_adapter = DatabaseAdapter(self.db)
         self.ensure_tables_exist()
-        self.laborant_adapter=LaborantAdapter(self.db)
-    
-        
+        self.laborant_adapter = LaborantAdapter(self.db)
 
     def ensure_tables_exist(self):
         if not self.database_adapter.does_table_exist("Laborant"):
@@ -28,52 +26,56 @@ class ExperimentAdapter:
             self.db.create_experiment_table()
             print("Tabelle 'Experiment' wurde erstellt.")
 
+    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
+        if self.laborant_adapter.does_laborant_exist(name):
+            print(f"Ein Laborant mit dem Namen {name} existiert.")
+        else:
+            self.laborant_adapter.add_laborant(name, vorname)
 
-    def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum):
-            if self.laborant_adapter.does_laborant_exist(name):
-                print(f"Ein Laborant mit dem Namen {name} existiert.")
-            else:
-                self.laborant_adapter.add_laborant(name,vorname)
+            print(f"Kein Laborant mit dem Namen {name} gefunden.")
+        exp_anzahl = self.laborant_adapter.get_experiment_count_for_laborant(name)
+        if exp_anzahl is not None:
+            print("Experiments_anzahl: " + str(exp_anzahl))
+        else:
+            print("Kein Laborant mit dem Namen " + name + " gefunden.")
 
-                print(f"Kein Laborant mit dem Namen {name} gefunden.")
-            exp_anzahl = self.laborant_adapter.get_experiment_count_for_laborant(name)
-            if exp_anzahl is not None:
-                print("Experiments_anzahl: " + str(exp_anzahl))
-            else:
-                print("Kein Laborant mit dem Namen " + name + " gefunden.")
-            
+        if not exp_id_param:
             exp_id = f"{name}{exp_anzahl + 1}"
+        else:
+            exp_id = exp_id_param
 
-            # if not self.database_adapter("Experiment"):
-            #     print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
-            #     # self.db.crt_experiment()
-            #     self.db.create_experiment_table()
+        # if not self.database_adapter("Experiment"):
+        #     print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
+        #     # self.db.crt_experiment()
+        #     self.db.create_experiment_table()
 
-            with self.db as conn:
-                cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (exp_id,))
-                exists = cursor.fetchone()[0] > 0
+        with self.db as conn:
+            cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (exp_id,))
+            exists = cursor.fetchone()[0] > 0
 
-                if exists:
-                    conn.execute('''
+            if exists:
+                conn.execute('''
                         UPDATE Experiment
                         SET name = ?, vorname = ?, anz_tubes = ?, anz_plasmid = ?, datum = ?
                         WHERE exp_id = ?
                     ''', (name, vorname, anz_tubes, anz_plasmid, datum, exp_id))
-                    print(f"Experiment mit ID {exp_id} wurde aktualisiert.")
-                else:
-                    conn.execute('''
+                print(f"Experiment mit ID {exp_id} wurde aktualisiert.")
+            else:
+                conn.execute('''
                         INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, anz_plasmid, datum)
                         VALUES (?, ?, ?, ?, ?, ?)
                     ''', (exp_id, name, vorname, anz_tubes, anz_plasmid, datum))
-                    print(f"Experiment mit ID {exp_id} wurde hinzugefügt.")
+                print(f"Experiment mit ID {exp_id} wurde hinzugefügt.")
 
-                    # Erhöhe anz_exp um 1 für den spezifischen Laboranten
-                    conn.execute('''
+                # Erhöhe anz_exp um 1 für den spezifischen Laboranten
+                conn.execute('''
                         UPDATE Laborant
                         SET anz_exp = anz_exp + 1
                         WHERE name = ?
                     ''', (name,))
-                    print(f"Experimentanzahl für Laborant {name} wurde um 1 erhöht.")
+                print(f"Experimentanzahl für Laborant {name} wurde um 1 erhöht.")
+
+        return exp_id
 
     def get_experiment_by_id(self, exp_id):
         with self.db as conn:
@@ -82,35 +84,34 @@ class ExperimentAdapter:
 
             if result:
                 # Optional: Konvertieren Sie das Ergebnis in ein Experiment-Objekt
-                experiment = Experimente(exp_id=result[0], name=result[1], vorname=result[2], anz_tubes=result[3], anz_plasmid=result[4], datum=result[5])
+                experiment = Experimente(exp_id=result[0], name=result[1], vorname=result[2], anz_tubes=result[3],
+                                         anz_plasmid=result[4], datum=result[5])
                 return experiment
             else:
                 print(f"Kein Experiment mit der ID {exp_id} gefunden.")
-                return None                   
-        # Weitere Methoden für CRUD-Operationen
-    
+                return None
+                # Weitere Methoden für CRUD-Operationen
 
-    
     def get_all_experiments(self):
-        
-            with self.db as conn:
-                cursor = conn.execute('SELECT * FROM Experiment')
-                experiments = cursor.fetchall()
 
-                # Optional: Konvertiere die Ergebnisse in eine Liste von Experiment-Objekten
-                experiment_list = []
-                for exp in experiments:
-                    experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3], video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
-                    experiment_list.append(experiment_obj)
+        with self.db as conn:
+            cursor = conn.execute('SELECT * FROM Experiment')
+            experiments = cursor.fetchall()
 
-                return experiment_list
-        
+            # Optional: Konvertiere die Ergebnisse in eine Liste von Experiment-Objekten
+            experiment_list = []
+            for exp in experiments:
+                experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3],
+                                            video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
+                experiment_list.append(experiment_obj)
+
+            return experiment_list
+
     def delete_all_experiment(self):
         with self.db as conn:
             # alle Einträge in der Tabelle Experiment löschen
             conn.execute('DELETE FROM Experiment')
             print("Alle Experimente wurden gelöscht.")
-
 
     def get_tubes_data_for_experiment(self, exp_id):
         try:
@@ -155,7 +156,6 @@ class ExperimentAdapter:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return []
 
-
     # def delete_experiment(self, exp_id):
     #     try:
     #         with self.db as conn:
@@ -176,9 +176,6 @@ class ExperimentAdapter:
 
     #     except Exception as e:
     #         print(f"Ein Fehler ist aufgetreten: {e}")
-
-
-
 
     def delete_experiment(self, exp_id):
         try:

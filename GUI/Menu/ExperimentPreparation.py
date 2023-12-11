@@ -10,7 +10,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '03/12/2023'
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton
 
 
 class ExperimentPreparation:
@@ -30,6 +30,7 @@ class ExperimentPreparation:
         self.dialog = CustomDialog(self.ui.centralwidget)
         self.ui_database = main_window.ui_db
         self.qr_code_generator = DisplayQRCode(self.ui, self.main_window)
+        self.current_experiment = None
 
         # Set the datumLE to current Date
         today = datetime.datetime.today()
@@ -213,14 +214,16 @@ class ExperimentPreparation:
 
             if exp_id_data is None:
                 print(f"{exp_id_data} is None")
-                exp_data = self.ui_database.adapter.add_experiment(data['firstname'], data['lastname'],
+                exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, None)
                 self.ui.experimentIdLE.setText(str(exp_data))
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
-
+                self.current_experiment = CurrentExperimentSingleton(exp_data)
+                print(self.main_window.save_cache("exp_id",self.experiment_data.experiment_id))
+                print("Exp-data : "+exp_data)
             else:
                 print(f"{exp_id_data} is not None")
                 print(exp_id_data)
@@ -231,6 +234,9 @@ class ExperimentPreparation:
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
+                print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
+                self.current_experiment = CurrentExperimentSingleton(exp_data)
+                print("Exp-data : "+exp_data)
 
             print(self.experiment_data)
             print(self.tube_information)
