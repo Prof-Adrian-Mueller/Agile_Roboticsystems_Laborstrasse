@@ -8,6 +8,7 @@ class TubeInformation(QWidget):
 
     def __init__(self, ui: Ui_MainWindow, main_window):
         super().__init__()
+        self.current_table = None
         self.ui = ui
         self.main_window = main_window
         # combo_option_class_type
@@ -22,7 +23,7 @@ class TubeInformation(QWidget):
 
     def append_info_to_view(self, input_id, current_option):
         global text_label_for_option
-        global data_for_table
+        data_for_table = None
         if current_option == 'Experiment':
             # Create the left-aligned label
             text_label_for_option = f"{current_option} {input_id} details: "
@@ -49,12 +50,17 @@ class TubeInformation(QWidget):
             pass
 
         try:
+            # Remove the old table from the layout, if it exists
+            if hasattr(self, 'current_table') and self.current_table:
+                self.ui.tube_info_grid_layout.removeWidget(self.current_table)
+                self.current_table.deleteLater()
             # Convert the Experimente instance to a dictionary
             data_for_table = vars(data_for_table)
             # Create the table
             table = QTableWidget()
             table.setMinimumSize(500, 500)
-
+            self.current_table = table
+            
             # Set the number of rows and columns based on the data
             table.setRowCount(len(data_for_table))
             table.setColumnCount(2)
@@ -80,8 +86,7 @@ class TubeInformation(QWidget):
             table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
             # Add the table to the grid layout
-            self.ui.tube_info_grid_layout.addWidget(table, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-            
+            self.ui.tube_info_grid_layout.addWidget(table, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
         except Exception as ex:
             print(ex)

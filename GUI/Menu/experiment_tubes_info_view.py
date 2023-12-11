@@ -137,35 +137,11 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
 
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/img/refresh-double.svg"), QIcon.Mode.Normal,
-                       QIcon.State.Off)
-
-        refresh_btn = QPushButton("")
-        refresh_btn.clicked.connect(self.refresh_data)
-        refresh_btn.setStyleSheet("""
-            QPushButton {
-                background: transparent;
-            }
-            QPushButton:hover {
-                background: #eee;
-            }
-        """)
-
-        refresh_btn.setToolTip("Refresh")
-        refresh_btn.setIcon(icon)
-        h_layout.addWidget(refresh_btn)
+        self.create_refresh_btn(h_layout)
 
         layout.addLayout(h_layout)
         self.setLayout(layout)
         self.current_experiment = CurrentExperimentSingleton()
-        # self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment("Ujwal2")
-        # try:
-        #     self.experiments_data_singleton = ExperimentSingleton()
-        #     if self.experiments_data_singleton.experiment_id:
-        #         self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.experiments_data_singleton.experiment_id)
-        # except Exception as ex:
-        #     print(ex)
 
         row = 0 if self.experiments_data is None else len(self.experiments_data)
 
@@ -200,8 +176,23 @@ class ExperimentTubesInfoDashboard(QWidget):
         # Connect the cell click signal
         self.experiments_table.cellClicked.connect(self.row_selected)
 
-        # back_button = QPushButton('Back', self)
-        # self.main_window.title_bar.add_back_btn(back_button)
+    def create_refresh_btn(self, h_layout):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/refresh-double.svg"), QIcon.Mode.Normal,
+                       QIcon.State.Off)
+        refresh_btn = QPushButton("")
+        refresh_btn.clicked.connect(self.refresh_data)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+        refresh_btn.setToolTip("Refresh")
+        refresh_btn.setIcon(icon)
+        h_layout.addWidget(refresh_btn)
 
     def refresh_data(self):
         try:

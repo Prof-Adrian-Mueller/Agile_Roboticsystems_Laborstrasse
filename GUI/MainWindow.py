@@ -4,7 +4,7 @@ import sys
 from PyQt6 import QtCore
 from PyQt6.QtCore import QEvent, QRect
 from PyQt6.QtWidgets import QSizePolicy, QApplication, QMainWindow, QVBoxLayout, \
-    QFileDialog, QStackedLayout
+    QFileDialog, QStackedLayout, QTabWidget
 from PyQt6.QtWidgets import QWidget
 
 from DBService.DBUIAdapter import DBUIAdapter
@@ -19,6 +19,7 @@ from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
+from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Menu.Settings import Settings
 from GUI.Menu.TubeInformation import TubeInformation
 from GUI.Navigation import Ui_MainWindow
@@ -173,23 +174,43 @@ class MainWindow(QMainWindow):
 
     def setupExperimentView(self):
         try:
+            # Create a QVBoxLayout for the main layout
             main_layout = QVBoxLayout(self.ui.experiment_info_view)
-            stacked_layout = QStackedLayout()  # Create a stacked layout
 
-            # Create the dashboard and details widgets
+            # Create the QTabWidget for the tabs
+            tab_widget = QTabWidget(self.ui.experiment_info_view)
+
+            # Create the content for the first tab (Experiment Tubes)
+            experiment_tubes_widget = QWidget()  # Container widget for the first tab
+            experiment_tubes_layout = QVBoxLayout(experiment_tubes_widget)  # Layout for the container widget
+
+            # Add your existing stacked layout to the first tab
+            stacked_layout = QStackedLayout()
+
             dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
             details = ExperimentTubesDetails(main_window=self)
 
-            # Add widgets to the stacked layout
             stacked_layout.addWidget(dashboard)
             stacked_layout.addWidget(details)
 
-            # Connect signals to switch views
+            # Connect signals as before
             dashboard.experiment_selected.connect(
                 lambda data: self.show_experiment_details(data, details, stacked_layout))
             details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
 
-            main_layout.addLayout(stacked_layout)
+            experiment_tubes_layout.addLayout(stacked_layout)
+            tab_widget.addTab(experiment_tubes_widget, "Experiment Tubes")
+
+            # Creates and adds tab for QR Codes
+            qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, number_of_labels=10)
+            tab_widget.addTab(qr_codes_widget, "QR Codes")
+
+            # TODO: fill qr codes with new data
+            qr_codes_widget.fill_with_test_data(10)
+
+            # Add the tab widget to the main layout
+            main_layout.addWidget(tab_widget)
+
         except Exception as ex:
             print(ex)
 

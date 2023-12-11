@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12 = QtWidgets.QHBoxLayout(self.vorbereitungTab)
         self.horizontalLayout_12.setObjectName("horizontalLayout_12")
         self.vorbereitungStackedTab = QtWidgets.QStackedWidget(parent=self.vorbereitungTab)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.vorbereitungStackedTab.sizePolicy().hasHeightForWidth())
@@ -694,7 +694,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidgetHome.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -702,7 +702,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.homeBtn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Home</p></body></html>"))
-        self.experiment_info_btn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Statistik</p></body></html>"))
+        self.experiment_info_btn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Experiment Details</p></body></html>"))
         self.statistik.setToolTip(_translate("MainWindow", "<html><head/><body><p>Statistik</p></body></html>"))
         self.importBtn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Import</p></body></html>"))
         self.qrGenBtn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Generate QR Codes</p></body></html>"))

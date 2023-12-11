@@ -121,6 +121,9 @@ class ExperimentPreparation:
                 self.nextPage()
                 self.show_message_in_dialog(display_msg)
 
+        elif page_data == 'ShowQrCodeList':
+            print()
+
     def show_message_in_dialog(self, display_msg):
         self.main_window.dialogBoxContents.append(
             self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
