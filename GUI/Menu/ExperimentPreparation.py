@@ -90,10 +90,19 @@ class ExperimentPreparation:
 
             # self.nextPage()
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
-                display_msg = "Experiment has duplicates, please reenter!"
+                display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
+
+            # # TODO check this before inserting data
+            # elif not self.main_window.plasmidTubesList.check_duplicate_inputs():
+            #     self.main_window.display_qr_from_main("Tube Ids sollten unterschiedlich sein.")
+            #     return
+            #
+            # elif self.main_window.plasmidTubesList.check_max_input():
+            #     self.main_window.display_qr_from_main("Anzahl von Tubes sollen nicht mehr als 32 sein.")
+
             else:
-                display_msg = "All the values look good.\n"
+                display_msg = "All values look good.\n"
                 count_tubes = []
                 try:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
@@ -208,6 +217,18 @@ class ExperimentPreparation:
             return
 
         try:
+            for elem in plasmid_list:
+                check_if_plasmid_exists_data = self.ui_database.metadata_adapter.get_plasmid_data_by_nr(elem)
+                if check_if_plasmid_exists_data:
+                    print("Plasmid data : " + str(check_if_plasmid_exists_data))
+                else:
+                    raise ValueError(f"Plasmid {elem} existiert nicht. \n")
+
+        except Exception as ex:
+            self.show_message_in_dialog(ex)
+            return
+
+        try:
             date_str = '-'.join(map(str, data['date']))
             experiment_id = data['exp_id'] or None
             exp_id_data = None
@@ -227,7 +248,7 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
-                print("Exp-data : "+exp_data)
+                print("Exp-data : " + exp_data)
             else:
                 print(f"{exp_id_data} is not None")
                 print(exp_id_data)
@@ -240,7 +261,7 @@ class ExperimentPreparation:
                                                            date=data['date'])
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
-                print("Exp-data : "+exp_data)
+                print("Exp-data : " + exp_data)
                 self.main_window.cache_data = self.main_window.load_cache()
 
             print(self.experiment_data)
