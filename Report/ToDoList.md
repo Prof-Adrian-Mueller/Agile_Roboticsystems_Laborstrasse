@@ -27,21 +27,22 @@
     - Show all the provided Plasmid Nr as a List 
         -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
 10. [x] Adding filter to Experiment Creation Form
+11. [x] Redesign QR-Image view row list near Experiment Tubes view
 
 ## Completed Tasks
 ### Wissam Alamareen
-1. Experiment creation or import
-2. Check if Experiment Exists
-3. Import of Plasmid metadata
-4. List of Tubes creation with Plasmid and Experiment ID
+1. [x] Experiment creation or import
+2. [x] Check if Experiment Exists
+3. [x] Import of Plasmid metadata
+4. [x] List of Tubes creation with Plasmid and Experiment ID
     - [x] QR Code Generation and assign it to Tube
-5. Return Experiment Data of a specific Experiments using Experiment Id
-6. Return Number of Experiments of a Labor Assistant using their Name
-7. Return all Tubes of specific Experiments using Experiment Id
-8. Return Tube Data per probe_ne(id)
-9. Return plasmid Data per plasmid_nr(id)
-10. Return all Tubes data of specific Experiment
-11. Return all Experiments of a Labor Assistant using laborant id
+5. [x] Return Experiment Data of a specific Experiments using Experiment Id
+6. [x] Return Number of Experiments of a Labor Assistant using their Name
+7. [x] Return all Tubes of specific Experiments using Experiment Id
+8. [x] Return Tube Data per probe_ne(id)
+9. [x] Return plasmid Data per plasmid_nr(id)
+10. [x] Return all Tubes data of specific Experiment
+11. [x] Return all Experiments of a Labor Assistant using laborant id
 
 
 ## On Progress

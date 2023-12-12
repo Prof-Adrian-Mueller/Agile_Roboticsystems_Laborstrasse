@@ -74,6 +74,20 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="home_btn_dashboard">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Home&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/icons/img/homebig.png</normaloff>:/icons/img/homebig.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="experiment_info_btn">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Experiment Details&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -147,6 +161,17 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="experimentPreparationBtn">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/icons/img/dna.svg</normaloff>:/icons/img/dna.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="settingsBtn">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -157,17 +182,6 @@
            <property name="icon">
             <iconset resource="resources.qrc">
              <normaloff>:/icons/img/settings.svg</normaloff>:/icons/img/settings.svg</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="experimentPreparationBtn">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/img/dna.svg</normaloff>:/icons/img/dna.svg</iconset>
            </property>
           </widget>
          </item>
@@ -207,7 +221,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="homePage">
           <property name="sizePolicy">
@@ -1123,6 +1137,14 @@
            </widget>
           </widget>
          </widget>
+         <widget class="QWidget" name="home_page_dashboard">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
          <widget class="QWidget" name="statistikPage">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1145,6 +1167,7 @@
           </widget>
          </widget>
          <widget class="QWidget" name="experiment_info_view"/>
+         <widget class="QWidget" name="test_page_home"/>
          <widget class="QWidget" name="cliPage">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1221,12 +1244,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>800</width>
-             <height>614</height>
-            </size>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>

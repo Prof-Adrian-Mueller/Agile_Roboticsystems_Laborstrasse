@@ -19,6 +19,7 @@ from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
+from GUI.Menu.HomePageDashboard import HomePageDashboard
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Menu.Settings import Settings
 from GUI.Menu.TableInformationFetchByParameter import TableInformationFetchByParameter
@@ -55,7 +56,6 @@ class MainWindow(QMainWindow):
             print(ex)
             self.cache_data = None
 
-
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
         # which are saved here
         self.dialogBoxContents = []
 
-
         # drag & drop import concept
         self.ui.importAreaDragDrop.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
         self.ui.importAreaDragDrop = DragDropWidget(self.ui.importPage, self.ui_db)
@@ -100,6 +99,9 @@ class MainWindow(QMainWindow):
 
         left_navigation = LeftNavigation(self.ui)
         left_navigation.map_buttons_to_pages()
+        #home dashboard
+        self.home_dashboard = HomePageDashboard(self.ui.home_page_dashboard, self)
+        self.home_dashboard.show()
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
@@ -149,10 +151,9 @@ class MainWindow(QMainWindow):
         self.tube_info = TableInformationFetchByParameter(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
 
-
         # reorganise layout
-        # self.ui.vorbereitungStackedTab.setParent(self.ui.statistikPage)
 
+        # self.ui.vorbereitungStackedTab.setParent(self.ui.statistikPage)
 
     def save_cache(self, arg, value):
         arg = "user_preferences"
@@ -165,7 +166,8 @@ class MainWindow(QMainWindow):
             if preferences:
                 # Assuming preferences is a dictionary with the key "user_preferences"
                 user_prefs = preferences.get("user_preferences", {})
-                cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"), language=user_prefs.get("language"))
+                cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"),
+                                        language=user_prefs.get("language"))
                 print(cache_data)
                 return cache_data
         except Exception as ex:
