@@ -13,6 +13,8 @@ from  Control.ExperimentAdapter import ExperimentAdapter
 # TODO
 # code comment 
 # methoden in den richtigen klasse rufen => teste alle methoden unten 
+# add experimt in databasedaapter in experimet adapter fügen 
+
 
 ui_db = DBUIAdapter()
 
@@ -51,7 +53,7 @@ ui_db = DBUIAdapter()
 # print(tubes_data)
 
 
-print(ui_db.get_tube_data_by_probe_nr(10))
+print(ui_db.get_tube_data_by_probe_nr(1))
 
 
 
