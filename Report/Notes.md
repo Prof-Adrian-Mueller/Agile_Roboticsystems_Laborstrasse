@@ -9,7 +9,7 @@ x - Redirect von stdin, stdout, stderr zu Gui
 
 Seiten Prinzip  für Experiment Vorbereitung
 
-- Experiment anlegen oder importieren - Wissam Alamareen
+- x Experiment anlegen oder importieren - Wissam Alamareen
 - Plasmid Metadaten importieren - Wissam Alamareen
 - Qr codes anzeigen - Ujwal Subedi
 
