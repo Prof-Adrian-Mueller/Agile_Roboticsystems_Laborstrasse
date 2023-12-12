@@ -20,6 +20,14 @@
 5. [x] Cross-process communication
 6. [x] Added Experiment Tubes Table to show Experiment Info about Current Experiment
 7. [x] Added Json-based Application Caching to Save previous application data for the startup
+    - Loads Experiment Tubes Information of Previous Experiment on Startup
+    - Loads QR-Codes of Previous Experiment on Startup
+8. [x] Implement Borg Singleton for Runtime shared cache
+9. [x] Experiment Preparation with multiple Page System 
+    - Experiment Creation / Import
+    - Show all the provided Plasmid Nr as a List 
+        -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
+10. [x] Adding filter to Experiment Creation Form
 
 ### Wissam Alamareen
 1. [x] Experiment creation or import
@@ -31,12 +39,8 @@
 
 ## On Progress
 ### Ujwal Subedi
-1. [ ] Experiment Preparation with multiple Page System 
-    - Experiment Creation / Import
-    - Show all the provided Plasmid Nr as a List 
-        -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
-2. [ ] Adding filter to Experiment Creation Form
-3. [ ] Implement Borg Singleton for shared cache
+1. Redesign QR-Image view row list near Experiment Tubes view
+
 
 ### Wissam Alamareen
 1. [ ] Check if Experiment Exists

@@ -21,7 +21,7 @@ from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Menu.Settings import Settings
-from GUI.Menu.TubeInformation import TubeInformation
+from GUI.Menu.TableInformationFetchByParameter import TableInformationFetchByParameter
 from GUI.Navigation import Ui_MainWindow
 from GUI.ResizeGripWidget import ResizeGripWidget
 
@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
         self.ui.plasmidMetaDataImport.clicked.connect(lambda: self.openFileDialog('plasmid'))
 
         # Display TubeInformation
-        self.tube_info = TubeInformation(self.ui, self)
+        self.tube_info = TableInformationFetchByParameter(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
 
 
@@ -202,11 +202,10 @@ class MainWindow(QMainWindow):
             tab_widget.addTab(experiment_tubes_widget, "Experiment Tubes")
 
             # Creates and adds tab for QR Codes
-            qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, number_of_labels=10)
+            qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, self)
             tab_widget.addTab(qr_codes_widget, "QR Codes")
-
-            # TODO: fill qr codes with new data
-            qr_codes_widget.fill_with_test_data(10)
+            # Load data to the Row
+            qr_codes_widget.refresh_data()
 
             # Add the tab widget to the main layout
             main_layout.addWidget(tab_widget)

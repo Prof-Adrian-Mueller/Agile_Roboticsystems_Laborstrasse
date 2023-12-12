@@ -6,10 +6,15 @@ from PyQt6.QtGui import QIcon, QPixmap, QPainter, QImage, QPalette, QColor
 from PyQt6.QtPrintSupport import QPrinter
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QScrollArea, QHBoxLayout, QPushButton, QSizePolicy, QFrame
 
+from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
+
 
 class QRCodesWidget(QWidget):
-    def __init__(self, parent=None, number_of_labels=5):
+    def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
+        self.current_experiment = CurrentExperimentSingleton()
+        self.experiments_qr_data = None
+        self.main_window = main_window
         self.layout = QVBoxLayout(self)  # Main layout of the widget
 
         # Create the refresh button and add it to the layout
@@ -61,6 +66,19 @@ class QRCodesWidget(QWidget):
     def refresh_data(self):
         print("refresh")
         # TODO add data to the list . here load the experiment, load all the tubes of exp and show using displayQr
+        try:
+            self.main_window.cache_data = self.main_window.load_cache()
+            if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
+                                                       'experiment_id') and self.current_experiment.experiment_id is not None):
+                self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
+                self.experiments_qr_data = self.main_window.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                    self.current_experiment.experiment_id)
+                self.populate_table()
+            else:
+                self.experiments_qr_data = self.main_window.cache_data.experiment_id
+        except Exception as ex:
+            self.main_window.removeDialogBoxContents()
+            self.main_window.show_message_in_dialog(ex)
 
     def fill_with_test_data(self, number_of_labels):
         for i in range(number_of_labels):
@@ -196,3 +214,14 @@ class QRCodesWidget(QWidget):
         drucken.setFixedWidth(30)
         drucken.clicked.connect(lambda: self.print_qr_image(img_location))
         return drucken, speichern
+
+    def populate_table(self):
+        print("Populate")
+        if self.experiments_qr_data:
+            while self.outputLayout.count():
+                child = self.outputLayout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+            for elem in self.experiments_qr_data:
+                print(elem['qr_code'])
+                self.displayQrCode(str(elem['qr_code']), str(elem['probe_nr']), str(elem['plasmid_nr']))

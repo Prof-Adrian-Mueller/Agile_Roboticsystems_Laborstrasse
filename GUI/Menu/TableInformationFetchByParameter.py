@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QTableWidget, QTableWidgetItem, QSi
 from GUI.Navigation import Ui_MainWindow
 
 
-class TubeInformation(QWidget):
+class TableInformationFetchByParameter(QWidget):
 
     def __init__(self, ui: Ui_MainWindow, main_window):
         super().__init__()
@@ -30,6 +30,7 @@ class TubeInformation(QWidget):
             data_for_table = self.main_window.ui_db.get_experiment_by_id(input_id)
         elif current_option == 'Plasmid':
             text_label_for_option = f"{current_option} {input_id} details: "
+            # data_for_table = self.main_window.ui_db.
             # data_for_table = self.main_window.ui_db.
         elif current_option == 'Tube':
             text_label_for_option = f"{current_option} {input_id} details: "
