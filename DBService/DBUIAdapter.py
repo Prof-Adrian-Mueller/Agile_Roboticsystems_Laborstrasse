@@ -46,6 +46,11 @@ class DBUIAdapter:
 
     def delete_experiment(self,exp_id):
         self.experiment_adapter.delete_experiment(exp_id)
+
+    def get_tube_data_by_probe_nr(self,probe_nr):
+        return self.tube_adapter.get_tube_data_by_probe_nr(probe_nr)
+    def get_plasmid_data_by_nr(self,plasmid_nr):
+        return self.metadata_adapter.get_plasmid_data_by_nr(plasmid_nr)
     def select_file(self):
         root = tk.Tk()
         root.withdraw()  # Verstecken Sie das Hauptfenster

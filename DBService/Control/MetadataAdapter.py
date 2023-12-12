@@ -60,6 +60,36 @@ class MetadataAdapter:
             else:
                 print(f"Kein Plasmid mit der Nummer {plasmid_nr} gefunden.")
 
+  
+
+    def get_plasmid_data_by_nr(self, plasmid_nr):
+        with self.db as conn:
+            # SQL-Abfrage, um die Daten des Plasmids zu holen
+            cursor = conn.execute('''
+                SELECT *
+                FROM Plasmid 
+                WHERE plasmid_nr = ?
+            ''', (plasmid_nr,))
+            plasmid_data = cursor.fetchone()
+           
+            # Überprüfen, ob Daten gefunden wurden
+            if plasmid_data:
+                # Erstellen eines Dictionary mit den Plasmid-Daten
+                plasmid_data_dict = {
+                    'plasmid_nr': plasmid_data[0],
+                    'vektor': plasmid_data[1],
+                    'insert': plasmid_data[2],
+                    'sequenz_nr': plasmid_data[3],
+                    'name': plasmid_data[4],
+                    'datum_maxi': plasmid_data[5],
+                    'quelle': plasmid_data[6],
+                    'konstruktion_datum': plasmid_data[7]
+                }
+                return plasmid_data_dict
+            else:
+                print(f"Kein Plasmid mit der Nummer {plasmid_nr} gefunden.")
+                return None
+
 
 
    

@@ -10,49 +10,64 @@ from DBUIAdapter import DBUIAdapter
 from  Control.ExperimentAdapter import ExperimentAdapter
   
 
+# TODO
+# code comment 
+# methoden in den richtigen klasse rufen => teste alle methoden unten 
+# add experimt in databasedaapter in experimet adapter fügen 
 
 
 ui_db = DBUIAdapter()
 
-ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+# ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
-probe_nr_list = [1, 2, 3, 4, 5]
-ui_db.insert_tubes(probe_nr_list, 'max2', 'PHB 371 ')
-
-
-tubes_for_exp=ui_db.get_tubes_by_exp_id("max5")
-for tube in tubes_for_exp:
-    print(tube)
+# probe_nr_list = [1, 2, 3, 4, 5]
+# ui_db.insert_tubes(probe_nr_list, 'max9', 'PHB 371 ')
 
 
-tubes_for_exp=ui_db.get_tubes()
-for tube in tubes_for_exp:
-    print(tube)
+# tubes_for_exp=ui_db.get_tubes_by_exp_id("max5")
+# for tube in tubes_for_exp:
+#     print(tube)
 
-print(ui_db.get_experiment_by_id("max2"))
 
-all_experiments = ui_db.get_all_experiments()
-# Verarbeiten oder anzeigen Sie die Experimente
-for experiment in all_experiments:
-        print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
+# tubes_for_exp=ui_db.get_tubes()
+# for tube in tubes_for_exp:
+#     print(tube)
+
+# print(ui_db.get_experiment_by_id("max2"))
+
+# all_experiments = ui_db.get_all_experiments()
+# # Verarbeiten oder anzeigen Sie die Experimente
+# for experiment in all_experiments:
+#         print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
 
 
 # insert metadaten----------------------------------------------------------------------
 # meta_adapter=MetaAdapter()
-ui_db.insert_metadaten()
-ui_db.select_all_from_plasmid()
+# ui_db.insert_metadaten()
+# ui_db.select_all_from_plasmid()
 # meta_adapter.delete_plasmid("PHB 371 ")
 
 # völlständige Daten eines Experiments
 
-tubes_data=ui_db.get_tubes_data_for_experiment("max2")
-print(tubes_data)
+# tubes_data=ui_db.get_tubes_data_for_experiment("max9")
+# print(tubes_data)
+
+
+# print(ui_db.get_tube_data_by_probe_nr(1))
+
+# ++++++++++++++++++
+# Return alle data eines Plasmid
+
+print(ui_db.get_plasmid_data_by_nr("PHB 20"))
+# print(ui_db.select_all_from_plasmid())
+
+
 
 # delete ein Experiment
-ui_db.delete_experiment("max2")
+# ui_db.delete_experiment("max2")
 
-tubes_data=ui_db.get_tubes_data_for_experiment("max2")
-print(tubes_data)
+# tubes_data=ui_db.get_tubes_data_for_experiment("max2")
+# print(tubes_data)
 
 
 
