@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         # UI Mainwindow Configuration
+        self.tab_widget_home_dashboard = None
         self.cache = Cache("application_cache.json")
         try:
             self.cache_data = self.load_cache()
@@ -96,12 +97,12 @@ class MainWindow(QMainWindow):
 
         # Experiment Table with Tubes view
         self.setupExperimentView()
+        # home dashboard
+        # self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
+        self.setupHomeDashboardView()
 
         left_navigation = LeftNavigation(self.ui)
         left_navigation.map_buttons_to_pages()
-        #home dashboard
-        self.home_dashboard = HomePageDashboard(self.ui.home_page_dashboard, self)
-        self.home_dashboard.show()
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
@@ -173,6 +174,27 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             print(ex)
         return None
+
+    def setupHomeDashboardView(self):
+        try:
+            # Create a QVBoxLayout for the main layout
+            main_layout = QVBoxLayout(self.ui.test_page_home)
+
+            # Create the QTabWidget for the tabs
+            self.tab_widget_home_dashboard = QTabWidget(self.ui.test_page_home)
+
+            # Add HomePageDashboard to the layout
+            home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
+            self.tab_widget_home_dashboard.addTab(home_dashboard, "Dashboard")
+            # Add CustomLiveWidget to the layout
+            #live_widget = CustomLiveWidget(self.ui.test_page_home)
+            #self.tab_widget_home_dashboard.addTab(live_widget, "Live")
+
+            # Add the tab widget to the main layout
+            main_layout.addWidget(self.tab_widget_home_dashboard)
+
+        except Exception as ex:
+            print(ex)
 
     def setupExperimentView(self):
         try:

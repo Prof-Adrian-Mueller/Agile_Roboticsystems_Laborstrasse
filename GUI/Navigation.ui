@@ -221,7 +221,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="homePage">
           <property name="sizePolicy">
@@ -1152,19 +1152,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QLabel" name="label_6">
-           <property name="geometry">
-            <rect>
-             <x>220</x>
-             <y>150</y>
-             <width>49</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Statistik</string>
-           </property>
-          </widget>
          </widget>
          <widget class="QWidget" name="experiment_info_view"/>
          <widget class="QWidget" name="test_page_home"/>
