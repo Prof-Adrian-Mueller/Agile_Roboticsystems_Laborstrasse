@@ -280,17 +280,17 @@ class DatabaseAdapter:
                 # Aktualisiere das vorhandene Experiment
                 conn.execute('''
                         UPDATE Experiment
-                        SET name = ?, vorname = ?, anz_tubes = ?, video_id = ?, datum = ?, anz_fehler = ?, bemerkung = ?
+                        SET name = ?, vorname = ?, anz_tubes = ?,anz_plasmid=?, datum = ?, video_id = ?,  anz_fehler = ?, bemerkung = ?
                         WHERE exp_id = ?
                     ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str,
                           experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
             else:
                 # ein neues Experiment einfügen
                 conn.execute('''
-                        INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler, bemerkung)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO Experiment (exp_id, name, vorname, anz_tubes,anz_plasmid, datum, video_id, anz_fehler, bemerkung)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
                     ''', (
-                experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str,
+                experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes,experiment.anz_plasmid, datum_str,video_id_str,
                 experiment.anz_fehler, experiment.bemerkung))
 
     def get_experiments(self):
@@ -306,38 +306,38 @@ class DatabaseAdapter:
                 experiment_list.append(experiment_obj)
             return experiment_list
 
-    def insert_experiment(self, experiment):
-        if not self.does_table_exist("Experiment"):
-            print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
-            self.db.create_experiment_table()
-        else:
-            print("Tabelle 'Experiment' existiert bereits.")
-        with self.db as conn:
-
-            # video_id in einen String
-            video_id_str = str(experiment.video_id)
-
-            # konvert das Datum in einen String im Format YYYY-MM-DD
-            datum_str = experiment.datum.strftime('%Y-%m-%d') if experiment.datum is not None else None
-
-            # Überprüfen, ob das Experiment bereits existiert
-            cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (experiment.exp_id,))
-            exists = cursor.fetchone()[0] > 0
-
-            if exists:
-                # Aktualisiere das vorhandene Experiment
-                conn.execute('''
-                    UPDATE Experiment
-                    SET name = ?, vorname = ?, anz_tubes = ?, video_id = ?, datum = ?, anz_fehler = ?, bemerkung = ?
-                    WHERE exp_id = ?
-                ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
-            else:
-                # ein neues Experiment einfügen
-                conn.execute('''
-                    INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler, bemerkung)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung))
-   
+    # def insert_experiment(self, experiment):
+    #     if not self.does_table_exist("Experiment"):
+    #         print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_experiment_table()
+    #     else:
+    #         print("Tabelle 'Experiment' existiert bereits.")
+    #     with self.db as conn:
+    #
+    #         # video_id in einen String
+    #         video_id_str = str(experiment.video_id)
+    #
+    #         # konvert das Datum in einen String im Format YYYY-MM-DD
+    #         datum_str = experiment.datum.strftime('%Y-%m-%d') if experiment.datum is not None else None
+    #
+    #         # Überprüfen, ob das Experiment bereits existiert
+    #         cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (experiment.exp_id,))
+    #         exists = cursor.fetchone()[0] > 0
+    #
+    #         if exists:
+    #             # Aktualisiere das vorhandene Experiment
+    #             conn.execute('''
+    #                 UPDATE Experiment
+    #                 SET name = ?, vorname = ?, anz_tubes = ?, video_id = ?, datum = ?, anz_fehler = ?, bemerkung = ?
+    #                 WHERE exp_id = ?
+    #             ''', (experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung, experiment.exp_id))
+    #         else:
+    #             # ein neues Experiment einfügen
+    #             conn.execute('''
+    #                 INSERT INTO Experiment (exp_id, name, vorname, anz_tubes, video_id, datum, anz_fehler, bemerkung)
+    #                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    #             ''', (experiment.exp_id, experiment.name, experiment.vorname, experiment.anz_tubes, video_id_str, datum_str, experiment.anz_fehler, experiment.bemerkung))
+    #
     def delete_all_experiments(self):
         with self.db as conn:
             # alle Einträge in der Tabelle Experiment löschen
@@ -359,8 +359,8 @@ class DatabaseAdapter:
             # Optional: Konvertiere die Ergebnisse in eine Liste von Experiment-Objekten
             experiment_list = []
             for exp in experiments:
-                experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3],
-                                            video_id=exp[4], datum=exp[5], anz_fehler=exp[6], bemerkung=exp[7])
+                experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3],anz_plasmid=exp[4],
+                                             datum=exp[5],video_id=exp[6], anz_fehler=exp[7], bemerkung=exp[8])
                 experiment_list.append(experiment_obj)
 
             return experiment_list

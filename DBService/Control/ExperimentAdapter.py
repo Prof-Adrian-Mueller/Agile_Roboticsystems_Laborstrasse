@@ -1,5 +1,8 @@
+import tkinter
+from tkinter import filedialog
 from DBService.Control.DatabaseConnection import DatabaseConnection
 from DBService.Control.DatabaseAdapter import DatabaseAdapter
+from DBService.Control.ExperimentImporter import ExperimentImporter
 from DBService.Control.LaborantAdapter import LaborantAdapter
 from DBService.Model.Experiment import Experiment
 from DBService.Model.Experimente import Experimente
@@ -7,6 +10,7 @@ from DBService.Model.Experimente import Experimente
 
 class ExperimentAdapter:
     def __init__(self, db):
+        self.experiment_importer = None
         self.db = db
         # self.db = DatabaseConnection("laborstreet_management")
         self.database_adapter = DatabaseAdapter(self.db)
@@ -184,3 +188,20 @@ class ExperimentAdapter:
 
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
+            
+    def insert_experiment_data(self,file_path):
+        # file_path = self.select_file()
+
+        if file_path:
+            # eine Instanz des ExperimentImporters mit dem ausgewählten Dateipfad
+            self.experiment_importer = ExperimentImporter(file_path,)
+            #die Methode import_data auf, um die Daten zu importieren
+            return self.experiment_importer.import_data()
+        else:
+            return "Keine Datei ausgewählt."
+        
+    def select_file(self):
+        root = tkinter.Tk()
+        root.withdraw()  # Verstecken Sie das Hauptfenster
+        file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
+        return file_path

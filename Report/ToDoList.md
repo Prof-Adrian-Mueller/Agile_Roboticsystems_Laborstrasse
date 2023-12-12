@@ -9,7 +9,6 @@
 
 ## Wissam Alamareen
 1. [ ] Return all Experiments of a Labor Assistant using laborant id
-2. [ ] Return all Tubes of specific Experiments using Experiment Id
 
 ## Completed Tasks
 ### Ujwal Subedi
@@ -29,26 +28,30 @@
         -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
 10. [x] Adding filter to Experiment Creation Form
 
+## Completed Tasks
 ### Wissam Alamareen
-1. [x] Experiment creation or import
-2. [x] Import of Plasmid metadata
-3. [x] List of Tubes creation with Plasmid and Experiment ID
-   - [x] QR Code Generation and assign it to Tube
-4. [x] Return Experiment Data of a specific Experiments using Experiment Id
-5. [x] Return Number of Experiments of a Labor Assistant using their Name 
+1. Experiment creation or import
+2. Check if Experiment Exists
+3. Import of Plasmid metadata
+4. List of Tubes creation with Plasmid and Experiment ID
+    - [x] QR Code Generation and assign it to Tube
+5. Return Experiment Data of a specific Experiments using Experiment Id
+6. Return Number of Experiments of a Labor Assistant using their Name
+7. Return all Tubes of specific Experiments using Experiment Id
+8. Return Tube Data per probe_ne(id)
+9. Return plasmid Data per plasmid_nr(id)
+10. Return all Tubes data of specific Experiment
+11. Return all Experiments of a Labor Assistant using laborant id
+
 
 ## On Progress
 ### Ujwal Subedi
 1. Redesign QR-Image view row list near Experiment Tubes view
 
 
+### TODO
 ### Wissam Alamareen
-1. [ ] Check if Experiment Exists
-2. [ ] Add new Tube with Plasmid Id, Experiment Nr, QR Code and Probe Nr
-   * Generate QR Code for each Probe Nr
-     * Save in Database
-3. [ ] Plasmid Metadata update
-4. [ ] Experiment Import tweak for Experiment Preparation
+
 
 ### Process for Labor Assistant
 - Experiment Preparation

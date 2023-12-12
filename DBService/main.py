@@ -1,13 +1,13 @@
 
 import pandas as pd
 from sqlite3 import Date
-from Control.ExcelImporter import ExcelImporter
-from Control.TubeAdapter import TubeAdapter
-from Control.DatabaseConnection import DatabaseConnection
-from Control.LaborantAdapter import LaborantAdapter
-from Control.MetadataAdapter import MetadataAdapter
-from DBUIAdapter import DBUIAdapter
-from  Control.ExperimentAdapter import ExperimentAdapter
+from DBService.Control.ExcelImporter import ExcelImporter
+from DBService.Control.TubeAdapter import TubeAdapter
+from DBService.Control.DatabaseConnection import DatabaseConnection
+from DBService.Control.LaborantAdapter import LaborantAdapter
+from DBService.Control.MetadataAdapter import MetadataAdapter
+from DBService.DBUIAdapter import DBUIAdapter
+from DBService.Control.ExperimentAdapter import ExperimentAdapter
   
 
 # TODO
@@ -58,7 +58,7 @@ ui_db = DBUIAdapter()
 # ++++++++++++++++++
 # Return alle data eines Plasmid
 
-print(ui_db.get_plasmid_data_by_nr("PHB 20"))
+# print(ui_db.get_plasmid_data_by_nr("PHB 20"))
 # print(ui_db.select_all_from_plasmid())
 
 
@@ -74,7 +74,7 @@ print(ui_db.get_plasmid_data_by_nr("PHB 20"))
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 
 # die Methode erwartet name und nachname von laborant, anzahl der Plasmidnr, anzahl der Tubes und Datum der erstellung des Experiments
-ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+# ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
 # SEITE 2
 # Tubes zu dem Experiment hinzufügen
@@ -171,13 +171,13 @@ ui_db.adapter.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
 
 # importer.import_data()
 
-# ui_db.insert_experiment_data()
+ui_db.insert_experiment_data()
 # # ui_db.delete_all_experiment()
-# all_experiments = ui_db.adapter.get_all_experiments()
-    # Verarbeiten oder anzeigen Sie die Experimente
-# for experiment in all_experiments:
-#         print("_______________________________Returned___________________________")
-#         print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
+all_experiments = ui_db.adapter.get_all_experiments()
+#     Verarbeiten oder anzeigen Sie die Experimente
+for experiment in all_experiments:
+        print("_______________________________Returned___________________________")
+        print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
 
 
 
