@@ -53,7 +53,13 @@ ui_db = DBUIAdapter()
 # print(tubes_data)
 
 
-print(ui_db.get_tube_data_by_probe_nr(1))
+# print(ui_db.get_tube_data_by_probe_nr(1))
+
+# ++++++++++++++++++
+# Return alle data eines Plasmid
+
+print(ui_db.get_plasmid_data_by_nr("PHB 20"))
+# print(ui_db.select_all_from_plasmid())
 
 
 
