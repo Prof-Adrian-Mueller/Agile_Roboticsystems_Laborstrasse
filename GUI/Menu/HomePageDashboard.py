@@ -1,6 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
 
+from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
+
 
 class HomePageDashboard(QWidget):
     def __init__(self, parent=None, main_window=None):
@@ -16,8 +18,6 @@ class HomePageDashboard(QWidget):
         self.show_experiment_preparation()
         # self.show_start_button()
         self.show_start_button_details()
-
-
 
     def create_refresh_btn(self):
         return QPushButton("Refresh")
@@ -40,7 +40,6 @@ class HomePageDashboard(QWidget):
 
         # Add the horizontal layout to the vertical layout
         self.vbox_layout.addLayout(hbox_layout)
-
 
     def show_start_button(self):
         # Create a horizontal layout for buttons
@@ -81,11 +80,45 @@ class HomePageDashboard(QWidget):
         # Add a stretch to push the buttons to the right
         h_layout.addStretch()
 
-        #h_layout.addWidget(speichern)
-        #h_layout.addWidget(drucken)
+        # h_layout.addWidget(speichern)
+        # h_layout.addWidget(drucken)
 
         # Add the widget to your main QVBoxLayout
         self.vbox_layout.addWidget(widget)
+
+    def add_other_page_nav_btns(self):
+        # Create a widget and set its object name
+        widget = QWidget()
+
+        # Create a horizontal layout for the widget
+        h_layout = QHBoxLayout(widget)
+
+        # Create a label for the probe number
+        probe_nr_text = QLabel("Navigate to other Pages")
+        probe_nr_text.setFixedWidth(120)
+        h_layout.addWidget(probe_nr_text)
+
+        # Create the buttons
+        live_view = QPushButton("Live View")
+        show_qr = QPushButton("Show QR Codes")
+        all_tubes_exp = QPushButton("All Tubes of current Experiment")
+
+        # map buttons
+        live_view.clicked.connect(lambda: (self.ui.home_btn_dashboard.setChecked(True), self.main_window.tab_widget_home_dashboard.setCurrentIndex(1)))
+        show_qr.clicked.connect(lambda: (self.ui.experiment_info_btn.setChecked(True), self.main_window.tab_widget_experiment_qr.setCurrentIndex(1)))
+        all_tubes_exp.clicked.connect(lambda: (self.ui.experiment_info_btn.setChecked(True), self.main_window.tab_widget_experiment_qr.setCurrentIndex(0)))
+
+
+        # Add a stretch to push the buttons to the right
+        h_layout.addStretch()
+
+        h_layout.addWidget(live_view)
+        h_layout.addWidget(show_qr)
+        h_layout.addWidget(all_tubes_exp)
+
+        # Add the widget to your main QVBoxLayout
+        self.vbox_layout.addWidget(widget)
+
 
 
     def startEnTProcess(self):
@@ -111,15 +144,9 @@ class HomePageDashboard(QWidget):
         # TODO - after loading vorbereitung page- after finished creating tubes and experiment hide the experiment prep
         #  page and show the dashboard page with start ent app.
         #  below it show buttons to show qr codes and load experiment tubes table pages
-        # Add the Vorbereitung tab
-        self.main_window.tab_widget_home_dashboard.addTab(self.ui.vorbereitungTab, "Vorbereitung")
-
-        # Find the index of the Vorbereitung tab
-        vorbereitung_index = self.main_window.tab_widget_home_dashboard.indexOf(self.ui.vorbereitungTab)
-
-        # Set the Vorbereitung tab as the current tab
-        self.main_window.tab_widget_home_dashboard.setCurrentIndex(vorbereitung_index)
-
+        experiment_preparation = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
+        experiment_preparation.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        experiment_preparation.addToMainWindow(self.main_window)
         # hide other tabs
-        #self.main_window.tab_widget_home_dashboard.removeTab(1)
-        #self.main_window.tab_widget_home_dashboard.removeTab(2)
+        # self.main_window.tab_widget_home_dashboard.removeTab(1)
+        # self.main_window.tab_widget_home_dashboard.removeTab(2)

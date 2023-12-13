@@ -1,6 +1,8 @@
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
+from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Menu.DisplayQRCode import DisplayQRCode
+from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -127,8 +129,24 @@ class ExperimentPreparation:
 
                 except Exception as ex:
                     display_msg = f"Could not create tubes. \n{ex}"
-                self.nextPage()
+                    self.show_message_in_dialog(display_msg)
+                    return
+
+                # self.nextPage()
+                # Load back dashboard
                 self.show_message_in_dialog(display_msg)
+                exp_sds = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
+                exp_sds.reset_input_of_past_experiments()
+                self.main_window.tab_widget_home_dashboard.removeTab(1)
+                #load start ent app
+                self.main_window.home_dashboard.show_start_button()
+                self.main_window.home_dashboard.add_other_page_nav_btns()
+
+                # load live view
+                # Add CustomLiveWidget to the layout
+                live_widget = CustomLiveWidget(self.ui.test_page_home)
+                self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+
 
         elif page_data == 'ShowQrCodeList':
             print()
@@ -280,11 +298,9 @@ class ExperimentPreparation:
         ui.vorbereitungPrev.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_2.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_4.clicked.connect(self.prevPage)
-        ui.vorbereitungPrev_5.clicked.connect(self.prevPage)
         ui.vorbereitungNext.clicked.connect(
             lambda: self.nextPageWithControl("CreateExperiment"))
         ui.probe_to_plasmid_next.clicked.connect(
             lambda: self.nextPageWithControl("AddProbeToPlasmid"))
         ui.vorbereitungWeiter_2.clicked.connect(self.nextPage)
         ui.vorbereitungWeiter_3.clicked.connect(self.nextPage)
-        ui.vorbereitungWeiter_6.clicked.connect(self.nextPage)

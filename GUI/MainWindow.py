@@ -19,6 +19,7 @@ from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
+from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Menu.HomePageDashboard import HomePageDashboard
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Menu.Settings import Settings
@@ -46,6 +47,8 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         # UI Mainwindow Configuration
+        self.tab_widget_experiment_qr = None
+        self.home_dashboard = None
         self.tab_widget_home_dashboard = None
         self.cache = Cache("application_cache.json")
         try:
@@ -59,8 +62,10 @@ class MainWindow(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.homePage.hide()
+
         self.ui.stackedWidget.setCurrentIndex(0)
-        self.ui.homeBtn.setChecked(True)
+        self.ui.home_btn_dashboard.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
         self.resizeGrip = ResizeGripWidget(self)
         self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
@@ -101,6 +106,10 @@ class MainWindow(QMainWindow):
         # self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
         self.setupHomeDashboardView()
 
+        # ExperimentPreparation Pages
+        self.experiment_preparation = ExperimentPreparation(self.ui, self)
+        self.experiment_preparation.map_prev_next(self.ui)
+
         left_navigation = LeftNavigation(self.ui)
         left_navigation.map_buttons_to_pages()
 
@@ -136,10 +145,6 @@ class MainWindow(QMainWindow):
         # settings
         self.settings = Settings(self.ui, self)
         self.ui.windowResizeSlider.valueChanged.connect(self.settings.resize_window)
-
-        # ExperimentPreparation Pages
-        self.experiment_preparation = ExperimentPreparation(self.ui, self)
-        self.experiment_preparation.map_prev_next(self.ui)
 
         # Display Plasmid Tubes
         self.plasmidTubesList = DisplayPlasmidTubes(self.ui, self)
@@ -184,11 +189,17 @@ class MainWindow(QMainWindow):
             self.tab_widget_home_dashboard = QTabWidget(self.ui.test_page_home)
 
             # Add HomePageDashboard to the layout
-            home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
-            self.tab_widget_home_dashboard.addTab(home_dashboard, "Dashboard")
+            self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
+            self.tab_widget_home_dashboard.addTab(self.home_dashboard, "Dashboard")
             # Add CustomLiveWidget to the layout
-            #live_widget = CustomLiveWidget(self.ui.test_page_home)
-            #self.tab_widget_home_dashboard.addTab(live_widget, "Live")
+            # live_widget = CustomLiveWidget(self.ui.test_page_home)
+            # self.tab_widget_home_dashboard.addTab(live_widget, "Live")
+            # ExperimentPreparation Pages
+
+            # experiment_preparation.map_prev_next(self.ui)
+            # self.tab_widget_home_dashboard.addTab(experiment_preparation, "Exp Vorb")
+            # vorbereitung_index = self.tab_widget_home_dashboard.indexOf(self)
+            # self.tab_widget_home_dashboard.setCurrentIndex(vorbereitung_index)
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_home_dashboard)
@@ -202,7 +213,7 @@ class MainWindow(QMainWindow):
             main_layout = QVBoxLayout(self.ui.experiment_info_view)
 
             # Create the QTabWidget for the tabs
-            tab_widget = QTabWidget(self.ui.experiment_info_view)
+            self.tab_widget_experiment_qr = QTabWidget(self.ui.experiment_info_view)
 
             # Create the content for the first tab (Experiment Tubes)
             experiment_tubes_widget = QWidget()  # Container widget for the first tab
@@ -223,16 +234,16 @@ class MainWindow(QMainWindow):
             details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
 
             experiment_tubes_layout.addLayout(stacked_layout)
-            tab_widget.addTab(experiment_tubes_widget, "Experiment Tubes")
+            self.tab_widget_experiment_qr.addTab(experiment_tubes_widget, "Experiment Tubes")
 
             # Creates and adds tab for QR Codes
             qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, self)
-            tab_widget.addTab(qr_codes_widget, "QR Codes")
+            self.tab_widget_experiment_qr.addTab(qr_codes_widget, "QR Codes")
             # Load data to the Row
             qr_codes_widget.refresh_data()
 
             # Add the tab widget to the main layout
-            main_layout.addWidget(tab_widget)
+            main_layout.addWidget(self.tab_widget_experiment_qr)
 
         except Exception as ex:
             print(ex)
