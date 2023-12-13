@@ -83,6 +83,9 @@ class MainWindow(QMainWindow):
         self.setMenuWidget(self.title_bar)
         self.setWindowTitle("Dashboard UI")
 
+        # TODO delete later
+        self.ui.experimentImportierenVorbereitung.hide()
+
         # Save all the contents of the dialog box, before adding anything , it is better idea to remove contents
         # which are saved here
         self.dialogBoxContents = []

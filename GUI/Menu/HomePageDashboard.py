@@ -104,10 +104,14 @@ class HomePageDashboard(QWidget):
         all_tubes_exp = QPushButton("All Tubes of current Experiment")
 
         # map buttons
-        live_view.clicked.connect(lambda: (self.ui.home_btn_dashboard.setChecked(True), self.main_window.tab_widget_home_dashboard.setCurrentIndex(1)))
-        show_qr.clicked.connect(lambda: (self.ui.experiment_info_btn.setChecked(True), self.main_window.tab_widget_experiment_qr.setCurrentIndex(1)))
-        all_tubes_exp.clicked.connect(lambda: (self.ui.experiment_info_btn.setChecked(True), self.main_window.tab_widget_experiment_qr.setCurrentIndex(0)))
-
+        live_view.clicked.connect(lambda: (
+            self.ui.home_btn_dashboard.setChecked(True), self.main_window.tab_widget_home_dashboard.setCurrentIndex(1)))
+        show_qr.clicked.connect(lambda: (
+            self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.experiment_info_view)),
+            self.main_window.tab_widget_experiment_qr.setCurrentIndex(1)))
+        all_tubes_exp.clicked.connect(lambda: (
+            self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.experiment_info_view)),
+            self.main_window.tab_widget_experiment_qr.setCurrentIndex(0)))
 
         # Add a stretch to push the buttons to the right
         h_layout.addStretch()
@@ -118,8 +122,6 @@ class HomePageDashboard(QWidget):
 
         # Add the widget to your main QVBoxLayout
         self.vbox_layout.addWidget(widget)
-
-
 
     def startEnTProcess(self):
         """

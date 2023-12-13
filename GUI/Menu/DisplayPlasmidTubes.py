@@ -41,7 +41,7 @@ class DisplayPlasmidTubes(QWidget):
         self.plasmid_tubes = {}
         self.tubes_input_fields = []
 
-    def displayPlasmidTubes(self, plasmidNrList):
+    def displayPlasmidTubes(self, plasmid_nr_list, plasmid_dict):
 
         for i in reversed(range(self.outputLayout.count())):
             widget = self.outputLayout.itemAt(i).widget().setParent(None)
@@ -58,7 +58,8 @@ class DisplayPlasmidTubes(QWidget):
         text_widget.setLayout(text_layout)  # Set the layout of the QWidget to your QHBoxLayout
         self.outputLayout.addWidget(text_widget)  # Add the QWidget to your outputLayout
 
-        for elem in plasmidNrList:
+        for elem in plasmid_nr_list:
+            # add list here
             self.appendOutput(elem)
 
     def appendOutput(self, plasmid_nr):

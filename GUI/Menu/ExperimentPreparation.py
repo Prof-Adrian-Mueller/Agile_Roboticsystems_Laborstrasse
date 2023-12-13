@@ -50,6 +50,7 @@ class ExperimentPreparation:
         # TODO: check in db
         try:
             exp_id_data = self.ui_database.adapter.get_experiment_by_id(text)
+            plasmids = self.ui_database.get_plasmids_for_experiment(self.experiment_data.experiment_id)
             if exp_id_data:
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
@@ -62,6 +63,11 @@ class ExperimentPreparation:
                 # Set the date of the QDateEdit widget
                 self.ui.datumLE.setDate(qdate)
                 print(exp_id_data)
+                if plasmids:
+                    plasmid_list = list(set(plasmids))
+                    plasmid_string = ','.join(plasmid_list)
+                    self.ui.plasmidListEV_LE.setText(plasmid_string)
+
         except Exception as ex:
             print(ex)
 
@@ -280,6 +286,7 @@ class ExperimentPreparation:
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print("Exp-data : " + exp_data)
+
                 self.main_window.cache_data = self.main_window.load_cache()
 
             print(self.experiment_data)
@@ -287,7 +294,16 @@ class ExperimentPreparation:
         except Exception as ex:
             print(f"An error occurred: {ex}")
 
-        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list)
+            # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
+        # plasmid_dict = self.ui_database.get_tubes_data_for_experiment(self.experiment_data.experiment_id)
+        # plasmid_probe_dict = {}
+        # for item in plasmid_dict:
+        #     plasmid_probe_dict[plasmid_dict['probe_nr']] = plasmid_dict['plasmid_nr']
+        # print("This is test plasmid_dict : ")
+        # print(plasmid_probe_dict)
+        # for elem in plasmid_probe_dict:
+        #     print(elem)
+        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, None)
         print(data)
 
         # self.main_window.ui_db.add_experiment()
