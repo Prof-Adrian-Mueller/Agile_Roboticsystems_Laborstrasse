@@ -13,18 +13,20 @@ from DBService.Control.ExperimentAdapter import ExperimentAdapter
 # TODO
 # code comment 
 # methoden in den richtigen klasse rufen => teste alle methoden unten 
-# add experimt in databasedaapter in experimet adapter fügen 
+# add experimt in databasedaapter in experimet adapter fügen
+# gerade zahlen von tubes anzhal und zwichen 2 -32
+#
 
 
 ui_db = DBUIAdapter()
 
-# ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22')
+# ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22',"max1")
 
 # probe_nr_list = [1, 2, 3, 4, 5]
-# ui_db.insert_tubes(probe_nr_list, 'max9', 'PHB 371 ')
+# ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 
 
-# tubes_for_exp=ui_db.get_tubes_by_exp_id("max5")
+# tubes_for_exp=ui_db.get_tubes_by_exp_id("max1")
 # for tube in tubes_for_exp:
 #     print(tube)
 
@@ -33,7 +35,7 @@ ui_db = DBUIAdapter()
 # for tube in tubes_for_exp:
 #     print(tube)
 
-# print(ui_db.get_experiment_by_id("max2"))
+# print(ui_db.get_experiment_by_id("max1"))
 
 # all_experiments = ui_db.get_all_experiments()
 # # Verarbeiten oder anzeigen Sie die Experimente
@@ -44,12 +46,12 @@ ui_db = DBUIAdapter()
 # insert metadaten----------------------------------------------------------------------
 # meta_adapter=MetaAdapter()
 # ui_db.insert_metadaten()
-# ui_db.select_all_from_plasmid()
+# print(ui_db.select_all_from_plasmid())
 # meta_adapter.delete_plasmid("PHB 371 ")
 
 # völlständige Daten eines Experiments
 
-# tubes_data=ui_db.get_tubes_data_for_experiment("max9")
+# tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)
 
 
@@ -70,6 +72,10 @@ ui_db = DBUIAdapter()
 # print(tubes_data)
 
 
+
+# print(ui_db.get_tubes_data_for_experiment("max1"))
+# Return all Plasmid eines Experiments
+print(ui_db.get_plasmids_for_experiment("max1"))
 
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 
@@ -171,14 +177,14 @@ ui_db = DBUIAdapter()
 
 # importer.import_data()
 
-ui_db.insert_experiment_data()
+#ui_db.insert_experiment_data()
 # # ui_db.delete_all_experiment()
-all_experiments = ui_db.adapter.get_all_experiments()
+# all_experiments = ui_db.adapter.get_all_experiments()
 #     Verarbeiten oder anzeigen Sie die Experimente
-for experiment in all_experiments:
-        print("_______________________________Returned___________________________")
-        print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
-
+# for experiment in all_experiments:
+#         print("_______________________________Returned___________________________")
+#         print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
+#
 
 
 
