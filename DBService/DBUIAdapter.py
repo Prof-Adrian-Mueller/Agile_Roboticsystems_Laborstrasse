@@ -43,7 +43,8 @@ class DBUIAdapter:
     def get_tubes_data_for_experiment(self,exp_id):
         return self.experiment_adapter.get_tubes_data_for_experiment(exp_id)
 
-
+    def get_probe_numbers_by_plasmid_for_experiment(self,exp_id):
+        return self.experiment_adapter.get_probe_numbers_by_plasmid_for_experiment(exp_id)
     def delete_experiment(self,exp_id):
         self.experiment_adapter.delete_experiment(exp_id)
 

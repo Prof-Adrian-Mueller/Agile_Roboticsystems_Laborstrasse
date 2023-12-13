@@ -23,7 +23,7 @@ ui_db = DBUIAdapter()
 # ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22',"max1")
 
 # probe_nr_list = [1, 2, 3, 4, 5]
-# ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
+ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 
 
 # tubes_for_exp=ui_db.get_tubes_by_exp_id("max1")
@@ -53,6 +53,8 @@ ui_db = DBUIAdapter()
 
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)
+tubes_pro_plasmid=ui_db.get_probe_numbers_by_plasmid_for_experiment("max1")
+print(tubes_pro_plasmid)
 
 
 # print(ui_db.get_tube_data_by_probe_nr(1))
@@ -75,7 +77,7 @@ ui_db = DBUIAdapter()
 
 # print(ui_db.get_tubes_data_for_experiment("max1"))
 # Return all Plasmid eines Experiments
-print(ui_db.get_plasmids_for_experiment("max1"))
+# print(ui_db.get_plasmids_for_experiment("max1"))
 
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 

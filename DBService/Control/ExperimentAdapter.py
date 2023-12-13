@@ -138,7 +138,7 @@ class ExperimentAdapter:
                     WHERE t.exp_id = ?
                 ''', (exp_id,))
                 tubes_data = cursor.fetchall()
-                print(tubes_data)
+
                 tubes_data_list = []
                 for data in tubes_data:
                     tube_data_dict = {
@@ -154,11 +154,62 @@ class ExperimentAdapter:
                         'anz_fehler': data[9]
                     }
                     tubes_data_list.append(tube_data_dict)
-                print(tubes_data_list)
                 return tubes_data_list
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return []
+
+    # def get_probe_numbers_by_plasmid_for_experiment(self, exp_id):
+    #     try:
+    #         with self.db as conn:
+    #             cursor = conn.execute('''
+    #                 SELECT
+    #                     t.plasmid_nr,
+    #                     t.probe_nr
+    #                 FROM Tubes t
+    #                 WHERE t.exp_id = ?
+    #             ''', (exp_id,))
+    #             tubes_data = cursor.fetchall()
+    #
+    #             plasmid_probe_dict = {}
+    #             for plasmid_nr, probe_nr in tubes_data:
+    #                 if plasmid_nr not in plasmid_probe_dict:
+    #                     plasmid_probe_dict[plasmid_nr] = []
+    #                 plasmid_probe_dict[plasmid_nr].append(probe_nr)
+    #
+    #             return plasmid_probe_dict
+    #     except Exception as e:
+    #         print(f"Ein Fehler ist aufgetreten: {e}")
+    #         return {}
+    def get_probe_numbers_by_plasmid_for_experiment(self, exp_id):
+        try:
+            with self.db as conn:
+                # Überprüfen, ob das Experiment existiert
+                cursor = conn.execute("SELECT COUNT(*) FROM Experiment WHERE exp_id = ?", (exp_id,))
+                if cursor.fetchone()[0] == 0:
+                    print(f"Kein Experiment mit der ID {exp_id} gefunden.")
+                    return {}
+
+                # SQL-Abfrage, um die Daten zu holen
+                cursor = conn.execute('''
+                    SELECT 
+                        t.plasmid_nr, 
+                        t.probe_nr
+                    FROM Tubes t
+                    WHERE t.exp_id = ?
+                ''', (exp_id,))
+                tubes_data = cursor.fetchall()
+
+                plasmid_probe_dict = {}
+                for plasmid_nr, probe_nr in tubes_data:
+                    if plasmid_nr not in plasmid_probe_dict:
+                        plasmid_probe_dict[plasmid_nr] = []
+                    plasmid_probe_dict[plasmid_nr].append(probe_nr)
+
+                return plasmid_probe_dict
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")
+            return {}
 
     def delete_experiment(self, exp_id):
         try:
