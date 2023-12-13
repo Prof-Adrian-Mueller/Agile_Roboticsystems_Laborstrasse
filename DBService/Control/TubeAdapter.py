@@ -123,7 +123,20 @@ class TubeAdapter:
                 return tube_data_dict
             else:
                 print(f"Kein Tube mit Probe-Nr. {probe_nr} gefunden.")
-                return None   
+                return None
 
 
-   
+    def get_plasmids_for_experiment(self, exp_id):
+        with self.db as conn:
+            # SQL-Abfrage, um alle Plasmid-Nummern für die gegebene Experiment-ID zu holen
+            cursor = conn.execute('''
+                     SELECT plasmid_nr
+                     FROM Tubes 
+                     WHERE exp_id = ?
+                 ''', (exp_id,))
+            plasmids = cursor.fetchall()
+
+            # Extrahieren Sie die Plasmid-Nummern aus den Ergebnissen
+            plasmid_numbers = [plasmid[0] for plasmid in plasmids]
+
+            return plasmid_numbers

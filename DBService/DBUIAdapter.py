@@ -35,8 +35,8 @@ class DBUIAdapter:
         return self.experiment_adapter.get_experiment_by_id(exp_id)
     def get_all_experiments(self):
         return(self.experiment_adapter.get_all_experiments())
-    def insert_metadaten(self, file_path):
-        self.metadata_adapter.insert_metadaten(file_path)
+    def insert_metadaten(self,file_patn):
+        self.metadata_adapter.insert_metadaten(file_patn)
     def select_all_from_plasmid(self):
         return self.metadata_adapter.select_all_from_plasmid()
 
@@ -51,6 +51,9 @@ class DBUIAdapter:
         return self.tube_adapter.get_tube_data_by_probe_nr(probe_nr)
     def get_plasmid_data_by_nr(self,plasmid_nr):
         return self.metadata_adapter.get_plasmid_data_by_nr(plasmid_nr)
+
+    def get_plasmids_for_experiment(self,exp_id):
+        return self.tube_adapter.get_plasmids_for_experiment(exp_id)
     def select_file(self):
         root = tk.Tk()
         root.withdraw()  # Verstecken Sie das Hauptfenster
@@ -77,5 +80,4 @@ class DBUIAdapter:
     def delete_all_experiment(self):
         self.adapter.delete_all_experiments()
 
-    
 
