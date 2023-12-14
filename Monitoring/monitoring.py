@@ -1,5 +1,5 @@
 """ Beinhaltet den Tracker, das Lesen der notwendigen Konfigwerte und die Klassen für die Tube, Station und das Log"""
-
+from Tracker_Config.path_configuration import PathConfiguration
 
 """ Inhaltsverzeichnis:
 
@@ -47,8 +47,10 @@ import Tracker_Config.calibrate_Camera as calibrate_Camera
 from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
 
 # Lese Config Datei
-config_object = ConfigParser()
-config_object.read("..\\Tracker_Config\\tracker_config.ini")
+# config_object = ConfigParser()
+# config_object.read("..\\Tracker_Config\\tracker_config.ini")
+path_config = PathConfiguration()
+config_object = path_config.load_configuration()
 cameraConf = config_object["Camera"]
 trackerConf = config_object["Tracker"]
 telegramConf = config_object["Telegram"]

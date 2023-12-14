@@ -60,8 +60,24 @@ class CliInOutWorkerThreadManager(QWidget):
             self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
             self.process.readyReadStandardError.connect(self.errorOutputWritten)
 
+            # script_path = os.path.join('.', 'Main', 'main.py')
+            # self.process.start('python', ['-u', script_path])
+            # self.appendOutput("Process has been started.")
+            # # Path to your virtual environment's Python executable
+            # venv_python_path = os.path.join('.', 'path_to_venv', 'Scripts',
+            #                                 'python')  # Use 'bin/python' instead of 'Scripts\python' on Unix-based systems
+
+            # Path to your script
             script_path = os.path.join('.', 'Main', 'main.py')
-            self.process.start('python', ['-u', script_path])
+
+            # Get the current directory
+            current_dir = os.getcwd()
+
+            # Construct the path to the virtual environment's Python executable
+            venv_python_path = os.path.join(current_dir, 'venv', 'Scripts', 'python')
+
+            # Start the process with the venv Python
+            self.process.start(venv_python_path, ['-u', script_path])
             self.appendOutput("Process has been started.")
         else:
             self.appendOutput("Process has already been started.")
