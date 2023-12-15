@@ -38,8 +38,10 @@ class DisplayPlasmidTubes(QWidget):
         scroll.setWidget(frame)
         self.outputLayout = QVBoxLayout(frame)
         self.experiment_data = ExperimentSingleton()
+        self.plasmid_tubes = {}
+        self.tubes_input_fields = []
 
-    def displayPlasmidTubes(self, plasmidNrList):
+    def displayPlasmidTubes(self, plasmid_nr_list, plasmid_dict):
 
         for i in reversed(range(self.outputLayout.count())):
             widget = self.outputLayout.itemAt(i).widget().setParent(None)
@@ -56,7 +58,8 @@ class DisplayPlasmidTubes(QWidget):
         text_widget.setLayout(text_layout)  # Set the layout of the QWidget to your QHBoxLayout
         self.outputLayout.addWidget(text_widget)  # Add the QWidget to your outputLayout
 
-        for elem in plasmidNrList:
+        for elem in plasmid_nr_list:
+            # add list here
             self.appendOutput(elem)
 
     def appendOutput(self, plasmid_nr):
@@ -66,6 +69,7 @@ class DisplayPlasmidTubes(QWidget):
         # Create the buttons and line edit
         plasmid_nr_label = QLabel(plasmid_nr)
         probe_nr_input = QLineEdit()
+        self.tubes_input_fields.append(probe_nr_input)
         print(plasmid_nr)
         probe_nr_input.editingFinished.connect(
             lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))
@@ -93,3 +97,26 @@ class DisplayPlasmidTubes(QWidget):
             self.main_window.dialogBoxContents.append(
                 self.main_window.dialog.addContent(f"Please check the Input. \n{ex}", ContentType.OUTPUT))
             self.main_window.dialog.show()
+
+    def check_duplicate_inputs(self):
+        input_values = []
+        for field in self.tubes_input_fields:
+            input_values.extend(field.text().split(','))
+
+        if len(input_values) != len(set(input_values)):
+            print("Duplicate inputs found.")
+            return True
+        else:
+            print("No duplicate inputs.")
+            return False
+
+    def check_max_input(self):
+        input_values = []
+        for field in self.tubes_input_fields:
+            input_values.extend(field.text().split(','))
+
+        if len(input_values)>32:
+            return False
+
+        return True
+

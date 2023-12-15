@@ -1,6 +1,8 @@
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
+from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Menu.DisplayQRCode import DisplayQRCode
+from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -48,6 +50,7 @@ class ExperimentPreparation:
         # TODO: check in db
         try:
             exp_id_data = self.ui_database.adapter.get_experiment_by_id(text)
+            plasmids = self.ui_database.get_plasmids_for_experiment(self.experiment_data.experiment_id)
             if exp_id_data:
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
@@ -60,6 +63,11 @@ class ExperimentPreparation:
                 # Set the date of the QDateEdit widget
                 self.ui.datumLE.setDate(qdate)
                 print(exp_id_data)
+                if plasmids:
+                    plasmid_list = list(set(plasmids))
+                    plasmid_string = ','.join(plasmid_list)
+                    self.ui.plasmidListEV_LE.setText(plasmid_string)
+
         except Exception as ex:
             print(ex)
 
@@ -90,10 +98,19 @@ class ExperimentPreparation:
 
             # self.nextPage()
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
-                display_msg = "Experiment has duplicates, please reenter!"
+                display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
+
+            # # TODO check this before inserting data
+            # elif not self.main_window.plasmidTubesList.check_duplicate_inputs():
+            #     self.main_window.display_qr_from_main("Tube Ids sollten unterschiedlich sein.")
+            #     return
+            #
+            # elif self.main_window.plasmidTubesList.check_max_input():
+            #     self.main_window.display_qr_from_main("Anzahl von Tubes sollen nicht mehr als 32 sein.")
+
             else:
-                display_msg = "All the values look good.\n"
+                display_msg = "All values look good.\n"
                 count_tubes = []
                 try:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
@@ -118,8 +135,24 @@ class ExperimentPreparation:
 
                 except Exception as ex:
                     display_msg = f"Could not create tubes. \n{ex}"
-                self.nextPage()
+                    self.show_message_in_dialog(display_msg)
+                    return
+
+                # self.nextPage()
+                # Load back dashboard
                 self.show_message_in_dialog(display_msg)
+                exp_sds = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
+                exp_sds.reset_input_of_past_experiments()
+                self.main_window.tab_widget_home_dashboard.removeTab(1)
+                #load start ent app
+                self.main_window.home_dashboard.show_start_button()
+                self.main_window.home_dashboard.add_other_page_nav_btns()
+
+                # load live view
+                # Add CustomLiveWidget to the layout
+                live_widget = CustomLiveWidget(self.ui.test_page_home)
+                self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+
 
         elif page_data == 'ShowQrCodeList':
             print()
@@ -208,6 +241,18 @@ class ExperimentPreparation:
             return
 
         try:
+            for elem in plasmid_list:
+                check_if_plasmid_exists_data = self.ui_database.metadata_adapter.get_plasmid_data_by_nr(elem)
+                if check_if_plasmid_exists_data:
+                    print("Plasmid data : " + str(check_if_plasmid_exists_data))
+                else:
+                    raise ValueError(f"Plasmid {elem} existiert nicht. \n")
+
+        except Exception as ex:
+            self.show_message_in_dialog(ex)
+            return
+
+        try:
             date_str = '-'.join(map(str, data['date']))
             experiment_id = data['exp_id'] or None
             exp_id_data = None
@@ -227,7 +272,7 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
-                print("Exp-data : "+exp_data)
+                print("Exp-data : " + exp_data)
             else:
                 print(f"{exp_id_data} is not None")
                 print(exp_id_data)
@@ -240,7 +285,8 @@ class ExperimentPreparation:
                                                            date=data['date'])
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
-                print("Exp-data : "+exp_data)
+                print("Exp-data : " + exp_data)
+
                 self.main_window.cache_data = self.main_window.load_cache()
 
             print(self.experiment_data)
@@ -248,7 +294,16 @@ class ExperimentPreparation:
         except Exception as ex:
             print(f"An error occurred: {ex}")
 
-        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list)
+            # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
+        # plasmid_dict = self.ui_database.get_tubes_data_for_experiment(self.experiment_data.experiment_id)
+        # plasmid_probe_dict = {}
+        # for item in plasmid_dict:
+        #     plasmid_probe_dict[plasmid_dict['probe_nr']] = plasmid_dict['plasmid_nr']
+        # print("This is test plasmid_dict : ")
+        # print(plasmid_probe_dict)
+        # for elem in plasmid_probe_dict:
+        #     print(elem)
+        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, None)
         print(data)
 
         # self.main_window.ui_db.add_experiment()
@@ -259,11 +314,9 @@ class ExperimentPreparation:
         ui.vorbereitungPrev.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_2.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_4.clicked.connect(self.prevPage)
-        ui.vorbereitungPrev_5.clicked.connect(self.prevPage)
         ui.vorbereitungNext.clicked.connect(
             lambda: self.nextPageWithControl("CreateExperiment"))
         ui.probe_to_plasmid_next.clicked.connect(
             lambda: self.nextPageWithControl("AddProbeToPlasmid"))
         ui.vorbereitungWeiter_2.clicked.connect(self.nextPage)
         ui.vorbereitungWeiter_3.clicked.connect(self.nextPage)
-        ui.vorbereitungWeiter_6.clicked.connect(self.nextPage)
