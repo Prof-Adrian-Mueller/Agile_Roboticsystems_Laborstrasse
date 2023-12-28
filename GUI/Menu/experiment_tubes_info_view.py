@@ -137,6 +137,7 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
 
+        self.create_export_btn(h_layout)
         self.create_refresh_btn(h_layout)
 
         layout.addLayout(h_layout)
@@ -175,6 +176,24 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         # Connect the cell click signal
         self.experiments_table.cellClicked.connect(self.row_selected)
+
+    def create_export_btn(self, h_layout):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal,
+                       QIcon.State.Off)
+        refresh_btn = QPushButton("")
+        refresh_btn.clicked.connect(self.refresh_data)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+        refresh_btn.setToolTip("Export")
+        refresh_btn.setIcon(icon)
+        h_layout.addWidget(refresh_btn)
 
     def create_refresh_btn(self, h_layout):
         icon = QIcon()

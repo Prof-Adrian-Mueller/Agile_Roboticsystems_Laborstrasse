@@ -13,6 +13,7 @@ class InterprocessCommunication:
     """
     Process to be run by GUI. Could Send and Receive Message to GUI.
     """
+
     def __init__(self, is_debug=False):
         self.is_debug = is_debug
 
@@ -32,7 +33,8 @@ class InterprocessCommunication:
                     print('Child process Exited!')
                     sys.exit(0)
 
-    def run(self):
+    def run(self, args):
+        anzahl_tubes = int(args[0])
         if self.is_debug:
             print("E&T Started! \n Type 'exit' to stop the process.")
 
@@ -44,15 +46,15 @@ class InterprocessCommunication:
         else:
             print("Starting steuerung")
             from Main.doBot_Steuerung import SteuerungControl
-            steuerung = SteuerungControl()
+            steuerung = SteuerungControl(anzahl_tubes)
             steuerung.steuerung()
 
 
 if __name__ == "__main__":
     ipc = InterprocessCommunication()
-
+    args = sys.argv[1:]
     try:
-        ipc.run()
+        ipc.run(args)
     except KeyboardInterrupt:
         print("Interrupt received, stopping child process...")
         print('Child process Exited!')

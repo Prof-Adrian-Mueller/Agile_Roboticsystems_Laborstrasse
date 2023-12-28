@@ -144,12 +144,15 @@ class ExperimentPreparation:
                 exp_sds = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
                 exp_sds.reset_input_of_past_experiments()
                 self.main_window.tab_widget_home_dashboard.removeTab(1)
-                #load start ent app
+                # load start ent app
                 self.main_window.home_dashboard.show_start_button()
                 self.main_window.home_dashboard.add_other_page_nav_btns()
 
                 # load live view
                 # Add CustomLiveWidget to the layout
+                current_exp = CurrentExperimentSingleton()
+                self.main_window.home_dashboard.nr_of_tubes = str(
+                    len(self.ui_database.get_tubes_by_exp_id(current_exp.experiment_id)))
                 live_widget = CustomLiveWidget(self.ui.test_page_home)
                 self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
 

@@ -1,5 +1,7 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
+from PyQt6.uic.properties import QtGui, QtWidgets, QtCore
 
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 
@@ -7,7 +9,12 @@ from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 class HomePageDashboard(QWidget):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
+        self.start_button = None
+        self.stopIcon = None
+        self.startIcon = None
         self.startEnTBtn = None
+        self.isStarted = False
+        self.init_icons()
         self.main_window = main_window
         self.ui = main_window.ui
         # Set size policy to expanding
@@ -16,8 +23,10 @@ class HomePageDashboard(QWidget):
         # Create a QVBoxLayout
         self.vbox_layout = QVBoxLayout(self)
         self.show_experiment_preparation()
-        # self.show_start_button()
         self.show_start_button_details()
+        self.nr_of_tubes = 0
+
+        # self.show_start_button()
 
     def create_refresh_btn(self):
         return QPushButton("Refresh")
@@ -41,34 +50,34 @@ class HomePageDashboard(QWidget):
         # Add the horizontal layout to the vertical layout
         self.vbox_layout.addLayout(hbox_layout)
 
+    def init_icons(self):
+        self.startIcon = QIcon(":/icons/img/play.svg")
+        self.stopIcon = QIcon(":/icons/img/stop.svg")
+
     def show_start_button(self):
-        # Create a horizontal layout for buttons
         hbox_layout = QHBoxLayout()
 
-        # Create label and add it to the horizontal layout
         start_label = QLabel("Start Erfassung & Tracking")
         hbox_layout.addWidget(start_label)
 
-        # Add a stretch to push the next widget (button) to the right
         hbox_layout.addStretch()
 
-        # Create the start button and add it to the layout
-        self.startEnTBtn = QPushButton("Start")
-        self.startEnTBtn.setMinimumSize(200, 240)
-        self.startEnTBtn.clicked.connect(self.startEnTProcess)
-        hbox_layout.addWidget(self.startEnTBtn)
+        # Create and configure the start button
+        self.configure_start_button()
+        hbox_layout.addWidget(self.start_button)
 
-        # Add the horizontal layout to the vertical layout
         self.vbox_layout.addLayout(hbox_layout)
 
+    def configure_start_button(self):
+        self.start_button = QPushButton()
+        self.start_button.setIcon(self.startIcon)
+        self.start_button.setIconSize(QSize(24, 24))
+        self.start_button.setStyleSheet("QPushButton { background-color: #45a049 }")
+        self.start_button.clicked.connect(self.startEnTProcess)
+
     def show_start_button_details(self):
-        # Create a widget and set its object name
         widget = QWidget()
-
-        # Create a horizontal layout for the widget
         h_layout = QHBoxLayout(widget)
-
-        # Create a label for the probe number
         probe_nr_text = QLabel("")
         probe_nr_text.setFixedWidth(120)
 
@@ -128,19 +137,23 @@ class HomePageDashboard(QWidget):
         Start the Monitoring App, change button color on the current situation of the Process.
         """
         # TODO Start monitoring app using python process
-
-        if self.startEnTBtn.text() == "Start":
-            self.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
-            self.startEnTBtn.setText("Stop")
-            self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
-            self.main_window.cliInOutWorkerThreadManager.startProcess()
-
-        else:
-            self.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
-            self.main_window.cliInOutWorkerThreadManager.stopProcess()
-            self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been stopped.")
-            print("E&T process Terminated!")
-            self.startEnTBtn.setText("Start")
+        try:
+            if not hasattr(self, 'isStarted') or not self.isStarted:
+                self.start_button.setStyleSheet("QPushButton { background-color: red }")
+                self.start_button.setIcon(self.stopIcon)
+                self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
+                self.main_window.cliInOutWorkerThreadManager.startProcess(self.nr_of_tubes)
+                self.isStarted = True
+            else:
+                self.start_button.setStyleSheet("QPushButton { background-color: #45a049 }")
+                self.main_window.cliInOutWorkerThreadManager.stopProcess()
+                self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been stopped.")
+                print("E&T process Terminated!")
+                self.start_button.setIcon(self.startIcon)
+                self.isStarted = False
+        except Exception as ex:
+            print(ex)
+            ex.with_traceback()
 
     def start_experiment_preparation(self):
         # TODO - after loading vorbereitung page- after finished creating tubes and experiment hide the experiment prep

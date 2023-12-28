@@ -2,7 +2,7 @@ import os
 import sys
 
 from PyQt6 import QtCore
-from PyQt6.QtCore import QEvent, QRect
+from PyQt6.QtCore import QEvent, QRect, Qt
 from PyQt6.QtWidgets import QSizePolicy, QApplication, QMainWindow, QVBoxLayout, \
     QFileDialog, QStackedLayout, QTabWidget
 from PyQt6.QtWidgets import QWidget
@@ -63,6 +63,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.homePage.hide()
+
+        self.ui.leftNavigation.move(0, 0)
 
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.home_btn_dashboard.setChecked(True)
@@ -193,7 +195,7 @@ class MainWindow(QMainWindow):
 
             # Add HomePageDashboard to the layout
             self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
-            # self.home_dashboard.show_start_button()
+            self.home_dashboard.show_start_button()
             self.tab_widget_home_dashboard.addTab(self.home_dashboard, "Dashboard")
             # Add CustomLiveWidget to the layout
             # live_widget = CustomLiveWidget(self.ui.test_page_home)
