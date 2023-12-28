@@ -34,9 +34,12 @@ class CustomTitleBar(QWidget):
         scaled_pixmap = pixmap.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio,
                                       Qt.TransformationMode.SmoothTransformation)
         app_logo.setPixmap(scaled_pixmap)
+        app_logo.setObjectName("app_logo")
         self.layout_logo.addWidget(app_logo)
         self.layout_logo.addStretch(10)
+        self.layout_logo.setObjectName("logo_layout")
         layout.addLayout(self.layout_logo)
+        # self.setStyleSheet("background-color: #E0E0E0; min-width: 60px;")
 
         layout.addStretch(1)
         app_title = QLabel("Dashboard UI")
