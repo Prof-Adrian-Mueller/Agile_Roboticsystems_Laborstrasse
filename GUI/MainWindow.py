@@ -11,8 +11,8 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.CliInOutWorkerThreadManager import CliInOutWorkerThreadManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
-from GUI.Custom.CustomTitleBar import CustomTitleBar
 from GUI.Custom.CustomLiveWidget import CustomLiveWidget
+from GUI.Custom.CustomTitleBar import CustomTitleBar
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.LeftNavigation import LeftNavigation
@@ -32,7 +32,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
-from GUI.Storage.BorgSingleton import TubesSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import TubesSingleton, CurrentExperimentSingleton, MainWindowSingleton
 from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
 from GUI.Storage.Cache import Cache
 from GUI.Storage.CacheModel import CacheModel
@@ -45,7 +45,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-
         # UI Mainwindow Configuration
         self.tab_widget_experiment_qr = None
         self.home_dashboard = None
@@ -123,9 +122,9 @@ class MainWindow(QMainWindow):
         self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
 
         # Live view widget
-        widget_live_layout = QVBoxLayout(self.ui.widgetLive)
-        self.custom_live_widget = CustomLiveWidget(self.ui.widgetLive)
-        widget_live_layout.addWidget(self.custom_live_widget)
+        # widget_live_layout = QVBoxLayout(self.ui.widgetLive)
+        # self.custom_live_widget = CustomLiveWidget(self.ui.widgetLive)
+        # widget_live_layout.addWidget(self.custom_live_widget)
 
         # Cli stdin stdout
         self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
@@ -161,6 +160,7 @@ class MainWindow(QMainWindow):
         # Display TubeInformation
         self.tube_info = TableInformationFetchByParameter(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
+        MainWindowSingleton().set_main_window(self)
 
         # reorganise layout
 
@@ -195,11 +195,11 @@ class MainWindow(QMainWindow):
 
             # Add HomePageDashboard to the layout
             self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
-            self.home_dashboard.show_start_button()
+            # self.home_dashboard.show_start_button()
             self.tab_widget_home_dashboard.addTab(self.home_dashboard, "Dashboard")
             # Add CustomLiveWidget to the layout
-            # live_widget = CustomLiveWidget(self.ui.test_page_home)
-            # self.tab_widget_home_dashboard.addTab(live_widget, "Live")
+            # self.live_widget = CustomLiveWidget(self.ui.test_page_home, self)
+            # self.tab_widget_home_dashboard.addTab(self.live_widget, "Live")
             # ExperimentPreparation Pages
 
             # experiment_preparation.map_prev_next(self.ui)

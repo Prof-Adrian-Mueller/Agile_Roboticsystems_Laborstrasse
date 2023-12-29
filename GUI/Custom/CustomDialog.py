@@ -124,23 +124,28 @@ class CustomDialog(QDialog):
                     self.row_widgets.remove(row_widget)
 
     def addContent(self, content, content_type=ContentType):
+        global label
         row_widget = QWidget()
         row_box = QHBoxLayout()
         if content_type == ContentType.OUTPUT:
-            label = QLabel(content)
+            if isinstance(content, str):
+                label = QLabel(content)
+            else:
+                label = content
             label.setWordWrap(True)
             row_box.addWidget(label)
 
             # Create and configure the copy button
-            copy_button = QPushButton("")
-            icon1 = QIcon()
-            icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
-            copy_button.setIcon(icon1)
-            copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
-            copy_button.setFixedHeight(30)
-            copy_button.setFixedWidth(30)
-            # Add the copy button to the horizontal layout
-            row_box.addWidget(copy_button)
+            if isinstance(content, str):
+                copy_button = QPushButton("")
+                icon1 = QIcon()
+                icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+                copy_button.setIcon(icon1)
+                copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
+                copy_button.setFixedHeight(30)
+                copy_button.setFixedWidth(30)
+                # Add the copy button to the horizontal layout
+                row_box.addWidget(copy_button)
 
         elif content_type == ContentType.INPUT:
             label = QLabel(content, self)

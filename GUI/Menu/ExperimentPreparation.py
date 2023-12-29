@@ -12,7 +12,8 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '03/12/2023'
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
+    MainWindowSingleton
 
 
 class ExperimentPreparation:
@@ -128,7 +129,6 @@ class ExperimentPreparation:
                     print(self.tube_information)
                     self.main_window.display_qr_from_main(probe_list)
                     # TODO layout anpassen
-                    self.main_window.custom_live_widget.display_tubes_data()
                     # qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
                     # for qr_code in qr_codes_list:
                     #     print(qr_code)
@@ -153,8 +153,17 @@ class ExperimentPreparation:
                 current_exp = CurrentExperimentSingleton()
                 self.main_window.home_dashboard.nr_of_tubes = str(
                     len(self.ui_database.get_tubes_by_exp_id(current_exp.experiment_id)))
-                live_widget = CustomLiveWidget(self.ui.test_page_home)
+                main_win_singleton = MainWindowSingleton()
+                if MainWindowSingleton().main_window:
+                    live_widget = CustomLiveWidget(self.ui.test_page_home, MainWindowSingleton().main_window)
+                    print("Main Singleton Loaded")
+                else:
+                    live_widget = CustomLiveWidget(self.ui.test_page_home, self.main_window)
                 self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+                tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
+                if tube_info_data:
+                    print(tube_info_data)
+                    live_widget.display_tubes_data(tube_info_data)
 
 
         elif page_data == 'ShowQrCodeList':

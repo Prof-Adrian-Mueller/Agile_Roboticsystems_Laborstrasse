@@ -221,8 +221,7 @@ class ExperimentTubesInfoDashboard(QWidget):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
                 self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.current_experiment.experiment_id)
                 self.populate_table()
-            else:
-                self.current_experiment = self.main_window.cache_data.experiment_id
+
         except Exception as ex:
             self.main_window.removeDialogBoxContents()
             self.main_window.show_message_in_dialog(ex)

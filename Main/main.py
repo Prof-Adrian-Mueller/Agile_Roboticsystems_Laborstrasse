@@ -42,6 +42,7 @@ class InterprocessCommunication:
             child_thread = threading.Thread(target=self.run_child_process)
             child_thread.start()
             child_thread.join()
+            str_dummy = ""
 
         else:
             print("Starting steuerung")

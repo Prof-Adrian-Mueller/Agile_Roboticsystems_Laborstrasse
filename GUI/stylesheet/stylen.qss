@@ -398,3 +398,10 @@ QLabel#qrCodeLabel {
 #more_btn:pressed {
     background-color: #201e21;
 }
+
+
+#live_row_label {
+  border: 1px solid #FFFFFF;
+  border-radius: 5px;
+  padding:5px;
+}

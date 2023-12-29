@@ -1,3 +1,5 @@
+
+
 class BorgSingleton:
     """
     Singleton Class to store shared data in Application Runtime
@@ -7,6 +9,7 @@ class BorgSingleton:
     def __init__(self):
         self.__dict__ = self._shared_state
 
+
 class CurrentExperimentSingleton(BorgSingleton):
     def __init__(self, experiment_id=None):
         BorgSingleton.__init__(self)
@@ -15,6 +18,7 @@ class CurrentExperimentSingleton(BorgSingleton):
 
     def __str__(self):
         return f"CurrentExperimentSingleton(experiment_id={self.experiment_id})"
+
 
 class ExperimentSingleton(BorgSingleton):
     """
@@ -96,6 +100,19 @@ class TubesSingleton(BorgSingleton):
 
     def __str__(self):
         return f'TubesSingleton(tubes={self.tubes})'
+
+
+class MainWindowSingleton(BorgSingleton):
+    """
+        Singleton Class to store MainWindow Data in Application Runtime
+    """
+
+    def __init__(self, main_window=None):
+        BorgSingleton.__init__(self)
+        self.main_window = main_window
+
+    def set_main_window(self, main_window):
+        self.main_window = main_window
 
 
 if __name__ == "__main__":
