@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
 
             # Add HomePageDashboard to the layout
             self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
-            self.home_dashboard.show_start_button()
+            # self.home_dashboard.show_start_button()
             self.tab_widget_home_dashboard.addTab(self.home_dashboard, "Dashboard")
             # Add CustomLiveWidget to the layout
             # live_widget = CustomLiveWidget(self.ui.test_page_home)

@@ -25,14 +25,19 @@ class DBUIAdapter:
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
         self.tube_adapter.insert_tubes(probe_nr_list, exp_id, plasmid_nr)
+    def available_qrcode(self,exp_id):
+        return (self.experiment_adapter.available_qrcode(exp_id))
 
     def get_tubes_by_exp_id(self,exp_id):
         return(self.tube_adapter.get_tubes_by_exp_id(exp_id))  
     def get_tubes(self):
         return(self.tube_adapter.get_tubes())
-    
+    def get_latest_tube_by_exp_id(self,exp_id):
+        return(self.experiment_adapter.get_latest_tube_by_exp_id(exp_id))
+    def get_anz_tubes_exp_id(self,exp_id):
+        return(self.experiment_adapter.get_anz_tubes_exp_id(exp_id))
     def  get_experiment_by_id(self,exp_id):
-        return self.experiment_adapter.get_experiment_by_id(exp_id)
+        return self.experiment_adapter.get_anz_tubes_exp_id(exp_id)
     def get_all_experiments(self):
         return(self.experiment_adapter.get_all_experiments())
     def insert_metadaten(self,file_patn):
