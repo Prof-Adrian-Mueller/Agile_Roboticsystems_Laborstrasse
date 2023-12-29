@@ -64,14 +64,14 @@ class TubeAdapter:
                         'plasmid_nr': tube[3]
                     }
                     tubes_list.append(tube_dict)
-                    print(f"Gefundenes Tube: {tube_dict}")
+                    # print(f"Gefundenes Tube: {tube_dict}")
 
                 return tubes_list
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return []
 
-  
+
 
     def get_tubes(self):
         with self.db as conn:
