@@ -6,7 +6,11 @@ from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWi
 from PyQt6.uic.properties import QtGui
 
 from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
+from GUI.Utils.FileUtils import FileUtils
 from GUI.button_back_design_test import CustomBackButton
+import os
+import pandas as pd
+from PyQt6.QtWidgets import QApplication, QFileDialog
 
 
 class ExperimentTubesDetails(QWidget):
@@ -182,7 +186,7 @@ class ExperimentTubesInfoDashboard(QWidget):
         icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal,
                        QIcon.State.Off)
         refresh_btn = QPushButton("")
-        refresh_btn.clicked.connect(self.refresh_data)
+        refresh_btn.clicked.connect(self.export_table_data)
         refresh_btn.setStyleSheet("""
             QPushButton {
                 background: transparent;
@@ -194,6 +198,16 @@ class ExperimentTubesInfoDashboard(QWidget):
         refresh_btn.setToolTip("Export")
         refresh_btn.setIcon(icon)
         h_layout.addWidget(refresh_btn)
+
+    def export_table_data(self):
+        self.refresh_data()
+        if not self.experiments_data:
+            return
+        try:
+            FileUtils.save_data_to_excel(self, self.experiments_data,
+                                         "experiment_data_exp_" + self.current_experiment.experiment_id)
+        except Exception as ex:
+            print(ex)
 
     def create_refresh_btn(self, h_layout):
         icon = QIcon()
@@ -219,7 +233,8 @@ class ExperimentTubesInfoDashboard(QWidget):
             if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
                                                        'experiment_id') and self.current_experiment.experiment_id is not None):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
-                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.current_experiment.experiment_id)
+                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                    self.current_experiment.experiment_id)
                 self.populate_table()
 
         except Exception as ex:

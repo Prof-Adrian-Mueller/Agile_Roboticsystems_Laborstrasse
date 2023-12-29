@@ -152,3 +152,11 @@ DBService/DefaultTemplate/.~lock.Experiment.xlsx\#
 /laborstreet_management
 DBService/laborstreet_management
 DBService/laborstreet_management
+ExportData/
+*.xlsx
+ExportData/2023-12-29_experiment_data_exp_Ujwal1.xlsx
+ExportData/20231229_192143_experiment_data_exp_Ujwal1.xlsx
+ExportData/Exp_overview.xlsx
+
+/ExportData/2023-12-29_experiment_data_exp_Ujwal1.xlsx
+/ExportData/2023-12-29_experiment_data_exp_Ujwal1.xlsx
