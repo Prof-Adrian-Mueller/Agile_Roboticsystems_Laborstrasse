@@ -11,6 +11,10 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
+from GUI.Utils.LiveObservable import MessageDisplay
+from GUI.Utils.LiveObservable import LiveObservable
+from GUI.Utils.LiveViewMessageDisplay import LiveViewMessageDisplay
+
 
 class CliInOutWorkerThreadManager(QWidget):
     """
@@ -40,6 +44,15 @@ class CliInOutWorkerThreadManager(QWidget):
         self.ui.cliOutputArea.setSizePolicy(self.sizePolicy)
 
         self.displayDefault("Process has not been still started.")
+
+        # Creating Observable
+        self.message_service = LiveObservable()
+
+        # Creating Observers
+        display = LiveViewMessageDisplay()
+
+        # Registering the Observer
+        self.message_service.register_observer(display)
 
     def displayDefault(self, message):
         self.defaultWidget = QWidget()
@@ -111,12 +124,24 @@ class CliInOutWorkerThreadManager(QWidget):
         """
         Display output text on CLI GUI
         """
-        new_text = self.process.readAllStandardOutput().data().decode().strip()
-        self.appendOutput(new_text)
+        try:
+            output = self.process.readAllStandardOutput().data().decode().strip()
+            if output:
+                if output.startswith("LIVE"):
+                    message = output[len("LIVE "):].strip()
+                    self.message_service.notify_observers(message)
+                else:
+                    self.appendOutput(output)
+        except Exception as ex:
+            print(ex)
 
     def errorOutputWritten(self):
         """
         Display error text on CLI GUI
         """
-        new_text = self.process.readAllStandardError().data().decode().strip()
-        self.appendOutput(new_text)
+        output = self.process.readAllStandardError().data().decode().strip()
+        if output:
+            if output.startswith("LIVE"):
+                print(f"It has {output.split()[0]} Data")
+            else:
+                self.appendOutput(output)

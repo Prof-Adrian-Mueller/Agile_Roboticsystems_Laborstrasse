@@ -31,9 +31,9 @@ class ExperimentAdapter:
             print("Tabelle 'Experiment' wurde erstellt.")
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
-        if anz_tubes % 2 != 0:
-            print("Die Anzahl der Tubes muss eine gerade Zahl sein. Das Experiment wird nicht hinzugefügt.")
-            return None
+        # if anz_tubes % 2 != 0:
+        #     print("Die Anzahl der Tubes muss eine gerade Zahl sein. Das Experiment wird nicht hinzugefügt.")
+        #     return None
 
         if self.laborant_adapter.does_laborant_exist(name):
             print(f"Ein Laborant mit dem Namen {name} existiert.")
@@ -127,12 +127,18 @@ class ExperimentAdapter:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return None
     def available_qrcode(self,exp_id):
-        print("in availeble_qrcode")
-        von=self.get_latest_tube_by_exp_id(exp_id)
-        bis=self.get_anz_tubes_exp_id(exp_id)
-        if bis is not None and bis >= von:
-            for x in range(von + 1, bis + 1):
-                print(f"{x:06d}")
+        try:
+            print("in availeble_qrcode")
+            von=self.get_latest_tube_by_exp_id(exp_id)
+            bis=self.get_anz_tubes_exp_id(exp_id)
+            list_of_tubes = []
+            if bis is not None and bis >= von:
+                for x in range(von + 1, bis + 1):
+                    list_of_tubes.append(x)
+                    print(f"{x:06d}")
+                return list_of_tubes
+        except Exception as ex:
+            return []
 
 
     def get_all_experiments(self):

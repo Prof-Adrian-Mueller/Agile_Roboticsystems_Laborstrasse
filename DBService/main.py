@@ -20,7 +20,7 @@ from DBService.Control.ExperimentAdapter import ExperimentAdapter
 
 ui_db = DBUIAdapter()
 
-ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
+# ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
 
 # probe_nr_list = [1, 2, 3, 4, 5]
 # ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
@@ -31,7 +31,7 @@ ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
 #     print(tube)
 # print(ui_db.get_latest_tube_by_exp_id("max1"))
 # print(ui_db.get_anz_tubes_exp_id("max1"))
-ui_db.available_qrcode("max1")
+# ui_db.available_qrcode("max1")
 
 
 # tubes_for_exp=ui_db.get_tubes()

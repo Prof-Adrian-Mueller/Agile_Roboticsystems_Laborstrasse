@@ -12,7 +12,8 @@ __last_changed__ = '01/12/2023'
 
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Menu.QRCodesWidget import QRCodesWidget
-from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
+    TubeLayoutSingleton
 
 
 class CustomLiveWidget(QWidget):
@@ -84,7 +85,8 @@ class CustomLiveWidget(QWidget):
         try:
             self.main_window.cache_data = self.main_window.load_cache()
             if self.main_window.cache_data:
-                tube_info_data = self.main_window.ui_db.adapter.get_tubes_by_exp_id(self.main_window.cache_data.experiment_id)
+                tube_info_data = self.main_window.ui_db.adapter.get_tubes_by_exp_id(
+                    self.main_window.cache_data.experiment_id)
                 self.display_tubes_data(tube_info_data)
 
         except Exception as ex:
@@ -106,19 +108,34 @@ class CustomLiveWidget(QWidget):
         label = QLabel(str(tube['probe_nr']))
         h_layout.addWidget(label)
         buttons = [QPushButton(f'{j + 1}') for j in range(3)]
-        for button in buttons:
+        tube_layout_singleton = TubeLayoutSingleton()
+        stations = []
+        for index, button in enumerate(buttons):
             h_layout.addWidget(button)
-            arrow_right_label = QLabel()
-            pixmap = QPixmap(":/icons/img/arrow-right.svg")
-            scaled_pixmap = pixmap.scaled(150, 20, Qt.AspectRatioMode.KeepAspectRatio)
-            arrow_right_label.setPixmap(scaled_pixmap)
-            h_layout.addWidget(arrow_right_label)
+            stations.append(button)
+            button.setStyleSheet("QPushButton { background-color: grey; }")
 
-            arrow_left_label = QLabel()
-            pixmap = QPixmap(":/icons/img/arrow-left.svg")
-            scaled_pixmap = pixmap.scaled(150, 20, Qt.AspectRatioMode.KeepAspectRatio)
-            arrow_left_label.setPixmap(scaled_pixmap)
-            h_layout.addWidget(arrow_left_label)
+            # Only add arrow layouts after the first and second buttons
+            if index < len(buttons) - 1:
+                # Create a layout for arrows
+                arrow_layout = QHBoxLayout()
+
+                # Upper arrow (right-facing)
+                arrow_right_label = QLabel()
+                arrow_right_pixmap = QPixmap(":/icons/img/arrow-right.svg").scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio)
+                arrow_right_label.setPixmap(arrow_right_pixmap)
+                arrow_layout.addWidget(arrow_right_label)
+
+                # Lower arrow (left-facing)
+                arrow_left_label = QLabel()
+                arrow_left_pixmap = QPixmap(":/icons/img/arrow-left.svg").scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio)
+                arrow_left_label.setPixmap(arrow_left_pixmap)
+                arrow_layout.addWidget(arrow_left_label)
+
+                # Add arrow layout to the main horizontal layout
+                h_layout.addLayout(arrow_layout)
+
+        tube_layout_singleton.add_button_layout(tube['probe_nr'], stations)
 
         more_btn = QPushButton(" > ")
         more_btn.setObjectName("more_btn")
@@ -129,8 +146,6 @@ class CustomLiveWidget(QWidget):
 
     def more_btn_layout(self, tube):
         global layout_field
-        print("more_btn_layout")
-        # print(tube)
         try:
             # self.main_window.removeDialogBoxContents()
             self.dialog = CustomDialog(self.main_window)

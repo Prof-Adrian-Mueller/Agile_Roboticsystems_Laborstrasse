@@ -1,5 +1,3 @@
-
-
 class BorgSingleton:
     """
     Singleton Class to store shared data in Application Runtime
@@ -113,6 +111,19 @@ class MainWindowSingleton(BorgSingleton):
 
     def set_main_window(self, main_window):
         self.main_window = main_window
+
+
+class TubeLayoutSingleton(BorgSingleton):
+    def __init__(self):
+        super().__init__()
+        if 'button_layouts' not in self._shared_state:
+            self._shared_state['button_layouts'] = {}
+
+    def add_button_layout(self, tube_id, buttons):
+        self._shared_state['button_layouts'][tube_id] = buttons
+
+    def get_button_layout(self, tube_id):
+        return self._shared_state['button_layouts'].get(tube_id)
 
 
 if __name__ == "__main__":

@@ -156,14 +156,13 @@ class ExperimentPreparation:
                 main_win_singleton = MainWindowSingleton()
                 if MainWindowSingleton().main_window:
                     live_widget = CustomLiveWidget(self.ui.test_page_home, MainWindowSingleton().main_window)
-                    print("Main Singleton Loaded")
                 else:
                     live_widget = CustomLiveWidget(self.ui.test_page_home, self.main_window)
                 self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
                 tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
                 if tube_info_data:
-                    print(tube_info_data)
                     live_widget.display_tubes_data(tube_info_data)
+                    live_widget.refresh_data()
 
 
         elif page_data == 'ShowQrCodeList':
@@ -190,7 +189,7 @@ class ExperimentPreparation:
         return len(flat_list) != len(set(flat_list))
 
     def experiment_creation(self, page_data):
-        global exp_data
+        global exp_data, all_tubes_of_exp
         # Clear Cache before saving
         self.experiment_data.clear_cache()
 
@@ -273,7 +272,6 @@ class ExperimentPreparation:
                 exp_id_data = self.ui_database.adapter.get_experiment_by_id(experiment_id)
 
             if exp_id_data is None:
-                print(f"{exp_id_data} is None")
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, None)
@@ -284,10 +282,7 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
-                print("Exp-data : " + exp_data)
             else:
-                print(f"{exp_id_data} is not None")
-                print(exp_id_data)
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, experiment_id)
@@ -295,18 +290,16 @@ class ExperimentPreparation:
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
-                print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
-                print("Exp-data : " + exp_data)
 
                 self.main_window.cache_data = self.main_window.load_cache()
-
-            print(self.experiment_data)
-            print(self.tube_information)
+            all_tubes_of_exp = self.ui_database.get_tubes_by_exp_id(self.main_window.cache_data.experiment_id)
+            print("------------------------------------")
+            print(all_tubes_of_exp)
         except Exception as ex:
             print(f"An error occurred: {ex}")
 
-            # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
+        # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
         # plasmid_dict = self.ui_database.get_tubes_data_for_experiment(self.experiment_data.experiment_id)
         # plasmid_probe_dict = {}
         # for item in plasmid_dict:
@@ -315,11 +308,13 @@ class ExperimentPreparation:
         # print(plasmid_probe_dict)
         # for elem in plasmid_probe_dict:
         #     print(elem)
-        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, None)
-        print(data)
-
+        if all_tubes_of_exp:
+            self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                self.main_window.cache_data.experiment_id), all_tubes_of_exp)
+        else:
+            self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                self.main_window.cache_data.experiment_id), [])
         # self.main_window.ui_db.add_experiment()
-
         self.nextPage()
 
     def map_prev_next(self, ui):

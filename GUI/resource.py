@@ -883,29 +883,36 @@ svg xmlns=\x22http:\
  6 6 1.41-1.41L6\
 .83 13H21v-2z\x22/>\
 </svg>\
-\x00\x00\x01F\
+\x00\x00\x01\xbe\
 <\
-svg xmlns=\x22http:\
-//www.w3.org/200\
-0/svg\x22 viewBox=\x22\
-0 0 512 512\x22>\x0d\x0a \
- <polygon fill=\x22\
-var(--ci-primary\
--color, currentC\
-olor)\x22 points=\x223\
-59.873 121.377 3\
-37.246 144.004 4\
-33.243 240.001 1\
-6 240.001 16 240\
-.002 16 272.001 \
-16 272.002 433.2\
-4 272.002 337.24\
-6 367.996 359.87\
-3 390.623 494.49\
-8 256 359.873 12\
-1.377\x22 class=\x22ci\
--primary\x22/>\x0d\x0a</s\
-vg>\x0d\x0a\
+svg viewBox=\x220 0\
+ 24 24\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22><path\
+ d=\x22m0 0h24v24h-\
+24z\x22 fill=\x22#fff\x22\
+ opacity=\x220\x22 tra\
+nsform=\x22matrix(0\
+ -1 1 0 0 24)\x22/>\
+<path d=\x22m5 13h1\
+1.86l-3.63 4.36a\
+1 1 0 0 0 1.54 1\
+.28l5-6a1.19 1.1\
+9 0 0 0 .09-.15c\
+0-.05.05-.08.07-\
+.13a1 1 0 0 0 .0\
+7-.36 1 1 0 0 0 \
+-.07-.36c0-.05-.\
+05-.08-.07-.13a1\
+.19 1.19 0 0 0 -\
+.09-.15l-5-6a1 1\
+ 0 0 0 -.77-.36 \
+1 1 0 0 0 -.64.2\
+3 1 1 0 0 0 -.13\
+ 1.41l3.63 4.36h\
+-11.86a1 1 0 0 0\
+ 0 2z\x22 fill=\x22#23\
+1f20\x22/></svg>\
 \x00\x00\x02\xb8\
 <\
 svg width=\x2224\x22 h\
@@ -952,18 +959,24 @@ Z\x22 stroke=\x22curre\
 ntColor\x22 stroke-\
 width=\x221.5\x22/>\x0d\x0a<\
 /svg>\x0d\x0a\
-\x00\x00\x00\x9a\
+\x00\x00\x00\xfb\
 <\
-svg height=\x228\x22 v\
-iewBox=\x220 0 8 8\x22\
- width=\x228\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22><p\
-ath d=\x22m3 0-3 2.\
-53 3 2.47v-2h5v-\
-1h-5z\x22 transform\
-=\x22translate(0 1)\
-\x22/></svg>\
+svg height=\x22512\x22\
+ viewBox=\x220 0 51\
+2 512\x22 width=\x2251\
+2\x22 xmlns=\x22http:/\
+/www.w3.org/2000\
+/svg\x22><g fill=\x22n\
+one\x22 stroke=\x22#00\
+0\x22 stroke-lineca\
+p=\x22round\x22 stroke\
+-linejoin=\x22round\
+\x22 stroke-width=\x22\
+48\x22><path d=\x22m24\
+4 400-144-144 14\
+4-144\x22/><path d=\
+\x22m120 256h292\x22/>\
+</g></svg>\
 "
 
 qt_resource_name = b"\
@@ -1115,10 +1128,10 @@ qt_resource_struct = b"\
 \x00\x00\x01\x8cS\xc8\xcf\x84\
 \x00\x00\x02\x18\x00\x00\x00\x00\x00\x01\x00\x00(.\
 \x00\x00\x01\x8cS\xc8\xcf\x86\
-\x00\x00\x03\x00\x00\x00\x00\x00\x00\x01\x00\x005\x16\
+\x00\x00\x03\x00\x00\x00\x00\x00\x00\x01\x00\x005\x8e\
 \x00\x00\x01\x8cS\xc8\xcf\x88\
-\x00\x00\x03\x16\x00\x00\x00\x00\x00\x01\x00\x007\xd2\
-\x00\x00\x01\x8cS\xc8\xcf\x84\
+\x00\x00\x03\x16\x00\x00\x00\x00\x00\x01\x00\x008J\
+\x00\x00\x01\x8c\xbb\xd8\xed\x0a\
 \x00\x00\x00H\x00\x00\x00\x00\x00\x01\x00\x00\x05f\
 \x00\x00\x01\x8b\xc8Vt\xd2\
 \x00\x00\x01\xa8\x00\x00\x00\x00\x00\x01\x00\x00\x1f\xfc\
@@ -1142,7 +1155,7 @@ qt_resource_struct = b"\
 \x00\x00\x00\xbe\x00\x00\x00\x00\x00\x01\x00\x00\x13h\
 \x00\x00\x01\x8cS\xc8\xcf\x85\
 \x00\x00\x02\xdc\x00\x00\x00\x00\x00\x01\x00\x003\xcc\
-\x00\x00\x01\x8b\xc8Vt\xcf\
+\x00\x00\x01\x8c\xbb\xde\x88\xb9\
 "
 
 def qInitResources():
