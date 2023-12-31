@@ -110,30 +110,37 @@ class CustomLiveWidget(QWidget):
         buttons = [QPushButton(f'{j + 1}') for j in range(3)]
         tube_layout_singleton = TubeLayoutSingleton()
         stations = []
+
+        # Creating buttons
+        buttons = [QPushButton(f'{i}') for i in range(1, 4)]
+
         for index, button in enumerate(buttons):
+            button.setStyleSheet("background-color: grey; ")
             h_layout.addWidget(button)
             stations.append(button)
-            button.setStyleSheet("QPushButton { background-color: grey; }")
 
-            # Only add arrow layouts after the first and second buttons
+            # For the first and second buttons, add arrow indicators
             if index < len(buttons) - 1:
-                # Create a layout for arrows
-                arrow_layout = QHBoxLayout()
+                arrow_layout = QVBoxLayout()  # This layout will stack arrows vertically
 
                 # Upper arrow (right-facing)
                 arrow_right_label = QLabel()
-                arrow_right_pixmap = QPixmap(":/icons/img/arrow-right.svg").scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio)
+                arrow_right_pixmap = QPixmap(":/icons/img/arrow-right.svg").scaled(300, 80,
+                                                                                   Qt.AspectRatioMode.KeepAspectRatio)
                 arrow_right_label.setPixmap(arrow_right_pixmap)
                 arrow_layout.addWidget(arrow_right_label)
 
                 # Lower arrow (left-facing)
                 arrow_left_label = QLabel()
-                arrow_left_pixmap = QPixmap(":/icons/img/arrow-left.svg").scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio)
+                arrow_left_pixmap = QPixmap(":/icons/img/arrow-left.svg").scaled(300, 80,
+                                                                                 Qt.AspectRatioMode.KeepAspectRatio)
                 arrow_left_label.setPixmap(arrow_left_pixmap)
                 arrow_layout.addWidget(arrow_left_label)
 
-                # Add arrow layout to the main horizontal layout
+                # Add the vertical layout of arrows to the main horizontal layout
                 h_layout.addLayout(arrow_layout)
+
+        widget.setLayout(h_layout)  # Set the layout on the main widget
 
         tube_layout_singleton.add_button_layout(tube['probe_nr'], stations)
 
