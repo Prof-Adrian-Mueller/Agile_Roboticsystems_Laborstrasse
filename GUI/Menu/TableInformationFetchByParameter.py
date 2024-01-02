@@ -49,7 +49,6 @@ class TableInformationFetchByParameter(QWidget):
                 # Create the left-aligned label
                 text_label_for_option = f"{current_option} {input_id} details: "
                 data_for_table = self.main_window.ui_db.get_experiment_by_id(input_id)
-
                 # Convert the Experimente instance to a dictionary
                 data_for_table = vars(data_for_table)
             elif current_option == 'Plasmid':
@@ -119,8 +118,9 @@ class TableInformationFetchByParameter(QWidget):
             self.current_table = table
 
             # Set the number of rows and columns based on the data
-            table.setRowCount(len(data_for_table))
-            table.setColumnCount(2)
+            if data_for_table:
+                table.setRowCount(len(data_for_table))
+                table.setColumnCount(2)
 
             table.setHorizontalHeaderLabels(['Key Name', 'Value'])
             # Hide the row and column headers

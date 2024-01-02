@@ -108,6 +108,14 @@ class MainWindowSingleton(BorgSingleton):
     def __init__(self, main_window=None):
         BorgSingleton.__init__(self)
         self.main_window = main_window
+        if not hasattr(self, 'stacked_tab'):
+            self.stacked_tab = {}
+
+    def add_stacked_tab_index(self, name, index):
+        self.stacked_tab[name] = index
+
+    def get_stacked_tab_index(self, name):
+        return self.stacked_tab[name]
 
     def set_main_window(self, main_window):
         self.main_window = main_window

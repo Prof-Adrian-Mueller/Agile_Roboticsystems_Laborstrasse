@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         # UI Mainwindow Configuration
+        self.experiment_details = None
         self.tab_widget_experiment_qr = None
         self.home_dashboard = None
         self.tab_widget_home_dashboard = None
@@ -229,15 +230,15 @@ class MainWindow(QMainWindow):
             stacked_layout = QStackedLayout()
 
             dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
-            details = ExperimentTubesDetails(main_window=self)
+            self.experiment_details = ExperimentTubesDetails(main_window=self)
 
             stacked_layout.addWidget(dashboard)
-            stacked_layout.addWidget(details)
+            stacked_layout.addWidget(self.experiment_details)
 
             # Connect signals as before
             dashboard.experiment_selected.connect(
-                lambda data: self.show_experiment_details(data, details, stacked_layout))
-            details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
+                lambda data: self.show_experiment_details(data, self.experiment_details, stacked_layout))
+            self.experiment_details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
 
             experiment_tubes_layout.addLayout(stacked_layout)
             self.tab_widget_experiment_qr.addTab(experiment_tubes_widget, "Experiment Tubes")

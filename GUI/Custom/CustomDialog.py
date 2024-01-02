@@ -28,7 +28,7 @@ class CustomTitleBarForDialogBox(QWidget):
                 font-weight: bold;  # Bold font
         """)
 
-        self.title = QLabel("Title")
+        self.title = QLabel("")
         self.layout.addWidget(self.title)
 
         self.layout.addStretch()
@@ -130,6 +130,7 @@ class CustomDialog(QDialog):
         # Custom Title Bar
         self.titleBar = CustomTitleBarForDialogBox(self)
         self.layout.addWidget(self.titleBar)
+        self.add_titlebar_name("Custom Title Bar")
 
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -158,6 +159,9 @@ class CustomDialog(QDialog):
 
             self.scroll_area_layout.removeWidget(row_widget)
             row_widget.deleteLater()
+
+    def add_titlebar_name(self, name):
+        self.titleBar.title.setText(name)
 
     def removeItems(self, row_data):
         """

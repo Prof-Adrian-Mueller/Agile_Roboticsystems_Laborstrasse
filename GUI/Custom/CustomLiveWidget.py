@@ -165,6 +165,7 @@ class CustomLiveWidget(QWidget):
         try:
             # self.main_window.removeDialogBoxContents()
             self.dialog = CustomDialog(self.main_window)
+            self.dialog.add_titlebar_name("Details")
             if tube:
                 for key, value in tube.items():
                     if key == 'qr_code':
@@ -185,6 +186,7 @@ class CustomLiveWidget(QWidget):
 
     def show_station_info(self, station, tube_nr):
         station_dialog = CustomDialog(self.main_window)
+        station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
         tube_station_info = TubeLayoutSingleton()
         station_dialog.addContent(f"Station {station}", ContentType.OUTPUT)
         station_dialog.addContent(f"{tube_station_info.get_station_info(str(tube_nr))[station-1]}", ContentType.OUTPUT)
