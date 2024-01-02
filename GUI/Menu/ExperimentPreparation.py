@@ -115,7 +115,7 @@ class ExperimentPreparation:
                 count_tubes = []
                 try:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
-                        self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
+                        self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
                         print(plasmid + " - " + ', '.join(map(str, tubes_list)))
                         display_msg += f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
                         count_tubes.append(tubes_list)

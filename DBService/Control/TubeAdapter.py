@@ -9,18 +9,24 @@ class TubeAdapter:
         self.db = db
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
-           
+
             with self.db as conn:
                 for probe_nr in probe_nr_list:
+                    print("in insert")
                     # Generiere qr_code basierend auf probe_nr
                     qr_code = f"{probe_nr:06d}"  # Füllt die Zahl mit führenden Nullen auf 6 Stellen auf
                     # Fügen Sie das Tube in die Datenbank ein
-                    conn.execute('''
-                        INSERT INTO Tubes (qr_code, probe_nr, exp_id, plasmid_nr)
-                        VALUES (?, ?, ?, ?)
-                    ''', (qr_code, probe_nr, exp_id, plasmid_nr))
-                    print(f"Tube mit QR-Code {qr_code} hinzugefügt.")
-
+                    # Überprüfe, ob das Tube bereits existiert
+                    cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE qr_code = ?", (qr_code,))
+                    if cursor.fetchone()[0] == 0:
+                        print("insert t")
+                        conn.execute('''
+                            INSERT INTO Tubes (qr_code, probe_nr, exp_id, plasmid_nr)
+                            VALUES (?, ?, ?, ?)
+                        ''', (qr_code, probe_nr, exp_id, plasmid_nr))
+                        print(f"Tube mit QR-Code {qr_code} hinzugefügt.")
+                    else:
+                        print(f"Tube mit QR-Code {qr_code} existiert bereits.")
 
 
     # def get_tubes_by_exp_id(self, exp_id):
