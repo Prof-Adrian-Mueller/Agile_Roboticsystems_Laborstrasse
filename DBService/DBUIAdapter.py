@@ -37,7 +37,7 @@ class DBUIAdapter:
     def get_anz_tubes_exp_id(self,exp_id):
         return(self.experiment_adapter.get_anz_tubes_exp_id(exp_id))
     def  get_experiment_by_id(self,exp_id):
-        return self.experiment_adapter.get_anz_tubes_exp_id(exp_id)
+        return self.experiment_adapter.get_experiment_by_id(exp_id)
     def get_all_experiments(self):
         return(self.experiment_adapter.get_all_experiments())
     def insert_metadaten(self,file_patn):
