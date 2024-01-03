@@ -19,6 +19,11 @@ from DBService.Control.ExperimentAdapter import ExperimentAdapter
 
 
 ui_db = DBUIAdapter()
+# ui_db.experiment_adapter.get_latest_tube("w1")
+# ui_db.get_latest_tube_by_exp_id("w1")
+# ui_db.get_anz_tubes_exp_id("w1")
+ui_db.available_qrcode("w2")
+
 
 # ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
 
@@ -103,7 +108,7 @@ ui_db = DBUIAdapter()
 #     print(tube)
 
 # Diese methode erwartet exp_id und dann liefert daten von  Expriment zurück
-print(ui_db.adapter.get_experiment_by_id("max1"))
+# print(ui_db.adapter.get_experiment_by_id("max1"))
 
 # Methode insert_tube
 # ui_db.adapter.insert_tube('000006',6,'maxi1','PHB 377')
