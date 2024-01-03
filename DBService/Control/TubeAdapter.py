@@ -25,10 +25,10 @@ class TubeAdapter:
                             VALUES (?, ?, ?, ?)
                         ''', (qr_code, probe_nr, exp_id, plasmid_nr))
                         print(f"Tube mit QR-Code {qr_code} hinzugefügt.")
-                        return(f"Tube mit QR-Code {qr_code} hinzugefügt.")
+                        # return(f"Tube mit QR-Code {qr_code} hinzugefügt.")
                     else:
                         print(f"Tube mit QR-Code {qr_code} existiert bereits.")
-                        return(f"Tube mit QR-Code {qr_code} existiert bereits.")
+                        # return(f"Tube mit QR-Code {qr_code} existiert bereits.")
 
 
     # def get_tubes_by_exp_id(self, exp_id):
