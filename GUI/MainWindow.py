@@ -62,6 +62,7 @@ class MainWindow(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.apply_stylesheet()
         self.ui.homePage.hide()
 
         self.ui.leftNavigation.move(0, 0)
@@ -72,7 +73,7 @@ class MainWindow(QMainWindow):
         self.resizeGrip = ResizeGripWidget(self)
         self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
         self.resizeGrip.show()
-        self.apply_stylesheet()
+
 
         # self.setGeometry(100, 100, 800, 600)
         self.process = any
@@ -229,14 +230,14 @@ class MainWindow(QMainWindow):
             # Add your existing stacked layout to the first tab
             stacked_layout = QStackedLayout()
 
-            dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
+            self.experiment_dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
             self.experiment_details = ExperimentTubesDetails(main_window=self)
 
-            stacked_layout.addWidget(dashboard)
+            stacked_layout.addWidget(self.experiment_dashboard)
             stacked_layout.addWidget(self.experiment_details)
 
             # Connect signals as before
-            dashboard.experiment_selected.connect(
+            self.experiment_dashboard.experiment_selected.connect(
                 lambda data: self.show_experiment_details(data, self.experiment_details, stacked_layout))
             self.experiment_details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
 
@@ -244,10 +245,10 @@ class MainWindow(QMainWindow):
             self.tab_widget_experiment_qr.addTab(experiment_tubes_widget, "Experiment Tubes")
 
             # Creates and adds tab for QR Codes
-            qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, self)
-            self.tab_widget_experiment_qr.addTab(qr_codes_widget, "QR Codes")
+            self.qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, self)
+            self.tab_widget_experiment_qr.addTab(self.qr_codes_widget, "QR Codes")
             # Load data to the Row
-            qr_codes_widget.refresh_data()
+            self.qr_codes_widget.refresh_data()
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_experiment_qr)
@@ -266,6 +267,7 @@ class MainWindow(QMainWindow):
         for tube in qr_code_list:
             # print(tube_information.tubes[tube].qr_code)
             qr_code_display.displayQrCode(tube)
+        return qr_code_display
         # Display QR Codes
 
     def show_message_in_dialog(self, display_msg):
@@ -292,6 +294,8 @@ class MainWindow(QMainWindow):
         Shows a Window File Selector UI Widget to select an Excel File to be imported.
         """
         file_name, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
+        dialog = CustomDialog(self)
+        dialog.add_titlebar_name(f"Import {file_type} Info")
         if file_name:
             print(f'Selected file: {file_name}')
             try:
@@ -305,21 +309,22 @@ class MainWindow(QMainWindow):
                     message = self.ui_db.insert_metadaten(file_name)
                 if message is not None:
                     display_msg = " ".join(str(item) for item in message)
+                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
+                    dialog.addContent(f'Successfully imported Excel file: {file_name}', ContentType.OUTPUT)
                 else:
-                    display_msg = "No Display Text"
-                self.dialogBoxContents.append(self.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                    display_msg = "Unknown Error, No Content Received!"
+                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
+
 
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {file_name}\n{str(e)}')
-                self.dialogBoxContents.append(
-                    self.dialog.addContent(f"Error occurred while importing Excel file: {file_name}",
-                                           ContentType.OUTPUT))
-                self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
+                dialog.addContent(f"Error occurred while importing Excel file: {file_name}",
+                                           ContentType.OUTPUT)
+                dialog.addContent(f" {str(e)}", ContentType.OUTPUT)
             finally:
                 print(f'Successfully imported Excel file: {file_name}')
-                self.dialogBoxContents.append(
-                    self.dialog.addContent(f'Successfully imported Excel file: {file_name}', ContentType.OUTPUT))
-            self.dialog.show()
+
+            dialog.show()
 
     def eventFilter(self, source, event):
         if source == self.ui.tableWidgetLiveAction and event.type() == QEvent.Type.Resize:

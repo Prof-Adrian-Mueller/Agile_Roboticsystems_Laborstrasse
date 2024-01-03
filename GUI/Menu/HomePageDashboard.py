@@ -1,4 +1,6 @@
-from PyQt6.QtCore import Qt, QSize
+from datetime import datetime
+
+from PyQt6.QtCore import Qt, QSize, QDate
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
 from PyQt6.uic.properties import QtGui, QtWidgets, QtCore
@@ -37,6 +39,9 @@ class HomePageDashboard(QWidget):
         return QPushButton("Refresh")
 
     def show_experiment_preparation(self):
+        today = datetime.today()
+        qdate = QDate(today.year, today.month, today.day)
+        self.ui.datumLE.setDate(qdate)
         # Create a horizontal layout for buttons
         hbox_layout = QHBoxLayout()
 
@@ -60,6 +65,9 @@ class HomePageDashboard(QWidget):
         self.stopIcon = QIcon(":/icons/img/stop.svg")
 
     def show_start_button(self):
+        today = datetime.today()
+        qdate = QDate(today.year, today.month, today.day)
+        self.ui.datumLE.setDate(qdate)
         # Identifier for the widget to be replaced
         unique_object_name = "start_button_widget"
 

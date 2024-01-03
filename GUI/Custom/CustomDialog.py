@@ -22,14 +22,15 @@ class CustomTitleBarForDialogBox(QWidget):
         self._dragging = False
         # Custom Styles
         self.setStyleSheet("""
-                background-color: transparent; 
-                color: white;  # White text
+                background-color: #FFFFFF; 
+                color: black;  # White text
                 font-size: 14px;  # Adjust font size as needed
                 font-weight: bold;  # Bold font
         """)
 
         self.title = QLabel("")
         self.layout.addWidget(self.title)
+        self.title.setStyleSheet("background-color:transparent; font-weight: bold;")
 
         self.layout.addStretch()
 
@@ -103,21 +104,26 @@ class CustomDialog(QDialog):
         self.setStyleSheet("""
             QDialog {
                 background-color: #FFFFFF;
-                border-radius: 8px; /* Rounded corners */
+                border-radius: 8px; 
+                border: 1px solid #F2F0EB;
+            }
+            QWidget {
+                background-color: #FFFFF;
             }
             QPushButton {
-                border-radius: 15px; /* Rounded button corners */
-                padding: 10px 20px; /* Padding inside buttons */
-                font-size: 16px; /* Button font size */
-                margin: 5px; /* Space around buttons */
-                border: none; /* Remove button border */
+                border-radius: 15px; 
+                padding: 10px 20px; 
+                font-size: 16px; 
+                margin: 5px; 
+                border: 1px solid #F2F0EB; 
+                background:color: #FFFFFF;
             }
             QPushButton#closeButton {
-                background-color: #FF3B30; /* Red color for close button */
+                background-color: #FF3B30; 
                 color: white;
             }
             QPushButton#saveButton {
-                background-color: #34C759; /* Green color for save button */
+                background-color: #34C759; 
                 color: white;
             }
             QScrollArea {

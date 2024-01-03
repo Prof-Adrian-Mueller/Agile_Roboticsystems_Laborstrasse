@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QTableWidget, QTableWidgetItem, QSi
     QAbstractScrollArea, QPushButton, QHBoxLayout
 from PyQt6.uic.properties import QtCore
 
+from GUI.Custom.CustomDialog import CustomDialog, ContentType
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Navigation import Ui_MainWindow
 from GUI.Utils.FileUtils import FileUtils
@@ -23,15 +24,16 @@ class TableInformationFetchByParameter(QWidget):
         self.main_window = main_window
         self.current_table.cellDoubleClicked.connect(self.open_image)
         self.filename_to_export = None
+        self.text_qlabel_option = QLabel("")
         # combo_option_class_type
 
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
         if tubeid_input_text:
-            print(tubeid_input_text)
             self.append_info_to_view(tubeid_input_text, self.ui.combo_option_class_type.currentText())
         else:
-            self.main_window.show_message_in_dialog("Please Enter Tube Id to proceed!")
+            self.main_window.dialog.add_titlebar_name("Query Info")
+            self.main_window.show_message_in_dialog("Bitte geben Sie eine gültige ID ein, um fortzufahren!")
 
     def open_image(self, row, column):
         # TODO Open image in an image viewer
@@ -44,16 +46,24 @@ class TableInformationFetchByParameter(QWidget):
                     QDesktopServices.openUrl(QUrl.fromLocalFile(image_path))
 
     def append_info_to_view(self, input_id, current_option):
-        global text_label_for_option
+
         data_for_table = None
         is_tube_selected = False
+        text_label_for_option = ""
         try:
             if current_option == 'Experiment':
                 # Create the left-aligned label
                 text_label_for_option = f"{current_option} {input_id} details: "
-                data_for_table = self.main_window.ui_db.get_experiment_by_id(input_id)
+                data_for_table = self.main_window.ui_db.adapter.get_experiment_by_id(input_id)
                 # Convert the Experimente instance to a dictionary
-                data_for_table = vars(data_for_table)
+                if data_for_table:
+                    data_for_table = vars(data_for_table)
+                else:
+                    data_for_table = {}
+                    dialog = CustomDialog(self)
+                    dialog.add_titlebar_name("Experiment Query")
+                    dialog.addContent(f"Kein Ergebnis für {input_id}", ContentType.OUTPUT)
+                    dialog.show()
             elif current_option == 'Plasmid':
                 text_label_for_option = f"{current_option} {input_id} details: "
                 data_for_table = self.main_window.ui_db.metadata_adapter.get_plasmid_data_by_nr(input_id)
@@ -70,12 +80,14 @@ class TableInformationFetchByParameter(QWidget):
             self.main_window.removeDialogBoxContents()
             self.main_window.show_message_in_dialog(ex)
 
-        text_qlabel_option = QLabel(text_label_for_option)
-        text_qlabel_option.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.text_qlabel_option.setText(text_label_for_option)
+        self.text_qlabel_option.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Create a horizontal layout
         h_layout = QHBoxLayout()
-        h_layout.addWidget(text_qlabel_option)
+        h_layout.setObjectName("title_export_box")
+        h_layout.addWidget(self.text_qlabel_option)
         # Add a stretch item
         h_layout.addStretch()
 
@@ -87,7 +99,7 @@ class TableInformationFetchByParameter(QWidget):
         self.ui.tube_info_grid_layout.addLayout(h_layout, 0, 0)
 
         if not data_for_table:
-            text_qlabel_option.setText(f"Could not load data for {current_option} with id {input_id}")
+            self.text_qlabel_option.setText(f"Could not load data for {current_option} with id {input_id}")
             pass
 
         try:
@@ -159,7 +171,9 @@ class TableInformationFetchByParameter(QWidget):
             self.data_for_table = data_for_table
 
         except Exception as ex:
-            print(ex)
+            dialog = CustomDialog(self)
+            dialog.addContent(f"{ex}", ContentType.OUTPUT)
+            dialog.show()
 
     def export_table_data(self):
         if not self.data_for_table:

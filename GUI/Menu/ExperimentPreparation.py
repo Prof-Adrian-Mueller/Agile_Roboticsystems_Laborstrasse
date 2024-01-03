@@ -5,6 +5,7 @@ from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
+from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -25,6 +26,7 @@ class ExperimentPreparation:
     sendButtonClicked = pyqtSignal(str)
 
     def __init__(self, ui: Ui_MainWindow, main_window):
+        self.is_current_experiment = False
         self.tube_information = TubesSingleton()
         self.experiment_data = ExperimentSingleton()
         self.ui = ui
@@ -49,12 +51,27 @@ class ExperimentPreparation:
         except Exception as ex:
             print(ex)
 
-    def checkExperimentID(self, text):
+    def checkExperimentID(self, exp_id):
         # TODO: check in db
         try:
-            exp_id_data = self.ui_database.adapter.get_experiment_by_id(text)
-            plasmids = self.ui_database.get_plasmids_for_experiment(text)
+            exp_id_data = self.ui_database.adapter.get_experiment_by_id(exp_id)
+            plasmids = self.ui_database.get_plasmids_for_experiment(exp_id)
             if exp_id_data:
+                all_experiments = self.ui_database.get_all_experiments()
+                last_exp_id = all_experiments[-1].exp_id
+                if exp_id == last_exp_id:
+                    print(f"Experiment ID {exp_id} is the latest one.")
+                    self.is_current_experiment = True
+                else:
+                    dialog = CustomDialog(self.main_window)
+                    dialog.add_titlebar_name("Experiment Update Message")
+                    dialog.addContent(
+                        f"Die Experiment-ID {exp_id} ist nicht die neueste. Die neueste ID lautet {last_exp_id}.",
+                        ContentType.OUTPUT)
+                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+                    self.is_current_experiment = False
+                    dialog.show()
+
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
                 self.ui.anzahlTubesLE.setText(str(exp_id_data.anz_tubes))
@@ -83,9 +100,6 @@ class ExperimentPreparation:
         global live_widget
         if page_data == 'CreateExperiment':
             # TODO: verify if plasmid exists
-            print("weiter clicked " + page_data)
-            # self.main_window.plasmidTubesList.displayPlasmidTubes("test")
-            # self.nextPage()
             try:
                 self.experiment_creation(page_data)
             except Exception as ex:
@@ -94,7 +108,6 @@ class ExperimentPreparation:
                     self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
                 self.main_window.dialogBoxContents.append(
                     self.main_window.dialog.addContent(f"{traceback.format_exc()}", ContentType.OUTPUT))
-                print(traceback.format_exc())
                 self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
@@ -103,7 +116,6 @@ class ExperimentPreparation:
             self.tube_information.clear_cache()
             self.main_window.removeDialogBoxContents()
 
-            # self.nextPage()
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
                 display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
@@ -141,7 +153,8 @@ class ExperimentPreparation:
                                                        tube['plasmid_nr'])
                         probe_list.append(tube['qr_code'])
                     print(self.tube_information)
-                    self.main_window.display_qr_from_main(probe_list)
+                    self.main_window.qr_codes_widget.refresh_data()
+                    self.main_window.experiment_dashboard.refresh_data()
                     # TODO layout anpassen
                     # qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
                     # for qr_code in qr_codes_list:
@@ -284,6 +297,13 @@ class ExperimentPreparation:
             self.show_message_in_dialog(display_msg)
             return
 
+        if not self.is_current_experiment:
+            dialog = CustomDialog(self.main_window)
+            dialog.add_titlebar_name("Experiment Update Message")
+            dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+            dialog.show()
+            return
+
         try:
             for elem in plasmid_list:
                 check_if_plasmid_exists_data = self.ui_database.metadata_adapter.get_plasmid_data_by_nr(elem)
@@ -341,14 +361,14 @@ class ExperimentPreparation:
         # print(plasmid_probe_dict)
         # for elem in plasmid_probe_dict:
         #     print(elem)
-        if all_tubes_of_exp:
-            self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                self.main_window.cache_data.experiment_id), all_tubes_of_exp)
-        else:
-            self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                self.main_window.cache_data.experiment_id), [])
-        # self.main_window.ui_db.add_experiment()
-        self.nextPage()
+        if self.current_experiment.experiment_id:
+            if all_tubes_of_exp:
+                self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                    self.current_experiment.experiment_id), all_tubes_of_exp)
+            else:
+                self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                    self.current_experiment.experiment_id), [])
+            self.nextPage()
 
     def map_prev_next(self, ui):
         ui.vorbereitungPrev.clicked.connect(self.prevPage)
