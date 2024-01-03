@@ -51,7 +51,7 @@ class ExperimentPreparation:
         # TODO: check in db
         try:
             exp_id_data = self.ui_database.adapter.get_experiment_by_id(text)
-            plasmids = self.ui_database.get_plasmids_for_experiment(self.experiment_data.experiment_id)
+            plasmids = self.ui_database.get_plasmids_for_experiment(text)
             if exp_id_data:
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
@@ -78,6 +78,7 @@ class ExperimentPreparation:
             self.ui.vorbereitungStackedTab.setCurrentIndex(current_index + 1)
 
     def nextPageWithControl(self, page_data):
+        global live_widget
         if page_data == 'CreateExperiment':
             # TODO: verify if plasmid exists
             print("weiter clicked " + page_data)
@@ -111,14 +112,22 @@ class ExperimentPreparation:
             #     self.main_window.display_qr_from_main("Anzahl von Tubes sollen nicht mehr als 32 sein.")
 
             else:
-                display_msg = "All values look good.\n"
+                dialog = CustomDialog(self.main_window)
+                dialog.add_titlebar_name("Experimenttubes Details")
                 count_tubes = []
                 try:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
-                        self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
-                        print(plasmid + " - " + ', '.join(map(str, tubes_list)))
-                        display_msg += f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
-                        count_tubes.append(tubes_list)
+                        try:
+                            self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
+                            print(plasmid + " - " + ', '.join(map(str, tubes_list)))
+                            display_msg = f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
+                            dialog.addContent(
+                                dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                            count_tubes.append(tubes_list)
+                        except Exception as ex:
+                            dialog.addContent(
+                                dialog.addContent(f"{ex}", ContentType.OUTPUT))
+                            count_tubes.append(tubes_list)
 
                     tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
                     probe_list = []
@@ -135,40 +144,59 @@ class ExperimentPreparation:
 
                 except Exception as ex:
                     display_msg = f"Could not create tubes. \n{ex}"
-                    self.show_message_in_dialog(display_msg)
+                    dialog.addContent(
+                        dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
                     return
 
                 # self.nextPage()
                 # Load back dashboard
-                self.show_message_in_dialog(display_msg)
-                exp_sds = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
-                exp_sds.reset_input_of_past_experiments()
-                self.main_window.tab_widget_home_dashboard.removeTab(1)
+                display_msg = "Prima! Alle Daten sehen Gut aus."
+                dialog.addContent(
+                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                dialog.show()
+                experiment_preparation_widget = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab,
+                                                                            self.ui.test_page_home)
+                experiment_preparation_widget.reset_input_of_past_experiments()
+                experiment_preparation_widget.removeFromMainWindow(self.main_window)
                 # load start ent app
                 self.main_window.home_dashboard.show_start_button()
                 self.main_window.home_dashboard.add_other_page_nav_btns()
 
                 # load live view
-                # Add CustomLiveWidget to the layout
+                # Add CustomLiveWidget to the layout if it doesn't exist
                 current_exp = CurrentExperimentSingleton()
                 self.main_window.home_dashboard.nr_of_tubes = str(
                     len(self.ui_database.get_tubes_by_exp_id(current_exp.experiment_id)))
+
+                # Use the existing MainWindowSingleton instance
                 main_win_singleton = MainWindowSingleton()
-                if MainWindowSingleton().main_window:
-                    live_widget = CustomLiveWidget(self.ui.test_page_home, MainWindowSingleton().main_window)
-                else:
-                    live_widget = CustomLiveWidget(self.ui.test_page_home, self.main_window)
-                self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
-                tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
-                if tube_info_data:
-                    live_widget.display_tubes_data(tube_info_data)
-                    live_widget.refresh_data()
 
+                # Determine the correct main window to use
+                main_window = main_win_singleton.main_window if main_win_singleton.main_window else self.main_window
 
-        elif page_data == 'ShowQrCodeList':
-            print()
+                # Check if the "Live" tab already exists
+                live_tab_found = False
+                for index in range(main_window.tab_widget_home_dashboard.count()):
+                    if main_window.tab_widget_home_dashboard.tabText(index) == "Live":
+                        live_tab_found = True
+                        break
+
+                # If "Live" tab does not exist, create and add it
+                if not live_tab_found:
+                    live_widget = CustomLiveWidget(self.ui.test_page_home, main_window)
+                    main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+                    live_index = main_window.tab_widget_home_dashboard.indexOf(live_widget)
+                    main_win_singleton.add_stacked_tab_index("live", live_index)
+
+                # Load and display tube information if the "Live" tab is added
+                if not live_tab_found and tube_info_data:
+                    tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
+                    if tube_info_data:
+                        live_widget.display_tubes_data(tube_info_data)
+                        live_widget.refresh_data()
 
     def show_message_in_dialog(self, display_msg):
+        self.main_window.dialog.add_titlebar_name("Experiment Vorbereitung")
         self.main_window.dialogBoxContents.append(
             self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
         self.main_window.dialog.show()

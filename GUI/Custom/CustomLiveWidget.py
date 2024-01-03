@@ -105,7 +105,8 @@ class CustomLiveWidget(QWidget):
         widget.setObjectName("itemRowLiveData")
         layout.addWidget(widget)
         h_layout = QHBoxLayout(widget)
-        label = QLabel(str(tube['probe_nr']))
+        tube_nr = tube['probe_nr']
+        label = QLabel(str(tube_nr))
         h_layout.addWidget(label)
         buttons = [QPushButton(f'{j + 1}') for j in range(3)]
         tube_layout_singleton = TubeLayoutSingleton()
@@ -113,11 +114,19 @@ class CustomLiveWidget(QWidget):
 
         # Creating buttons
         buttons = [QPushButton(f'{i}') for i in range(1, 4)]
-
+        tube_station_info = TubeLayoutSingleton()
         for index, button in enumerate(buttons):
-            button.setStyleSheet("background-color: grey; ")
             h_layout.addWidget(button)
             stations.append(button)
+            station_nr = index + 1
+            tube_station_info.add_station_info(str(tube_nr), station_nr,
+                                               {"name": f"Station {station_nr}",
+                                                "details": f"Details about Station {station_nr}"})
+
+            def create_click_handler(station_number):
+                return lambda: self.show_station_info(station_number, tube_nr)
+
+            button.clicked.connect(create_click_handler(station_nr))
 
             # For the first and second buttons, add arrow indicators
             if index < len(buttons) - 1:
@@ -142,7 +151,7 @@ class CustomLiveWidget(QWidget):
 
         widget.setLayout(h_layout)  # Set the layout on the main widget
 
-        tube_layout_singleton.add_button_layout(tube['probe_nr'], stations)
+        tube_layout_singleton.add_button_layout(tube_nr, stations)
 
         more_btn = QPushButton(" > ")
         more_btn.setObjectName("more_btn")
@@ -156,6 +165,7 @@ class CustomLiveWidget(QWidget):
         try:
             # self.main_window.removeDialogBoxContents()
             self.dialog = CustomDialog(self.main_window)
+            self.dialog.add_titlebar_name("Details")
             if tube:
                 for key, value in tube.items():
                     if key == 'qr_code':
@@ -173,6 +183,14 @@ class CustomLiveWidget(QWidget):
                 self.dialog.show()
         except Exception as ex:
             print(ex)
+
+    def show_station_info(self, station, tube_nr):
+        station_dialog = CustomDialog(self.main_window)
+        station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
+        tube_station_info = TubeLayoutSingleton()
+        station_dialog.addContent(f"Station {station}", ContentType.OUTPUT)
+        station_dialog.addContent(f"{tube_station_info.get_station_info(str(tube_nr))[station-1]}", ContentType.OUTPUT)
+        station_dialog.show()
 
     def clear_layout(self, layout):
         """

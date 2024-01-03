@@ -316,6 +316,11 @@ QWidget#itemRowLiveData QPushButton {
     max-width:25px;
     border-radius:20px;
     margin-left:20px;
+    background-color: #999999;
+}
+
+QWidget#itemRowLiveData QPushButton:hover {
+    background-color: #707070;
 }
 
 QWidget#clioutputwidgetdesign {

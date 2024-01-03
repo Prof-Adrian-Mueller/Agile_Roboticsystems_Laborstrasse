@@ -16,6 +16,7 @@ class FileUtils:
     @staticmethod
     def save_data_to_excel(parent, data_to_save, document_info):
         dialog = CustomDialog(parent)
+        dialog.add_titlebar_name("Saving data to an Excel File")
         try:
             current_date = datetime.datetime.today().strftime('%Y-%m-%d')
             filename_suggestion = f"{current_date}_{document_info}.xlsx"

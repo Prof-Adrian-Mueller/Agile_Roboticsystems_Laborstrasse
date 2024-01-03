@@ -3,12 +3,17 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
 from PyQt6.uic.properties import QtGui, QtWidgets, QtCore
 
+from GUI.Custom.CustomDialog import CustomDialog, ContentType
+from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
+from GUI.Storage.BorgSingleton import MainWindowSingleton
 
 
 class HomePageDashboard(QWidget):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
+        self.live_widget = None
+        self.main_window_singleton = MainWindowSingleton(main_window)
         self.start_button = None
         self.stopIcon = None
         self.startIcon = None
@@ -55,7 +60,23 @@ class HomePageDashboard(QWidget):
         self.stopIcon = QIcon(":/icons/img/stop.svg")
 
     def show_start_button(self):
-        hbox_layout = QHBoxLayout()
+        # Identifier for the widget to be replaced
+        unique_object_name = "start_button_widget"
+
+        # Find and remove the existing widget with the same object name
+        for i in range(self.vbox_layout.count()):
+            item = self.vbox_layout.itemAt(i)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None and widget.objectName() == unique_object_name:
+                    self.vbox_layout.takeAt(i)
+                    widget.deleteLater()
+                    break
+
+        # Create a new widget to hold the QHBoxLayout
+        hbox_widget = QWidget()
+        hbox_widget.setObjectName(unique_object_name)
+        hbox_layout = QHBoxLayout(hbox_widget)
 
         start_label = QLabel("Start Erfassung & Tracking")
         hbox_layout.addWidget(start_label)
@@ -66,7 +87,8 @@ class HomePageDashboard(QWidget):
         self.configure_start_button()
         hbox_layout.addWidget(self.start_button)
 
-        self.vbox_layout.addLayout(hbox_layout)
+        # Add the QHBoxLayout container to the main QVBoxLayout
+        self.vbox_layout.addWidget(hbox_widget)
 
     def configure_start_button(self):
         self.start_button = QPushButton()
@@ -76,7 +98,21 @@ class HomePageDashboard(QWidget):
         self.start_button.clicked.connect(self.startEnTProcess)
 
     def show_start_button_details(self):
+        # Identifier for the widget to be replaced
+        buttons_navigation_widget = "navigation_widget"
+
+        # Find and remove the existing widget with the same object name
+        for i in range(self.vbox_layout.count()):
+            item = self.vbox_layout.itemAt(i)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None and widget.objectName() == buttons_navigation_widget:
+                    self.vbox_layout.takeAt(i)
+                    widget.deleteLater()
+                    break
+
         widget = QWidget()
+        widget.setObjectName(buttons_navigation_widget)
         h_layout = QHBoxLayout(widget)
         probe_nr_text = QLabel("")
         probe_nr_text.setFixedWidth(120)
@@ -96,8 +132,22 @@ class HomePageDashboard(QWidget):
         self.vbox_layout.addWidget(widget)
 
     def add_other_page_nav_btns(self):
-        # Create a widget and set its object name
+        # Identifier for the widget to be replaced
+        buttons_navigation_widget = "navigation_widget"
+
+        # Find and remove the existing widget with the same object name
+        for i in range(self.vbox_layout.count()):
+            item = self.vbox_layout.itemAt(i)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None and widget.objectName() == buttons_navigation_widget:
+                    self.vbox_layout.takeAt(i)
+                    widget.deleteLater()
+                    break
+
+        # Create a new widget and set its object name
         widget = QWidget()
+        widget.setObjectName(buttons_navigation_widget)
 
         # Create a horizontal layout for the widget
         h_layout = QHBoxLayout(widget)
@@ -112,9 +162,10 @@ class HomePageDashboard(QWidget):
         show_qr = QPushButton("Show QR Codes")
         all_tubes_exp = QPushButton("All Tubes of current Experiment")
 
+
         # map buttons
         live_view.clicked.connect(lambda: (
-            self.ui.home_btn_dashboard.setChecked(True), self.main_window.tab_widget_home_dashboard.setCurrentIndex(1)))
+            self.ui.home_btn_dashboard.setChecked(True), self.initialize_live_tab()))
         show_qr.clicked.connect(lambda: (
             self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.experiment_info_view)),
             self.main_window.tab_widget_experiment_qr.setCurrentIndex(1)))
@@ -131,6 +182,32 @@ class HomePageDashboard(QWidget):
 
         # Add the widget to your main QVBoxLayout
         self.vbox_layout.addWidget(widget)
+
+    def initialize_live_tab(self):
+        live_tab_title = "Live"
+        tab_widget = self.main_window.tab_widget_home_dashboard
+
+        # Check if the "Live" tab already exists
+        for index in range(tab_widget.count()):
+            if tab_widget.tabText(index) == live_tab_title:
+                # "Live" tab found, set it as the current tab
+                tab_widget.setCurrentIndex(index)
+                return
+
+        # If "Live" tab does not exist, create and add it
+        live_widget = CustomLiveWidget(self.ui.test_page_home, self.main_window)
+        tab_widget.addTab(live_widget, live_tab_title)
+        live_index = tab_widget.indexOf(live_widget)
+        main_window_singleton = MainWindowSingleton(self.main_window)
+        main_window_singleton.add_stacked_tab_index("live", live_index)
+
+        # Set the newly added "Live" tab as the current tab
+        tab_widget.setCurrentIndex(live_index)
+
+    def show_live_tab(self):
+        live_index = self.main_window_singleton.get_stacked_tab_index("live")
+        if live_index is not None:
+            self.main_window.tab_widget_home_dashboard.setCurrentIndex(live_index)
 
     def startEnTProcess(self):
         """
@@ -153,15 +230,19 @@ class HomePageDashboard(QWidget):
                 self.isStarted = False
         except Exception as ex:
             print(ex)
-            ex.with_traceback()
 
     def start_experiment_preparation(self):
         # TODO - after loading vorbereitung page- after finished creating tubes and experiment hide the experiment prep
         #  page and show the dashboard page with start ent app.
         #  below it show buttons to show qr codes and load experiment tubes table pages
-        experiment_preparation = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
-        experiment_preparation.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        experiment_preparation.addToMainWindow(self.main_window)
-        # hide other tabs
-        # self.main_window.tab_widget_home_dashboard.removeTab(1)
-        # self.main_window.tab_widget_home_dashboard.removeTab(2)
+        try:
+            experiment_preparation = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
+            experiment_preparation.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            experiment_preparation.addToMainWindow(self.main_window)
+        except Exception as ex:
+            print(ex)
+        #     dialog = CustomDialog(self)
+        #     dialog.add_titlebar_name("Experiment Preparation Widget")
+        #     dialog.addContent(ex, ContentType.OUTPUT)
+        #     dialog.show()
+
