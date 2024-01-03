@@ -11,6 +11,9 @@ from GUI.Utils.FileUtils import FileUtils
 
 
 class TableInformationFetchByParameter(QWidget):
+    """
+    It manages the Search function for different type of variables.
+    """
 
     def __init__(self, ui: Ui_MainWindow, main_window):
         super().__init__()

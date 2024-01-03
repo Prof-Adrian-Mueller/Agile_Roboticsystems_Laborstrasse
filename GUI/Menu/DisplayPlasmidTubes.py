@@ -94,8 +94,9 @@ class DisplayPlasmidTubes(QWidget):
         # Create the buttons and line edit
         plasmid_nr_label = QLabel(plasmid_nr)
         probe_nr_input = QLineEdit()
-        if mapped_plasmid_tubes:
-            probe_nr_input.setText(",".join(str(x) for x in mapped_plasmid_tubes[plasmid_nr]))
+        plasmid_tubes = mapped_plasmid_tubes.get(plasmid_nr)
+        if plasmid_tubes:
+            probe_nr_input.setText(",".join(str(x) for x in plasmid_tubes))
         self.tubes_input_fields.append(probe_nr_input)
         probe_nr_input.editingFinished.connect(
             lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))

@@ -1,3 +1,5 @@
+import traceback
+
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Custom.CustomLiveWidget import CustomLiveWidget
@@ -90,6 +92,9 @@ class ExperimentPreparation:
                 display_msg = "Could not create Experiment.\n"
                 self.main_window.dialogBoxContents.append(
                     self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
+                self.main_window.dialogBoxContents.append(
+                    self.main_window.dialog.addContent(f"{traceback.format_exc()}", ContentType.OUTPUT))
+                print(traceback.format_exc())
                 self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
