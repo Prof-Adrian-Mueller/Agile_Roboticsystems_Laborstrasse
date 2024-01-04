@@ -30,7 +30,7 @@ from GUI.ResizeGripWidget import ResizeGripWidget
 __author__ = 'Ujwal Subedi'
 __date__ = '01/12/2023'
 __version__ = '1.0'
-__last_changed__ = '01/12/2023'
+__last_changed__ = '04/01/2024'
 
 from GUI.Storage.BorgSingleton import TubesSingleton, CurrentExperimentSingleton, MainWindowSingleton
 from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
@@ -70,10 +70,10 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.ui.home_btn_dashboard.setChecked(True)
         self.setWindowTitle("Dashboard GUI")
+        # resize window using a traingle in the right buttom corner
         self.resizeGrip = ResizeGripWidget(self)
         self.resizeGrip.setGeometry(self.width() - 16, self.height() - 16, 16, 16)
         self.resizeGrip.show()
-
 
         # self.setGeometry(100, 100, 800, 600)
         self.process = any
@@ -121,12 +121,7 @@ class MainWindow(QMainWindow):
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
 
-        self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
-
-        # Live view widget
-        # widget_live_layout = QVBoxLayout(self.ui.widgetLive)
-        # self.custom_live_widget = CustomLiveWidget(self.ui.widgetLive)
-        # widget_live_layout.addWidget(self.custom_live_widget)
+        # self.ui.startEnTBtn.clicked.connect(self.startEnTProcess)
 
         # Cli stdin stdout
         self.cliInOutWorkerThreadManager = CliInOutWorkerThreadManager(self.ui)
@@ -164,10 +159,6 @@ class MainWindow(QMainWindow):
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
         MainWindowSingleton().set_main_window(self)
 
-        # reorganise layout
-
-        # self.ui.vorbereitungStackedTab.setParent(self.ui.statistikPage)
-
     def save_cache(self, arg, value):
         arg = "user_preferences"
         value = {"experiment_id": value, "language": "en"}
@@ -197,17 +188,7 @@ class MainWindow(QMainWindow):
 
             # Add HomePageDashboard to the layout
             self.home_dashboard = HomePageDashboard(self.ui.test_page_home, self)
-            # self.home_dashboard.show_start_button()
             self.tab_widget_home_dashboard.addTab(self.home_dashboard, "Dashboard")
-            # Add CustomLiveWidget to the layout
-            # self.live_widget = CustomLiveWidget(self.ui.test_page_home, self)
-            # self.tab_widget_home_dashboard.addTab(self.live_widget, "Live")
-            # ExperimentPreparation Pages
-
-            # experiment_preparation.map_prev_next(self.ui)
-            # self.tab_widget_home_dashboard.addTab(experiment_preparation, "Exp Vorb")
-            # vorbereitung_index = self.tab_widget_home_dashboard.indexOf(self)
-            # self.tab_widget_home_dashboard.setCurrentIndex(vorbereitung_index)
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_home_dashboard)
@@ -227,10 +208,9 @@ class MainWindow(QMainWindow):
             experiment_tubes_widget = QWidget()  # Container widget for the first tab
             experiment_tubes_layout = QVBoxLayout(experiment_tubes_widget)  # Layout for the container widget
 
-            # Add your existing stacked layout to the first tab
             stacked_layout = QStackedLayout()
-
-            self.experiment_dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view, main_window=self)
+            self.experiment_dashboard = ExperimentTubesInfoDashboard(parent=self.ui.experiment_info_view,
+                                                                     main_window=self)
             self.experiment_details = ExperimentTubesDetails(main_window=self)
 
             stacked_layout.addWidget(self.experiment_dashboard)
@@ -259,16 +239,6 @@ class MainWindow(QMainWindow):
     def show_experiment_details(self, data, details_widget, stacked_layout):
         details_widget.update_details(data)
         stacked_layout.setCurrentIndex(1)
-
-    def display_qr_from_main(self, qr_code_list):
-        tube_information = TubesSingleton()
-        print("----Main----")
-        qr_code_display = DisplayQRCode(self.ui, self)
-        for tube in qr_code_list:
-            # print(tube_information.tubes[tube].qr_code)
-            qr_code_display.displayQrCode(tube)
-        return qr_code_display
-        # Display QR Codes
 
     def show_message_in_dialog(self, display_msg):
         self.dialogBoxContents.append(
@@ -319,7 +289,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {file_name}\n{str(e)}')
                 dialog.addContent(f"Error occurred while importing Excel file: {file_name}",
-                                           ContentType.OUTPUT)
+                                  ContentType.OUTPUT)
                 dialog.addContent(f" {str(e)}", ContentType.OUTPUT)
             finally:
                 print(f'Successfully imported Excel file: {file_name}')

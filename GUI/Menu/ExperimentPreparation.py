@@ -297,12 +297,6 @@ class ExperimentPreparation:
             self.show_message_in_dialog(display_msg)
             return
 
-        if not self.is_current_experiment:
-            dialog = CustomDialog(self.main_window)
-            dialog.add_titlebar_name("Experiment Update Message")
-            dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
-            dialog.show()
-            return
 
         try:
             for elem in plasmid_list:
@@ -336,6 +330,12 @@ class ExperimentPreparation:
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
             else:
+                if not self.is_current_experiment:
+                    dialog = CustomDialog(self.main_window)
+                    dialog.add_titlebar_name("Experiment Update Message")
+                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+                    dialog.show()
+                    return
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, experiment_id)
