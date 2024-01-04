@@ -40,7 +40,7 @@ class InterprocessCommunication:
                 pass  # No new message
 
     def live_simulation(self):
-        file_path = r"C:\Users\Ujwal Subedi\Documents\Bachelorarbeit\Agile_Roboticsystems_Laborstrasse\Monitoring\Logs\tracking_20230814-185137\log_detail.csv"
+        file_path = "SimulationData\log_detail.csv"
         data = pd.read_csv(file_path)
         for index, row in data.iterrows():
             print("LIVE " + str(row))
@@ -73,13 +73,14 @@ class InterprocessCommunication:
         child_thread = threading.Thread(target=self.run_child_process)
         child_thread.start()
 
-        child_thread_live_simulation = threading.Thread(target=self.live_simulation)
-        child_thread_live_simulation.start()
 
+        child_thread_live_simulation = threading.Thread(target=self.live_simulation)
         # Join threads at the end
         input_thread.join()
         child_thread.join()
-        child_thread_live_simulation.join()
+        if self.is_debug:
+            child_thread_live_simulation.start()
+            child_thread_live_simulation.join()
 
 
 if __name__ == "__main__":
