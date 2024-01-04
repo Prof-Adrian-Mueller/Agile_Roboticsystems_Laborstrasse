@@ -11,6 +11,10 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '01/12/2023'
 
+from GUI.Utils.LiveObservable import MessageDisplay
+from GUI.Utils.LiveObservable import LiveObservable
+from GUI.Utils.LiveViewMessageDisplay import LiveViewMessageDisplay
+
 
 class CliInOutWorkerThreadManager(QWidget):
     """
@@ -41,6 +45,15 @@ class CliInOutWorkerThreadManager(QWidget):
 
         self.displayDefault("Process has not been still started.")
 
+        # Creating Observable
+        self.message_service = LiveObservable()
+
+        # Creating Observers
+        display = LiveViewMessageDisplay()
+
+        # Registering the Observer
+        self.message_service.register_observer(display)
+
     def displayDefault(self, message):
         self.defaultWidget = QWidget()
         self.defaultWidget.setObjectName("clioutputwidgetdesign")
@@ -51,7 +64,7 @@ class CliInOutWorkerThreadManager(QWidget):
         self.defaultLabel.setWordWrap(True)
         h_layout.addWidget(self.defaultLabel)
 
-    def startProcess(self):
+    def startProcess(self, nr_of_tubes):
         """
         Start the monitoring application.
         """
@@ -60,24 +73,14 @@ class CliInOutWorkerThreadManager(QWidget):
             self.process.readyReadStandardOutput.connect(self.normalOutputWritten)
             self.process.readyReadStandardError.connect(self.errorOutputWritten)
 
-            # script_path = os.path.join('.', 'Main', 'main.py')
-            # self.process.start('python', ['-u', script_path])
-            # self.appendOutput("Process has been started.")
-            # # Path to your virtual environment's Python executable
-            # venv_python_path = os.path.join('.', 'path_to_venv', 'Scripts',
-            #                                 'python')  # Use 'bin/python' instead of 'Scripts\python' on Unix-based systems
-
             # Path to your script
             script_path = os.path.join('.', 'Main', 'main.py')
-
             # Get the current directory
             current_dir = os.getcwd()
-
             # Construct the path to the virtual environment's Python executable
             venv_python_path = os.path.join(current_dir, 'venv', 'Scripts', 'python')
-
             # Start the process with the venv Python
-            self.process.start(venv_python_path, ['-u', script_path])
+            self.process.start(venv_python_path, ['-u', script_path, nr_of_tubes])
             self.appendOutput("Process has been started.")
         else:
             self.appendOutput("Process has already been started.")
@@ -111,18 +114,34 @@ class CliInOutWorkerThreadManager(QWidget):
 
         label = QLabel(text)
         label.setWordWrap(True)
+        label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)  # Enables text selection
         h_layout.addWidget(label)
+
+        clipboard = QApplication.clipboard()
+        clipboard.setText(label.text())
 
     def normalOutputWritten(self):
         """
         Display output text on CLI GUI
         """
-        new_text = self.process.readAllStandardOutput().data().decode().strip()
-        self.appendOutput(new_text)
+        try:
+            output = self.process.readAllStandardOutput().data().decode().strip()
+            if output:
+                if output.startswith("LIVE"):
+                    message = output[len("LIVE "):].strip()
+                    self.message_service.notify_observers(message)
+                else:
+                    self.appendOutput(output)
+        except Exception as ex:
+            print(ex)
 
     def errorOutputWritten(self):
         """
         Display error text on CLI GUI
         """
-        new_text = self.process.readAllStandardError().data().decode().strip()
-        self.appendOutput(new_text)
+        output = self.process.readAllStandardError().data().decode().strip()
+        if output:
+            if output.startswith("LIVE"):
+                print(f"It has {output.split()[0]} Data")
+            else:
+                self.appendOutput(output)

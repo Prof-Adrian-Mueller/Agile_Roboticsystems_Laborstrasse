@@ -52,6 +52,7 @@ def microqr_reader(count):
         Tube_IDs und den Koordinaten der Bounding Box ist
     """
     print("QR Reader gestartet")
+    # TODO : send this status to GUI , QR Button green in Live View
 
     # Bereite Kamera vor
     cap = cv2.VideoCapture(0)
@@ -107,6 +108,7 @@ def microqr_reader(count):
         # für jede Erkennung
         for qr in detector.detections:
             print("message: '" + qr.message + "'")
+            # TODO QR Message in Live View
 
             # speicher Koordinaten
             points = np.array([tuple(c) for c in qr.bounds.convert_tuple()], dtype=np.int32)
@@ -134,6 +136,7 @@ def microqr_reader(count):
             cap.release()
             #cv2.destroyAllWindows()
             print(tube_ids)
+            # TODO Green GUI, everything ok to read QR
             return tube_ids
 
         # Tube Anzahl ist falsch, nach Ablauf der Zeit Warnung herausschicken und nach 30 Sekunden wiederholen
@@ -143,10 +146,11 @@ def microqr_reader(count):
                 send_to_telegram("Es wurden nicht alle Tubes in der vorgegebenen Zeit erkannt. Bitte überprüfen")
                 time.sleep(30)
                 start_time = datetime.datetime.now()
+                # TODO Red GUI, everything not ok to read QR
 
     # beende auslesen der Kamera
     cap.release()
-
+    # TODO Wissam - die Anfangszeit & Endezeit  für Tracking; anzahl tubes, status : ok?
     # beende alle Fenster
     cv2.destroyAllWindows()
 

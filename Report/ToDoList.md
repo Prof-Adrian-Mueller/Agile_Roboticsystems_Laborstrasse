@@ -1,7 +1,6 @@
 ## TODO
 ## Ujwal Subedi
 1. [ ] Code Cleanup & Code Comments
-2. [ ] PC Transformer2023 Prio 1
 3. [ ] Relative Folder Structure fix for Labor PC
 4. [ ] Layout View for Experiment, Plasmid, Tubes using Mock Data
 5. [ ] Export of Data , downloadable Excel File
@@ -28,6 +27,7 @@
         -  Show Input Field for each Plasmid Nr to accept Tube Nr in comma separated List eg. (5,7,8,12,24)
 10. [x] Adding filter to Experiment Creation Form
 11. [x] Redesign QR-Image view row list near Experiment Tubes view
+12. [x] PC Transformer2023 Prio 1
 
 ## Completed Tasks
 ### Wissam Alamareen
@@ -47,7 +47,7 @@
 
 ## On Progress
 ### Ujwal Subedi
-1. Redesign QR-Image view row list near Experiment Tubes view
+1. Export Data from the result Tables
 
 
 ### TODO

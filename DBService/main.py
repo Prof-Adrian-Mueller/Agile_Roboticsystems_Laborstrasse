@@ -19,8 +19,13 @@ from DBService.Control.ExperimentAdapter import ExperimentAdapter
 
 
 ui_db = DBUIAdapter()
+# ui_db.experiment_adapter.get_latest_tube("w1")
+# ui_db.get_latest_tube_by_exp_id("w1")
+# ui_db.get_anz_tubes_exp_id("w1")
+ui_db.available_qrcode("w2")
 
-# ui_db.add_experiment("max", "Mustermann", 5,32, '2023-10-22',"max1")
+
+# ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
 
 # probe_nr_list = [1, 2, 3, 4, 5]
 # ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
@@ -29,6 +34,9 @@ ui_db = DBUIAdapter()
 # tubes_for_exp=ui_db.get_tubes_by_exp_id("max1")
 # for tube in tubes_for_exp:
 #     print(tube)
+# print(ui_db.get_latest_tube_by_exp_id("max1"))
+# print(ui_db.get_anz_tubes_exp_id("max1"))
+# ui_db.available_qrcode("max1")
 
 
 # tubes_for_exp=ui_db.get_tubes()
@@ -41,7 +49,7 @@ ui_db = DBUIAdapter()
 # # Verarbeiten oder anzeigen Sie die Experimente
 # for experiment in all_experiments:
 #         print(f"Experiment ID: {experiment.exp_id}, Name: {experiment.name}, Vorname: {experiment.vorname}, Anzahl Tubes: {experiment.anz_tubes}, Video ID: {experiment.video_id}, Datum: {experiment.datum}, Anzahl Fehler: {experiment.anz_fehler}, Bemerkung: {experiment.bemerkung}")
-
+#
 
 # insert metadaten----------------------------------------------------------------------
 # meta_adapter=MetaAdapter()
@@ -53,6 +61,8 @@ ui_db = DBUIAdapter()
 
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)
+# tubes_pro_plasmid=ui_db.get_probe_numbers_by_plasmid_for_experiment("max1")
+# print(tubes_pro_plasmid)
 
 
 # print(ui_db.get_tube_data_by_probe_nr(1))
@@ -68,14 +78,14 @@ ui_db = DBUIAdapter()
 # delete ein Experiment
 # ui_db.delete_experiment("max2")
 
-# tubes_data=ui_db.get_tubes_data_for_experiment("max2")
+# tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)
 
 
 
 # print(ui_db.get_tubes_data_for_experiment("max1"))
 # Return all Plasmid eines Experiments
-print(ui_db.get_plasmids_for_experiment("max1"))
+# print(ui_db.get_plasmids_for_experiment("max1"))
 
 # SEITE 1
 # diese Methode wird aufgerufen bei Experiment hinzufügen 

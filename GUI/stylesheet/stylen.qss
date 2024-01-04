@@ -1,7 +1,7 @@
 /* Set a default background color and remove border for all widgets */
 QWidget {
-    background-color: #f2f2f2;
     border: none;
+    background-color: #f2f2f2;
 }
 
 /* Style for all buttons */
@@ -9,26 +9,47 @@ QPushButton {
     background-color: #4CAF50;
     color: white;
     border: none;
-    font-size: 12px;
+    font-size: 12px; /* Decrease the size of the button */
     padding: 10px 10px;
-    min-height: 10px;
+    min-height: 4px; /* Decrease the size of the button */
+    min-width: 4px; /* Decrease the size of the button */
     border-radius: 4px;
+    icon-size: 28px 28px; /* Increase the size of the icon */
 }
 
-QWidget#leftNavigation QPushButton{
+#leftNavigation QPushButton{
     background-color: #4CAF50;
     color: white;
     border: none;
-    padding: 10px 15px;
-    font-size: 14px;
+    padding: 10px 10px;
+    font-size: 8px;
     border-radius: 4px;
 }
 
+#leftNavigation QPushButton:hover {
+    background-color: #388E3C;
+}
+
+#centralwidget {
+    /* background-color:aqua; */
+    padding:none;
+}
+
 QVBoxLayout#leftNavigationVerticalLayout {
-    padding: top 5px; 
+    /* padding: top 5px;  */
     background-color: #FF0000;
 }
 
+#leftNavigation {
+    background-color: #E0E0E0;
+    min-width: 60px;
+    box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+#logo_layout {
+    background-color: #E0E0E0;
+    min-width: 60px;
+}
 
 /* Change background color on hover */
 QPushButton:hover {
@@ -61,6 +82,12 @@ QPushButton#closeButton {
 /* Change background color on hover */
 QPushButton#closeButton:hover {
     background-color: #FF3B37;
+}
+
+#app_logo {
+    background-color: #E0E0E0;
+    min-width: 25px;
+    min-height: 25px;
 }
 
 /* Specific styles for minimizeButton */
@@ -290,6 +317,11 @@ QWidget#itemRowLiveData QPushButton {
     max-width:25px;
     border-radius:20px;
     margin-left:20px;
+    background-color: #999999;
+}
+
+QWidget#itemRowLiveData QPushButton:hover {
+    background-color: #707070;
 }
 
 QWidget#clioutputwidgetdesign {
@@ -371,4 +403,11 @@ QLabel#qrCodeLabel {
 
 #more_btn:pressed {
     background-color: #201e21;
+}
+
+
+#live_row_label {
+  border: 1px solid #FFFFFF;
+  border-radius: 5px;
+  padding:5px;
 }

@@ -6,7 +6,11 @@ from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWi
 from PyQt6.uic.properties import QtGui
 
 from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
+from GUI.Utils.FileUtils import FileUtils
 from GUI.button_back_design_test import CustomBackButton
+import os
+import pandas as pd
+from PyQt6.QtWidgets import QApplication, QFileDialog
 
 
 class ExperimentTubesDetails(QWidget):
@@ -137,6 +141,7 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
 
+        self.create_export_btn(h_layout)
         self.create_refresh_btn(h_layout)
 
         layout.addLayout(h_layout)
@@ -176,6 +181,34 @@ class ExperimentTubesInfoDashboard(QWidget):
         # Connect the cell click signal
         self.experiments_table.cellClicked.connect(self.row_selected)
 
+    def create_export_btn(self, h_layout):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal,
+                       QIcon.State.Off)
+        refresh_btn = QPushButton("")
+        refresh_btn.clicked.connect(self.export_table_data)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+        refresh_btn.setToolTip("Export")
+        refresh_btn.setIcon(icon)
+        h_layout.addWidget(refresh_btn)
+
+    def export_table_data(self):
+        self.refresh_data()
+        if not self.experiments_data:
+            return
+        try:
+            FileUtils.save_data_to_excel(self, self.experiments_data,
+                                         "experiment_data_exp_" + self.current_experiment.experiment_id)
+        except Exception as ex:
+            print(ex)
+
     def create_refresh_btn(self, h_layout):
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/img/refresh-double.svg"), QIcon.Mode.Normal,
@@ -200,10 +233,10 @@ class ExperimentTubesInfoDashboard(QWidget):
             if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
                                                        'experiment_id') and self.current_experiment.experiment_id is not None):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
-                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.current_experiment.experiment_id)
+                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                    self.current_experiment.experiment_id)
                 self.populate_table()
-            else:
-                self.current_experiment = self.main_window.cache_data.experiment_id
+
         except Exception as ex:
             self.main_window.removeDialogBoxContents()
             self.main_window.show_message_in_dialog(ex)

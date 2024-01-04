@@ -7,6 +7,7 @@ class BorgSingleton:
     def __init__(self):
         self.__dict__ = self._shared_state
 
+
 class CurrentExperimentSingleton(BorgSingleton):
     def __init__(self, experiment_id=None):
         BorgSingleton.__init__(self)
@@ -15,6 +16,7 @@ class CurrentExperimentSingleton(BorgSingleton):
 
     def __str__(self):
         return f"CurrentExperimentSingleton(experiment_id={self.experiment_id})"
+
 
 class ExperimentSingleton(BorgSingleton):
     """
@@ -96,6 +98,57 @@ class TubesSingleton(BorgSingleton):
 
     def __str__(self):
         return f'TubesSingleton(tubes={self.tubes})'
+
+
+class MainWindowSingleton(BorgSingleton):
+    """
+        Singleton Class to store MainWindow Data in Application Runtime
+    """
+
+    def __init__(self, main_window=None):
+        BorgSingleton.__init__(self)
+        self.main_window = main_window
+        if not hasattr(self, 'stacked_tab'):
+            self.stacked_tab = {}
+
+    def add_stacked_tab_index(self, name, index):
+        self.stacked_tab[name] = index
+
+    def get_stacked_tab_index(self, name):
+        return self.stacked_tab[name]
+
+    def set_main_window(self, main_window):
+        self.main_window = main_window
+
+
+class TubeLayoutSingleton(BorgSingleton):
+    def __init__(self):
+        super().__init__()
+        if 'button_layouts' not in self._shared_state:
+            self._shared_state['button_layouts'] = {}
+        if 'station_info' not in self._shared_state:
+            self._shared_state['station_info'] = {}
+
+    def add_button_layout(self, tube_id, buttons):
+        self._shared_state['button_layouts'][tube_id] = buttons
+
+    def get_button_layout(self, tube_id):
+        return self._shared_state['button_layouts'].get(tube_id)
+
+    def add_station_info(self, tube_id, station_nr, station_info):
+        # Ensure a list exists for this tube_id
+        if tube_id not in self._shared_state['station_info']:
+            self._shared_state['station_info'][tube_id] = [None, None, None]
+
+        # Update the station information for the specified station number
+        if 1 <= station_nr <= 3:
+            self._shared_state['station_info'][tube_id][station_nr - 1] = station_info
+        else:
+            raise ValueError("Invalid station number. Must be 1, 2, or 3.")
+
+    def get_station_info(self, tube_id):
+        # Retrieve station info for the given tube_id
+        return self._shared_state['station_info'].get(tube_id)
 
 
 if __name__ == "__main__":

@@ -40,8 +40,8 @@ from supervision import VideoSink, VideoInfo
 from ultralytics import YOLO
 
 # wird benötigt um aus der Konsole raus zu starten
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'Tracker_Config'))
-#wenn diese Import rot markiert sind muss in intellij der Ordner Monitoring und Tracker_Config rechtsklick mark as
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'Tracker_Config'))
+# wenn diese Import rot markiert sind muss in intellij der Ordner Monitoring und Tracker_Config rechtsklick mark as
 # source Folder  eingestellt werrden
 import Tracker_Config.calibrate_Camera as calibrate_Camera
 from Tracker_Config.tracker_utils import VideoCapture, mergeIDs, calculate_distance, send_to_telegram
@@ -80,8 +80,6 @@ config.version = 1
 config.maxIterations = 10
 config.maximumSizeFraction = 0.8
 config.minimumSizeFraction = 0.01
-
-
 
 # Bounding_Box settings
 box_annotator = sv.BoxAnnotator(
@@ -203,10 +201,9 @@ def tracker(tube_ids):
     # cv2.VideoCapture() gibt ein Frame nacheinander zurück. Kann hinterherhängen.
     # VideoCapture() ist eine Klasse aus tracker_utils, die immer den aktuellsten Frame zurückgibt
 
-
     # aus Deckenkamera oder Video, gewünschte Zeile nutzen
     # cap = VideoCapture(RTSP_URL)
-    #cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
+    # cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
     cap = cv2.VideoCapture("C:\\Users\\Mirko\\Downloads\\20230809_121620.mp4")
 
     # Berechne Kameramatrix mit Kalibrierdaten
@@ -229,14 +226,15 @@ def tracker(tube_ids):
                  'endStation',
                  'endStationTime', 'duration',
                  'videoTimestamp']
-    headerLogDetail = ['frame','tubeID','trackingID', 'lastStation', 'leftStation',
+    headerLogDetail = ['frame', 'tubeID', 'trackingID', 'lastStation', 'leftStation',
                        'nextStation', 'nextStationDistance']
 
     frameIndex = 0
 
     video = cv2.VideoWriter(os.getcwd() + '\\' + TARGET_VIDEO_PATH,
                             cv2.VideoWriter.fourcc(*'X264'),
-                            4, (3840, 2160)) # falls entzerrung ein pixel kleiner. muss immer mit Bildgröße übereinstimmen ansonsten ist das Video leer
+                            4, (3840,
+                                2160))  # falls entzerrung ein pixel kleiner. muss immer mit Bildgröße übereinstimmen ansonsten ist das Video leer
 
     cv2.namedWindow("Monitoring", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Monitoring", 1920, 1080)
@@ -258,7 +256,7 @@ def tracker(tube_ids):
                 # jeden xten Frame lesen
                 for i in range(1):
                     # lese frame
-                    frameIndex+=1
+                    frameIndex += 1
                     flag, img = cap.read()
 
                 # überspringen, wenn kein frame vorhanden
@@ -269,13 +267,13 @@ def tracker(tube_ids):
 
                 # entzerre frame mit Kameramatrix,
                 # aus performance gründen auskommentiert, fals gewünscht in model.track() die source auf dst stellen
-                #dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-                #x, y, w, h = roi
-                #dst = dst[y:y + h, x:x + w]
+                # dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+                # x, y, w, h = roi
+                # dst = dst[y:y + h, x:x + w]
 
                 # Tracking für den aktuellen Frame
                 track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=True
-                                    , save_txt=False, show=False,imgsz=1920,
+                                    , save_txt=False, show=False, imgsz=1920,
                                     device='cpu', save=False,
                                     persist=True)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
                 # generator to list
@@ -285,9 +283,10 @@ def tracker(tube_ids):
                     for result in results:
                         detections = sv.Detections.from_yolov8(result)
                         detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
-                        if not any(r.trackingID == detections.tracker_id for r in live_tracking) and not any(s.trackingID ==detections.tracker_id for s in stations) and not start:
+                        if not any(r.trackingID == detections.tracker_id for r in live_tracking) and not any(
+                                s.trackingID == detections.tracker_id for s in stations) and not start:
                             coords = result.boxes.xywh.tolist()[0]
-                            changedID = min(live_tracking,key= lambda y : calculate_distance(y.coords,coords))
+                            changedID = min(live_tracking, key=lambda y: calculate_distance(y.coords, coords))
                             changedID.trackingID = detections.tracker_id
                             changedID.coords = coords
 
@@ -360,11 +359,14 @@ def tracker(tube_ids):
 
                                                 # aktuelles Objekt ist die Tube
                                                 if tube.trackingID == detections.tracker_id[0]:
-                                                    print("Tube " + str(tube.tubeID) +" ist in Station " + station.name )
+                                                    print(
+                                                        "Tube " + str(tube.tubeID) + " ist in Station " + station.name)
+                                                    # TODO : check LIVE_INFO and show this in tube row
+                                                    print("LIVE_INFO Tube " + str(
+                                                        tube.tubeID) + " ist in Station " + station.name)
                                                     # wenn noch nicht in Tube Liste der Station, Tube kommt neu an
                                                     # die Station
                                                     if tube not in station.tubes:
-
 
                                                         # für jeden Logeintrag
                                                         for entry in log:
@@ -384,14 +386,12 @@ def tracker(tube_ids):
                                                                                  entry.endStationTime, entry.duration,
                                                                                  entry.videoTimestamp])
 
-
-
                                                         # aktualisiert tube werte
                                                         tube.leftStation = False
                                                         tube.lastStationTime = datetime.datetime.now()
-                                                        tube.lastStation=station.name
-                                                        tube.nextStation=station.name
-                                                        tube.nextStationDistance=0
+                                                        tube.lastStation = station.name
+                                                        tube.nextStation = station.name
+                                                        tube.nextStationDistance = 0
                                                         tube.coords = result.boxes.xywh.tolist()[0]
 
                                                         # fügt Tube in Station Tube Liste hinzu
@@ -405,7 +405,8 @@ def tracker(tube_ids):
 
                                                 # aktuelles Objekt ist die Tube
                                                 if tube.trackingID == detections.tracker_id[0]:
-                                                    print("Tube " + str(tube.tubeID) +" ist nicht in Station " + station.name )
+                                                    print("Tube " + str(
+                                                        tube.tubeID) + " ist nicht in Station " + station.name)
                                                     # wenn in Tubel Liste der Station, dann hat das Tube die Station verlassen
                                                     if tube in station.tubes:
                                                         # trackinglogentry erzeugen und mit Stationname und Zeit füllen
@@ -421,14 +422,11 @@ def tracker(tube_ids):
                                                         tube.leftStation = True
                                                         tube.lastStationTime = datetime.datetime.now()
                                                         tube.nextStationDistance = None
-                                                        tube.nextStation=None
+                                                        tube.nextStation = None
                                                         tube.coords = result.boxes.xywh.tolist()[0]
 
                                                         # entfernt Tube aus Station Tube Liste
                                                         station.tubes.remove(tube)
-
-
-
 
                                     # in keiner station, Abstand zur nächsten Station berechnen für jede Tube
                                     for tube in live_tracking:
@@ -442,10 +440,13 @@ def tracker(tube_ids):
                                                 # Abstand zu jeder Station berechnen
                                                 for station in stations:
                                                     print(station.name)
-                                                    distance = calculate_distance(result.boxes.xywh.tolist()[0], station.coords)
+                                                    distance = calculate_distance(result.boxes.xywh.tolist()[0],
+                                                                                  station.coords)
 
                                                     # in cm umrechnen
-                                                    distance = round(distance * (STATION_LENGTH / result.boxes.xywh.tolist()[0][2] * 2)/10)
+                                                    distance = round(distance * (
+                                                                STATION_LENGTH / result.boxes.xywh.tolist()[0][
+                                                            2] * 2) / 10)
 
                                                     # niedrigste Distanz in Tube abspeichern
                                                     if tube.nextStationDistance is None:
@@ -458,8 +459,14 @@ def tracker(tube_ids):
 
                                             # schreibe log_detail.csv
                                             writer2.writerow(
-                                                [frameIndex,tube.tubeID,tube.trackingID, tube.lastStation, tube.leftStation,
+                                                [frameIndex, tube.tubeID, tube.trackingID, tube.lastStation,
+                                                 tube.leftStation,
                                                  tube.nextStation, tube.nextStationDistance])
+                                            # TODO: live view log here
+                                            print("LIVE " + str(
+                                                [frameIndex, tube.tubeID, tube.trackingID, tube.lastStation,
+                                                 tube.leftStation,
+                                                 tube.nextStation, tube.nextStationDistance]))
 
                                 # objekt ist Station, Koordinaten aktualisieren
                                 else:
@@ -481,11 +488,11 @@ def tracker(tube_ids):
                                                 # überschritten wurde
                                                 if calculate_distance(newCoords,
                                                                       station.startCoords) * (
-                                                        STATION_LENGTH / newCoords[1] * 2)/10 > \
+                                                        STATION_LENGTH / newCoords[1] * 2) / 10 > \
                                                         MOVING_STATIONS_DISTANCE_LIMIT:
                                                     station.moving_index += 1
                                                     station.name = station.moving_names[station.moving_index]
-                                                    station.startCoords=newCoords
+                                                    station.startCoords = newCoords
 
                                             # überschreibe Koordinaten in Station
                                             station.coords = newCoords
@@ -495,8 +502,8 @@ def tracker(tube_ids):
                 # schreibe Frame in Datei
                 im_array = results.plot()  # plot a BGR numpy array of predictions
                 cv2.imshow("Monitoring", im_array)
-                #für performance deaktiviert
-                #video.write(im_array)
+                # für performance deaktiviert
+                # video.write(im_array)
                 # nach erstem Frame
                 if start:
 
@@ -513,7 +520,7 @@ def tracker(tube_ids):
                     for index in mergedIDs:
                         # erzeuge Tube Objekt und füge es in die live-tracking Liste
                         id1, id2 = index
-                        tube = Tube(id1,id2)
+                        tube = Tube(id1, id2)
                         live_tracking.append(Tube(id1, id2))
 
                         # für Startstation einmal zu Beginn eintragen
@@ -524,19 +531,17 @@ def tracker(tube_ids):
                 for tube in live_tracking:
 
                     # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
-                    if ((datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME and tube.error==False):
+                    if ((
+                            datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME and tube.error == False):
                         send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
-                        ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
-                        tube.error=True
-
-
+                            ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+                        tube.error = True
 
             # beende auslesen der Kamera
             video.release()
             cap.release()
             # beende alle Fenster
             cv2.destroyAllWindows()
-
 
 
 def start_tracking(tube_ids):

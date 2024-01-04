@@ -1,8 +1,11 @@
+import traceback
+
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
+from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Navigation import Ui_MainWindow
 from PyQt6.QtCore import pyqtSignal, QDate
 import datetime
@@ -12,7 +15,8 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '03/12/2023'
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
+    MainWindowSingleton
 
 
 class ExperimentPreparation:
@@ -22,6 +26,7 @@ class ExperimentPreparation:
     sendButtonClicked = pyqtSignal(str)
 
     def __init__(self, ui: Ui_MainWindow, main_window):
+        self.is_current_experiment = False
         self.tube_information = TubesSingleton()
         self.experiment_data = ExperimentSingleton()
         self.ui = ui
@@ -46,12 +51,27 @@ class ExperimentPreparation:
         except Exception as ex:
             print(ex)
 
-    def checkExperimentID(self, text):
+    def checkExperimentID(self, exp_id):
         # TODO: check in db
         try:
-            exp_id_data = self.ui_database.adapter.get_experiment_by_id(text)
-            plasmids = self.ui_database.get_plasmids_for_experiment(self.experiment_data.experiment_id)
+            exp_id_data = self.ui_database.adapter.get_experiment_by_id(exp_id)
+            plasmids = self.ui_database.get_plasmids_for_experiment(exp_id)
             if exp_id_data:
+                all_experiments = self.ui_database.get_all_experiments()
+                last_exp_id = all_experiments[-1].exp_id
+                if exp_id == last_exp_id:
+                    print(f"Experiment ID {exp_id} is the latest one.")
+                    self.is_current_experiment = True
+                else:
+                    dialog = CustomDialog(self.main_window)
+                    dialog.add_titlebar_name("Experiment Update Message")
+                    dialog.addContent(
+                        f"Die Experiment-ID {exp_id} ist nicht die neueste. Die neueste ID lautet {last_exp_id}.",
+                        ContentType.OUTPUT)
+                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+                    self.is_current_experiment = False
+                    dialog.show()
+
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
                 self.ui.anzahlTubesLE.setText(str(exp_id_data.anz_tubes))
@@ -77,17 +97,17 @@ class ExperimentPreparation:
             self.ui.vorbereitungStackedTab.setCurrentIndex(current_index + 1)
 
     def nextPageWithControl(self, page_data):
+        global live_widget
         if page_data == 'CreateExperiment':
             # TODO: verify if plasmid exists
-            print("weiter clicked " + page_data)
-            # self.main_window.plasmidTubesList.displayPlasmidTubes("test")
-            # self.nextPage()
             try:
                 self.experiment_creation(page_data)
             except Exception as ex:
                 display_msg = "Could not create Experiment.\n"
                 self.main_window.dialogBoxContents.append(
                     self.main_window.dialog.addContent(f"{display_msg} {ex}", ContentType.OUTPUT))
+                self.main_window.dialogBoxContents.append(
+                    self.main_window.dialog.addContent(f"{traceback.format_exc()}", ContentType.OUTPUT))
                 self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
@@ -96,7 +116,6 @@ class ExperimentPreparation:
             self.tube_information.clear_cache()
             self.main_window.removeDialogBoxContents()
 
-            # self.nextPage()
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
                 display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
@@ -110,14 +129,22 @@ class ExperimentPreparation:
             #     self.main_window.display_qr_from_main("Anzahl von Tubes sollen nicht mehr als 32 sein.")
 
             else:
-                display_msg = "All values look good.\n"
+                dialog = CustomDialog(self.main_window)
+                dialog.add_titlebar_name("Experimenttubes Details")
                 count_tubes = []
                 try:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
-                        self.ui_database.adapter.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
-                        print(plasmid + " - " + ', '.join(map(str, tubes_list)))
-                        display_msg += f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
-                        count_tubes.append(tubes_list)
+                        try:
+                            self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
+                            print(plasmid + " - " + ', '.join(map(str, tubes_list)))
+                            display_msg = f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
+                            dialog.addContent(
+                                dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                            count_tubes.append(tubes_list)
+                        except Exception as ex:
+                            dialog.addContent(
+                                dialog.addContent(f"{ex}", ContentType.OUTPUT))
+                            count_tubes.append(tubes_list)
 
                     tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
                     probe_list = []
@@ -126,38 +153,68 @@ class ExperimentPreparation:
                                                        tube['plasmid_nr'])
                         probe_list.append(tube['qr_code'])
                     print(self.tube_information)
-                    self.main_window.display_qr_from_main(probe_list)
+                    self.main_window.qr_codes_widget.refresh_data()
+                    self.main_window.experiment_dashboard.refresh_data()
                     # TODO layout anpassen
-                    self.main_window.custom_live_widget.display_tubes_data()
                     # qr_codes_list = self.ui_database.adapter.get_next_qr_codes(len(count_tubes))
                     # for qr_code in qr_codes_list:
                     #     print(qr_code)
 
                 except Exception as ex:
                     display_msg = f"Could not create tubes. \n{ex}"
-                    self.show_message_in_dialog(display_msg)
+                    dialog.addContent(
+                        dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
                     return
 
                 # self.nextPage()
                 # Load back dashboard
-                self.show_message_in_dialog(display_msg)
-                exp_sds = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab, self.ui.test_page_home)
-                exp_sds.reset_input_of_past_experiments()
-                self.main_window.tab_widget_home_dashboard.removeTab(1)
-                #load start ent app
+                display_msg = "Prima! Alle Daten sehen Gut aus."
+                dialog.addContent(
+                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                dialog.show()
+                experiment_preparation_widget = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab,
+                                                                            self.ui.test_page_home)
+                experiment_preparation_widget.reset_input_of_past_experiments()
+                experiment_preparation_widget.removeFromMainWindow(self.main_window)
+                # load start ent app
                 self.main_window.home_dashboard.show_start_button()
                 self.main_window.home_dashboard.add_other_page_nav_btns()
 
                 # load live view
-                # Add CustomLiveWidget to the layout
-                live_widget = CustomLiveWidget(self.ui.test_page_home)
-                self.main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+                # Add CustomLiveWidget to the layout if it doesn't exist
+                current_exp = CurrentExperimentSingleton()
+                self.main_window.home_dashboard.nr_of_tubes = str(
+                    len(self.ui_database.get_tubes_by_exp_id(current_exp.experiment_id)))
 
+                # Use the existing MainWindowSingleton instance
+                main_win_singleton = MainWindowSingleton()
 
-        elif page_data == 'ShowQrCodeList':
-            print()
+                # Determine the correct main window to use
+                main_window = main_win_singleton.main_window if main_win_singleton.main_window else self.main_window
+
+                # Check if the "Live" tab already exists
+                live_tab_found = False
+                for index in range(main_window.tab_widget_home_dashboard.count()):
+                    if main_window.tab_widget_home_dashboard.tabText(index) == "Live":
+                        live_tab_found = True
+                        break
+
+                # If "Live" tab does not exist, create and add it
+                if not live_tab_found:
+                    live_widget = CustomLiveWidget(self.ui.test_page_home, main_window)
+                    main_window.tab_widget_home_dashboard.addTab(live_widget, "Live")
+                    live_index = main_window.tab_widget_home_dashboard.indexOf(live_widget)
+                    main_win_singleton.add_stacked_tab_index("live", live_index)
+
+                # Load and display tube information if the "Live" tab is added
+                if not live_tab_found and tube_info_data:
+                    tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
+                    if tube_info_data:
+                        live_widget.display_tubes_data(tube_info_data)
+                        live_widget.refresh_data()
 
     def show_message_in_dialog(self, display_msg):
+        self.main_window.dialog.add_titlebar_name("Experiment Vorbereitung")
         self.main_window.dialogBoxContents.append(
             self.main_window.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
         self.main_window.dialog.show()
@@ -178,7 +235,7 @@ class ExperimentPreparation:
         return len(flat_list) != len(set(flat_list))
 
     def experiment_creation(self, page_data):
-        global exp_data
+        global exp_data, all_tubes_of_exp
         # Clear Cache before saving
         self.experiment_data.clear_cache()
 
@@ -240,6 +297,7 @@ class ExperimentPreparation:
             self.show_message_in_dialog(display_msg)
             return
 
+
         try:
             for elem in plasmid_list:
                 check_if_plasmid_exists_data = self.ui_database.metadata_adapter.get_plasmid_data_by_nr(elem)
@@ -261,7 +319,6 @@ class ExperimentPreparation:
                 exp_id_data = self.ui_database.adapter.get_experiment_by_id(experiment_id)
 
             if exp_id_data is None:
-                print(f"{exp_id_data} is None")
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, None)
@@ -272,10 +329,13 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
-                print("Exp-data : " + exp_data)
             else:
-                print(f"{exp_id_data} is not None")
-                print(exp_id_data)
+                if not self.is_current_experiment:
+                    dialog = CustomDialog(self.main_window)
+                    dialog.add_titlebar_name("Experiment Update Message")
+                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+                    dialog.show()
+                    return
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, experiment_id)
@@ -283,18 +343,16 @@ class ExperimentPreparation:
                 self.experiment_data = ExperimentSingleton(firstname=data['firstname'], lastname=data['lastname'],
                                                            exp_id=exp_data, plasmids=data['plasmid_list'],
                                                            date=data['date'])
-                print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
-                print("Exp-data : " + exp_data)
 
                 self.main_window.cache_data = self.main_window.load_cache()
-
-            print(self.experiment_data)
-            print(self.tube_information)
+            all_tubes_of_exp = self.ui_database.get_tubes_by_exp_id(self.main_window.cache_data.experiment_id)
+            print("------------------------------------")
+            print(all_tubes_of_exp)
         except Exception as ex:
             print(f"An error occurred: {ex}")
 
-            # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
+        # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
         # plasmid_dict = self.ui_database.get_tubes_data_for_experiment(self.experiment_data.experiment_id)
         # plasmid_probe_dict = {}
         # for item in plasmid_dict:
@@ -303,12 +361,14 @@ class ExperimentPreparation:
         # print(plasmid_probe_dict)
         # for elem in plasmid_probe_dict:
         #     print(elem)
-        self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, None)
-        print(data)
-
-        # self.main_window.ui_db.add_experiment()
-
-        self.nextPage()
+        if self.current_experiment.experiment_id:
+            if all_tubes_of_exp:
+                self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                    self.current_experiment.experiment_id), all_tubes_of_exp)
+            else:
+                self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
+                    self.current_experiment.experiment_id), [])
+            self.nextPage()
 
     def map_prev_next(self, ui):
         ui.vorbereitungPrev.clicked.connect(self.prevPage)
