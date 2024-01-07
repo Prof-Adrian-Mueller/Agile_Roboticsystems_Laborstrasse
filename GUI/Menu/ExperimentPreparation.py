@@ -59,18 +59,7 @@ class ExperimentPreparation:
             if exp_id_data:
                 all_experiments = self.ui_database.get_all_experiments()
                 last_exp_id = all_experiments[-1].exp_id
-                if exp_id == last_exp_id:
-                    print(f"Experiment ID {exp_id} is the latest one.")
-                    self.is_current_experiment = True
-                else:
-                    dialog = CustomDialog(self.main_window)
-                    dialog.add_titlebar_name("Experiment Update Message")
-                    dialog.addContent(
-                        f"Die Experiment-ID {exp_id} ist nicht die neueste. Die neueste ID lautet {last_exp_id}.",
-                        ContentType.OUTPUT)
-                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
-                    self.is_current_experiment = False
-                    dialog.show()
+                self.check_if_current_experiment(exp_id, last_exp_id)
 
                 self.ui.nameLE.setText(exp_id_data.name)
                 self.ui.vornameLE.setText(exp_id_data.vorname)
@@ -90,6 +79,20 @@ class ExperimentPreparation:
 
         except Exception as ex:
             print(ex)
+
+    def check_if_current_experiment(self, exp_id, current_exp_id):
+        if exp_id == current_exp_id:
+            print(f"Experiment ID {exp_id} is the latest one.")
+            self.is_current_experiment = True
+        else:
+            dialog = CustomDialog(self.main_window)
+            dialog.add_titlebar_name("Experiment Update Message")
+            dialog.addContent(
+                f"Die Experiment-ID {exp_id} ist nicht die neueste. Die neueste ID lautet {current_exp_id}.",
+                ContentType.OUTPUT)
+            dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+            self.is_current_experiment = False
+            dialog.show()
 
     def nextPage(self):
         current_index = self.ui.vorbereitungStackedTab.currentIndex()
@@ -330,11 +333,10 @@ class ExperimentPreparation:
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
             else:
+                self.main_window.cache_data = self.main_window.load_cache()
+                if self.main_window.cache_data.experiment_id:
+                    self.check_if_current_experiment(experiment_id,self.main_window.cache_data.experiment_id)
                 if not self.is_current_experiment:
-                    dialog = CustomDialog(self.main_window)
-                    dialog.add_titlebar_name("Experiment Update Message")
-                    dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
-                    dialog.show()
                     return
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
