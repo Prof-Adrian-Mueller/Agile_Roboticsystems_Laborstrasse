@@ -1,3 +1,5 @@
+from collections import deque
+
 from PyQt6.QtCore import QProcess
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QApplication, QSizePolicy, QScrollArea, QFrame
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel
@@ -54,6 +56,9 @@ class CliInOutWorkerThreadManager(QWidget):
         # Registering the Observer
         self.message_service.register_observer(display)
 
+        # Max 20 Messages will be shown
+        self.total_messages_displayed = deque(maxlen=20)
+
     def displayDefault(self, message):
         self.defaultWidget = QWidget()
         self.defaultWidget.setObjectName("clioutputwidgetdesign")
@@ -81,8 +86,11 @@ class CliInOutWorkerThreadManager(QWidget):
             venv_python_path = os.path.join(current_dir, 'venv', 'Scripts', 'python')
             # Start the process with the venv Python
             self.process.start(venv_python_path, ['-u', script_path, nr_of_tubes])
-        else:
-            self.appendOutput("Process has already been started.")
+
+            for i in range(1, 50):
+                self.appendOutput(f"Count : {i}")
+        # else:
+        #     self.appendOutput("Process has already been started.")
 
     def stopProcess(self):
         if self.isProcessStarted():
@@ -106,6 +114,15 @@ class CliInOutWorkerThreadManager(QWidget):
         """
         Appends text to CLI Interface on GUI.
         """
+        # Add the new message to the deque
+        self.total_messages_displayed.append(text)
+
+        # If the maximum number of messages has been reached, remove the oldest message
+        if len(self.total_messages_displayed) == self.total_messages_displayed.maxlen:
+            widget = self.outputLayout.itemAt(0).widget()
+            self.outputLayout.removeWidget(widget)
+            widget.deleteLater()
+
         widget = QWidget()
         widget.setObjectName("clioutputwidgetdesign")
         self.outputLayout.addWidget(widget)
