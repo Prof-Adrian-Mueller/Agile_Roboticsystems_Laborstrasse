@@ -308,13 +308,11 @@ class MainWindow(QMainWindow):
         if self.ui.startEnTBtn.text() == "Start":
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: red }")
             self.ui.startEnTBtn.setText("Stop")
-            self.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
             self.cliInOutWorkerThreadManager.startProcess()
 
         else:
             self.ui.startEnTBtn.setStyleSheet("QPushButton { background-color: #45a049 }")
             self.cliInOutWorkerThreadManager.stopProcess()
-            self.cliInOutWorkerThreadManager.displayDefault("Process has been stopped.")
             print("E&T process Terminated!")
             self.ui.startEnTBtn.setText("Start")
 

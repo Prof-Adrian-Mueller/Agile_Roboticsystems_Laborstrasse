@@ -226,18 +226,19 @@ class HomePageDashboard(QWidget):
             if not hasattr(self, 'isStarted') or not self.isStarted:
                 self.start_button.setStyleSheet("QPushButton { background-color: red }")
                 self.start_button.setIcon(self.stopIcon)
-                self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been started.")
                 self.main_window.cliInOutWorkerThreadManager.startProcess(self.nr_of_tubes)
                 self.isStarted = True
             else:
                 self.start_button.setStyleSheet("QPushButton { background-color: #45a049 }")
                 self.main_window.cliInOutWorkerThreadManager.stopProcess()
-                self.main_window.cliInOutWorkerThreadManager.displayDefault("Process has been stopped.")
-                print("E&T process Terminated!")
                 self.start_button.setIcon(self.startIcon)
                 self.isStarted = False
         except Exception as ex:
             print(ex)
+            dialog = CustomDialog(self)
+            dialog.add_titlebar_name("Monitoring & Tracking Info")
+            dialog.addContent(ex, ContentType.ERROR)
+            dialog.show()
 
     def start_experiment_preparation(self):
         # TODO - after loading vorbereitung page- after finished creating tubes and experiment hide the experiment prep
@@ -248,9 +249,9 @@ class HomePageDashboard(QWidget):
             experiment_preparation.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
             experiment_preparation.addToMainWindow(self.main_window)
         except Exception as ex:
-            print(ex)
-        #     dialog = CustomDialog(self)
-        #     dialog.add_titlebar_name("Experiment Preparation Widget")
-        #     dialog.addContent(ex, ContentType.OUTPUT)
-        #     dialog.show()
+            # print(ex)
+            dialog = CustomDialog(self)
+            dialog.add_titlebar_name("Experiment Preparation Widget")
+            dialog.addContent(ex, ContentType.ERROR)
+            dialog.show()
 

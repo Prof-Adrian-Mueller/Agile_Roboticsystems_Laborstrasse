@@ -34,7 +34,7 @@ class DisplayQRCode(QWidget):
         self.main_window = main_window
         self.tubes_information = TubesSingleton()
         scroll = QScrollArea(self)
-        self.ui.qr_code_list_content.addWidget(scroll)
+        # self.ui.qr_code_list_content.addWidget(scroll)
         scroll.setWidgetResizable(True)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 

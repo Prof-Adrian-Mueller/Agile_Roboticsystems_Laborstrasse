@@ -81,7 +81,6 @@ class CliInOutWorkerThreadManager(QWidget):
             venv_python_path = os.path.join(current_dir, 'venv', 'Scripts', 'python')
             # Start the process with the venv Python
             self.process.start(venv_python_path, ['-u', script_path, nr_of_tubes])
-            self.appendOutput("Process has been started.")
         else:
             self.appendOutput("Process has already been started.")
 

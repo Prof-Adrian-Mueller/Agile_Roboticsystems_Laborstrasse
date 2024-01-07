@@ -45,12 +45,7 @@ class InterprocessCommunication:
         for index, row in data.iterrows():
             print("LIVE " + str(row))
             # time.sleep(2)
-        print("sending done!")
-        # counter = 0
-        # while True:
-        #     print(f"LIVE Test Message {counter}\n")
-        #     time.sleep(1)
-        #     counter += 1
+        print("Simulation Complete!")
 
     def run(self, args):
         anzahl_tubes = int(args[0])
@@ -73,14 +68,13 @@ class InterprocessCommunication:
         child_thread = threading.Thread(target=self.run_child_process)
         child_thread.start()
 
-
         child_thread_live_simulation = threading.Thread(target=self.live_simulation)
         # Join threads at the end
-        input_thread.join()
-        child_thread.join()
         if self.is_debug:
             child_thread_live_simulation.start()
             child_thread_live_simulation.join()
+        input_thread.join()
+        child_thread.join()
 
 
 if __name__ == "__main__":

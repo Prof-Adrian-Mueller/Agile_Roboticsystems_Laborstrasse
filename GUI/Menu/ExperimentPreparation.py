@@ -89,8 +89,8 @@ class ExperimentPreparation:
             dialog.add_titlebar_name("Experiment Update Message")
             dialog.addContent(
                 f"Die Experiment-ID {exp_id} ist nicht die neueste. Die neueste ID lautet {current_exp_id}.",
-                ContentType.OUTPUT)
-            dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.OUTPUT)
+                ContentType.ERROR)
+            dialog.addContent(f"Sie dürfen nur das aktuelle Experiment aktualisieren.", ContentType.ERROR)
             self.is_current_experiment = False
             dialog.show()
 
@@ -300,7 +300,6 @@ class ExperimentPreparation:
             self.show_message_in_dialog(display_msg)
             return
 
-
         try:
             for elem in plasmid_list:
                 check_if_plasmid_exists_data = self.ui_database.metadata_adapter.get_plasmid_data_by_nr(elem)
@@ -335,7 +334,7 @@ class ExperimentPreparation:
             else:
                 self.main_window.cache_data = self.main_window.load_cache()
                 if self.main_window.cache_data.experiment_id:
-                    self.check_if_current_experiment(experiment_id,self.main_window.cache_data.experiment_id)
+                    self.check_if_current_experiment(experiment_id, self.main_window.cache_data.experiment_id)
                 if not self.is_current_experiment:
                     return
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],

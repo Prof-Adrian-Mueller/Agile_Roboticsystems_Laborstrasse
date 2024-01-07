@@ -78,7 +78,8 @@ class CustomTitleBarForDialogBox(QWidget):
 
 class ContentType(Enum):
     INPUT = 1,
-    OUTPUT = 2
+    OUTPUT = 2,
+    ERROR=3
 
 
 class CustomDialog(QDialog):
@@ -189,25 +190,12 @@ class CustomDialog(QDialog):
         global label
         row_widget = QWidget()
         row_box = QHBoxLayout()
-        if content_type == ContentType.OUTPUT:
-            if isinstance(content, str):
-                label = QLabel(content)
-            else:
-                label = content
-            label.setWordWrap(True)
-            row_box.addWidget(label)
+        if content_type == ContentType.ERROR:
+            row_widget.setStyleSheet("QLabel { color: red }")
+            self.content_addition_template(content, row_box)
 
-            # Create and configure the copy button
-            if isinstance(content, str):
-                copy_button = QPushButton("")
-                icon1 = QIcon()
-                icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
-                copy_button.setIcon(icon1)
-                copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
-                copy_button.setFixedHeight(30)
-                copy_button.setFixedWidth(30)
-                # Add the copy button to the horizontal layout
-                row_box.addWidget(copy_button)
+        if content_type == ContentType.OUTPUT:
+            self.content_addition_template(content, row_box)
 
         elif content_type == ContentType.INPUT:
             label = QLabel(content, self)
@@ -222,10 +210,31 @@ class CustomDialog(QDialog):
         # Set the layout for the row widget
         row_widget.setLayout(row_box)
 
+
         # Add the row widget to the scroll area's layout
         self.scroll_area_layout.addWidget(row_widget)
         self.row_widgets.append(row_widget)
         return row_widget
+
+    def content_addition_template(self, content, row_box):
+        global label
+        if isinstance(content, str):
+            label = QLabel(content)
+        else:
+            label = content
+        label.setWordWrap(True)
+        row_box.addWidget(label)
+        # Create and configure the copy button
+        if isinstance(content, str):
+            copy_button = QPushButton("")
+            icon1 = QIcon()
+            icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+            copy_button.setIcon(icon1)
+            copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
+            copy_button.setFixedHeight(30)
+            copy_button.setFixedWidth(30)
+            # Add the copy button to the horizontal layout
+            row_box.addWidget(copy_button)
 
     def emitTextChanged(self, text):
         self.lineEditTextChanged = text
