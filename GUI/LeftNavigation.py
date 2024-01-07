@@ -15,8 +15,6 @@ class LeftNavigation:
             lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.statistikPage)))
         self.ui.importBtn.clicked.connect(
             lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.importPage)))
-        self.ui.qrGenBtn.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.qrGenPage)))
         self.ui.settingsBtn.clicked.connect(
             lambda: self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(self.ui.settingsPage)))
         self.ui.cliBtn.clicked.connect(

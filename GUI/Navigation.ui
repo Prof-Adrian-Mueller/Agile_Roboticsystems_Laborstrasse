@@ -149,23 +149,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="qrGenBtn">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate QR Codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/img/qr-code-scanner.svg</normaloff>:/icons/img/qr-code-scanner.svg</iconset>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="cliBtn">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Command Line Interface&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -255,7 +238,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>9</number>
+          <number>8</number>
          </property>
          <widget class="QWidget" name="test_page_home"/>
          <widget class="QWidget" name="home_page_dashboard">
@@ -441,66 +424,73 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QPushButton" name="plasmidMetaDataImport">
+          <widget class="QWidget" name="">
            <property name="geometry">
             <rect>
-             <x>360</x>
-             <y>370</y>
-             <width>231</width>
-             <height>31</height>
+             <x>100</x>
+             <y>40</y>
+             <width>711</width>
+             <height>561</height>
             </rect>
            </property>
-           <property name="text">
-            <string>Plasmid Metadaten Importieren</string>
-           </property>
-          </widget>
-          <widget class="QWidget" name="importAreaDragDrop" native="true">
-           <property name="geometry">
-            <rect>
-             <x>130</x>
-             <y>90</y>
-             <width>461</width>
-             <height>261</height>
-            </rect>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="acceptDrops">
-            <bool>true</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color:rgb(217, 217, 217)</string>
-           </property>
-           <widget class="QLabel" name="label_8">
-            <property name="geometry">
-             <rect>
-              <x>180</x>
-              <y>110</y>
-              <width>181</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Drag and Drop</string>
-            </property>
-           </widget>
-          </widget>
-          <widget class="QPushButton" name="chooseFileFromExplorer">
-           <property name="geometry">
-            <rect>
-             <x>130</x>
-             <y>370</y>
-             <width>221</width>
-             <height>31</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Experiment Importieren</string>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_12">
+            <item>
+             <widget class="QWidget" name="importAreaDragDrop" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="acceptDrops">
+               <bool>true</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color:rgb(217, 217, 217)</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>Drag and Drop</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QPushButton" name="chooseFileFromExplorer">
+                <property name="text">
+                 <string>Experiment Importieren</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="plasmidMetaDataImport">
+                <property name="text">
+                 <string>Plasmid Metadaten Importieren</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
           <zorder>plasmidMetaDataImport</zorder>
           <zorder>chooseFileFromExplorer</zorder>
@@ -607,39 +597,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QWidget" name="layoutWidget">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>-10</y>
-             <width>861</width>
-             <height>711</height>
-            </rect>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Resize Window Frame</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Settings</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSlider" name="windowResizeSlider">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
          </widget>
          <widget class="QWidget" name="homePage">
           <property name="sizePolicy">
@@ -684,6 +641,9 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="currentIndex">
+                <number>0</number>
                </property>
                <widget class="QWidget" name="vorbereitungExperimentPage">
                 <property name="sizePolicy">
@@ -1199,104 +1159,6 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <widget class="QWidget" name="layoutWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>40</y>
-                   <width>701</width>
-                   <height>471</height>
-                  </rect>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_2">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_9">
-                    <item>
-                     <widget class="QLabel" name="label_15">
-                      <property name="text">
-                       <string>Plasmid Metadaten importieren</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="importPlasmidMetadaten">
-                      <property name="text">
-                       <string>Import</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
-                    <item>
-                     <spacer name="horizontalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="vorbereitungPrev">
-                      <property name="minimumSize">
-                       <size>
-                        <width>200</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>200</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Zurück</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="vorbereitungWeiter_2">
-                      <property name="minimumSize">
-                       <size>
-                        <width>200</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>200</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Weiter</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </widget>
                </widget>
               </widget>
              </item>
@@ -1396,41 +1258,6 @@
             <attribute name="title">
              <string>Live View</string>
             </attribute>
-            <widget class="QWidget" name="widgetLive" native="true">
-             <property name="geometry">
-              <rect>
-               <x>29</x>
-               <y>19</y>
-               <width>711</width>
-               <height>531</height>
-              </rect>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-            <widget class="QLabel" name="label_9">
-             <property name="geometry">
-              <rect>
-               <x>30</x>
-               <y>0</y>
-               <width>711</width>
-               <height>16</height>
-              </rect>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Live-Action in der Laborstraße</string>
-             </property>
-            </widget>
            </widget>
            <widget class="QWidget" name="experiments">
             <property name="sizePolicy">

@@ -38,7 +38,7 @@ class ExperimentTubesDetails(QWidget):
         self.back_button.setGeometry(50, 20, 100, 50)
         self.back_button.clicked.connect(self.on_back_clicked)
 
-        # layout.addWidget(back_button, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignRight)
 
         layout = QVBoxLayout(self)
         self.title = QLabel('Experiment Details')
@@ -79,7 +79,8 @@ class ExperimentTubesDetails(QWidget):
 
             # Reset the table rows
             self.details_table.setRowCount(10)
-            self.main_window.title_bar.add_back_btn(self.back_button)
+            # self.main_window.title_bar.add_back_btn(self.back_button)
+            self.layout().addWidget(self.back_button)
 
             # Populate the table with the data
             fields = ['Probe Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',

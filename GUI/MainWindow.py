@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
         self.ui.importAreaDragDrop.setObjectName(u"dragdropwidget")
         self.ui.importAreaDragDrop.setGeometry(QRect(130, 90, 461, 261))
         self.ui.importAreaDragDrop.setStyleSheet(u"background-color:#666;")
-        self.ui.chooseFileFromExplorer.clicked.connect(self.openFileDialog)
+        self.ui.chooseFileFromExplorer.clicked.connect(lambda: self.openFileDialog("plasmid"))
 
         # Custom ModalDialogBox
         self.dialog = CustomDialog(self)
@@ -144,14 +144,12 @@ class MainWindow(QMainWindow):
         self.ui.plasmidMetadatenView.setLayout(plasmid_table_layout)
 
         # settings
-        self.settings = Settings(self.ui, self)
-        self.ui.windowResizeSlider.valueChanged.connect(self.settings.resize_window)
+        self.settings = Settings(self.ui, self, self.ui.settingsPage)
 
         # Display Plasmid Tubes
         self.plasmidTubesList = DisplayPlasmidTubes(self.ui, self)
 
         self.ui.experimentImportierenVorbereitung.clicked.connect(lambda: self.openFileDialog('experiment'))
-        self.ui.importPlasmidMetadaten.clicked.connect(lambda: self.openFileDialog('plasmid'))
         self.ui.plasmidMetaDataImport.clicked.connect(lambda: self.openFileDialog('plasmid'))
 
         # Display TubeInformation
@@ -343,31 +341,6 @@ class MainWindow(QMainWindow):
             self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
         return text
 
-    def importPlasmidMetaDaten(self):
-        fileName, _ = QFileDialog.getOpenFileName(self.ui.centralwidget, "Open File", "", "Excel Files (*.xls *.xlsx)")
-        if fileName:
-            print(f'Selected file: {fileName}')
-            try:
-                # df = pd.read_excel(fileName)
-                # TODO show message in dialogbox
-                if self.dialogBoxContents.count:
-                    self.dialog.removeItems(self.dialogBoxContents)
-                print(f'Successfully imported Excel file: {fileName}')
-                self.dialogBoxContents.append(
-                    self.dialog.addContent(f'Successfully imported Excel file: {fileName}', ContentType.OUTPUT))
-                message = self.ui_db.insert_metadaten(fileName)
-                if message is not None:
-                    displayMsg = " ".join(str(item) for item in message)
-                else:
-                    displayMsg = "No Display Text"
-                self.dialogBoxContents.append(self.dialog.addContent(f"{displayMsg}", ContentType.OUTPUT))
-
-            except Exception as e:
-                print(f'Error occurred while importing Excel file: {fileName}\n{str(e)}')
-                self.dialogBoxContents.append(
-                    self.dialog.addContent(f"Error occurred while importing Excel file: {fileName}",
-                                           ContentType.OUTPUT))
-                self.dialogBoxContents.append(self.dialog.addContent(f" {str(e)}", ContentType.OUTPUT))
 
     def apply_stylesheet(self):
         """

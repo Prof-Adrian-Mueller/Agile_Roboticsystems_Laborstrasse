@@ -28,6 +28,19 @@
 10. [x] Adding filter to Experiment Creation Form
 11. [x] Redesign QR-Image view row list near Experiment Tubes view
 12. [x] PC Transformer2023 Prio 1
+13. [x] Send Tube Nr to Dobot
+14. [x] Live View Layout adjusted
+    - It Loads all Tubes to Live view after Experiment Preparation
+    - Clicking More Button will show Details about the certain Tube
+    - Each Station button click will load details about station and current status
+    - Stations color will change if tube reached certain Station
+    - Tubes and Station data will be updated in real time using interprocess communication and observer pattern
+15. [x] Available QR Codes are shown in Experiment Preparation
+16. [x] Export Funktion for Search Results and Current Experiment Data
+17. [x] Live View Simulation added using log_detail.csv , which is old log file
+18. [x] Adjusted Custom Dialog
+19. [x] Only Current Experiment could be updated
+20. [x] Load tubes of specific plasmid while updating current Experiment
 
 ## Completed Tasks
 ### Wissam Alamareen
@@ -43,6 +56,9 @@
 9. [x] Return plasmid Data per plasmid_nr(id)
 10. [x] Return all Tubes data of specific Experiment
 11. [x] Return all Experiments of a Labor Assistant using laborant id
+12. [x] Available QR Codes are shown in Experiment Preparation
+13. [x] Only new tubes will be added while updating the current Experiment
+14. [x] Load tubes of specific plasmid while updating current Experiment
 
 
 ## On Progress

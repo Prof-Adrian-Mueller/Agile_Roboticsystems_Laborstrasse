@@ -42,8 +42,8 @@ class CustomTitleBar(QWidget):
         # self.setStyleSheet("background-color: #E0E0E0; min-width: 60px;")
 
         layout.addStretch(1)
-        app_title = QLabel("Dashboard UI")
-        layout.addWidget(app_title)
+        self.app_title = QLabel("Dashboard UI")
+        layout.addWidget(self.app_title)
         layout.addStretch(1)
 
         # Minimize button

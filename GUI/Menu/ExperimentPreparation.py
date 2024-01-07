@@ -353,14 +353,7 @@ class ExperimentPreparation:
             print(f"An error occurred: {ex}")
 
         # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
-        # plasmid_dict = self.ui_database.get_tubes_data_for_experiment(self.experiment_data.experiment_id)
-        # plasmid_probe_dict = {}
-        # for item in plasmid_dict:
-        #     plasmid_probe_dict[plasmid_dict['probe_nr']] = plasmid_dict['plasmid_nr']
-        # print("This is test plasmid_dict : ")
-        # print(plasmid_probe_dict)
-        # for elem in plasmid_probe_dict:
-        #     print(elem)
+
         if self.current_experiment.experiment_id:
             if all_tubes_of_exp:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
@@ -371,12 +364,10 @@ class ExperimentPreparation:
             self.nextPage()
 
     def map_prev_next(self, ui):
-        ui.vorbereitungPrev.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_2.clicked.connect(self.prevPage)
         ui.vorbereitungPrev_4.clicked.connect(self.prevPage)
         ui.vorbereitungNext.clicked.connect(
             lambda: self.nextPageWithControl("CreateExperiment"))
         ui.probe_to_plasmid_next.clicked.connect(
             lambda: self.nextPageWithControl("AddProbeToPlasmid"))
-        ui.vorbereitungWeiter_2.clicked.connect(self.nextPage)
         ui.vorbereitungWeiter_3.clicked.connect(self.nextPage)
