@@ -5,7 +5,6 @@ from DBService.Control.ExcelImporter import ExcelImporter
 from DBService.Control.TubeAdapter import TubeAdapter
 from DBService.Control.DatabaseConnection import DatabaseConnection
 from DBService.Control.LaborantAdapter import LaborantAdapter
-from DBService.Control.MetadataAdapter import MetadataAdapter
 from DBService.DBUIAdapter import DBUIAdapter
 from DBService.Control.ExperimentAdapter import ExperimentAdapter
   
@@ -22,7 +21,16 @@ ui_db = DBUIAdapter()
 # ui_db.experiment_adapter.get_latest_tube("w1")
 # ui_db.get_latest_tube_by_exp_id("w1")
 # ui_db.get_anz_tubes_exp_id("w1")
-ui_db.available_qrcode("w2")
+# ui_db.available_qrcode("w2")
+
+# Beispiel für das Einfügen eines Datensatzes
+# ui_db.insert_tracking_log(3, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
+# result = ui_db.get_tracking_logs_by_probe_nr("2")
+#
+# # 'result' enthält jetzt alle Tracking-Logs für die angegebene 'probe_nr'
+# for row in result:
+#     print(row)
+
 
 
 # ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")

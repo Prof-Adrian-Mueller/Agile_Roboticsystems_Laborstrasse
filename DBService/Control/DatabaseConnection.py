@@ -31,18 +31,19 @@ class DatabaseConnection:
     
             ''')
     def create_plasmid_table(self):
-        print("in create")
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS Plasmid (
                 plasmid_nr TEXT PRIMARY KEY,
+                antibiotika TEXT,
                 vektor TEXT,
                 "insert" TEXT,
-                sequenz_nr TEXT,
-                name TEXT,
-                datum_maxi DATE,
                 quelle TEXT,
-                konstruktion_datum DATE
+                sequenz_nr TEXT,
+                konstruktion TEXT,
+                verdau TEXT,
+                bemerkung TEXT,
+                farbecode TEXT
             )
             ''')         
     def create_experiment_table(self):
@@ -97,3 +98,19 @@ class DatabaseConnection:
                 )
             ''')
             # print("Tabelle 'Laborant' wurde erstellt.")
+
+    def create_tracking_log_table(self):
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS TrackingLog (
+                probe_nr INTEGER PRIMARY KEY,
+                Startstation TEXT,
+                Startzeit TEXT,  
+                Zielstation TEXT,
+                Zielzeit TEXT,   
+                Dauer INTEGER,
+                Zeitstempel TEXT
+            )
+            ''')
+
+

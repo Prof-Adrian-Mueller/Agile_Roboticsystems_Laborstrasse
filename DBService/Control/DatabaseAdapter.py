@@ -126,30 +126,46 @@ class DatabaseAdapter:
             formatted_qr_codes = [(str(row[0]).zfill(6), row[1]) for row in qr_codes]
             return formatted_qr_codes
 
+    # def insert_plasmid(self, plasmid):
+    #     # Überprüfen, ob die Tabelle existiert
+    #     if not self.does_table_exist("Plasmid"):
+    #         print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_plasmid_table()
+    #     else:
+    #         print("Tabelle 'Plasmid' existiert bereits.")
+    #
+    #     with self.db as conn:
+    #         # Überprüfen und konvertieren Sie den Datentyp von plasmid.name
+    #         name = str(plasmid.name) if plasmid.name is not None else None
+    #
+    #         # Konvertiert Datumswerte in Strings
+    #         datum_maxi = plasmid.datum_maxi.strftime('%Y-%m-%d') if plasmid.datum_maxi is not None else None
+    #         konstruktion_datum = plasmid.konstruktion_datum.strftime(
+    #             '%Y-%m-%d') if plasmid.konstruktion_datum is not None else None
+    #
+    #         # Füge das Plasmid in die Datenbank ein
+    #         conn.execute('''
+    #         INSERT INTO Plasmid (plasmid_nr, vektor, "insert", sequenz_nr, name, datum_maxi, quelle, konstruktion_datum)
+    #         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    #         ''', (
+    #         plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
+    #         konstruktion_datum))
     def insert_plasmid(self, plasmid):
-        # Überprüfen, ob die Tabelle existiert
-        if not self.does_table_exist("Plasmid"):
-            print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
-            self.db.create_plasmid_table()
-        else:
-            print("Tabelle 'Plasmid' existiert bereits.")
+        # # Überprüfen, ob die Tabelle existiert
+        # if not self.does_table_exist("Plasmid"):
+        #     print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
+        #     self.db.create_plasmid_table()
+        # # else:
+        # #     print("Tabelle 'Plasmid' existiert bereits.")
 
         with self.db as conn:
-            # Überprüfen und konvertieren Sie den Datentyp von plasmid.name
-            name = str(plasmid.name) if plasmid.name is not None else None
-
-            # Konvertiert Datumswerte in Strings
-            datum_maxi = plasmid.datum_maxi.strftime('%Y-%m-%d') if plasmid.datum_maxi is not None else None
-            konstruktion_datum = plasmid.konstruktion_datum.strftime(
-                '%Y-%m-%d') if plasmid.konstruktion_datum is not None else None
-
-            # Füge das Plasmid in die Datenbank ein
+            quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
             conn.execute('''
-            INSERT INTO Plasmid (plasmid_nr, vektor, "insert", sequenz_nr, name, datum_maxi, quelle, konstruktion_datum)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-            plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
-            konstruktion_datum))
+                    INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (
+                    plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
+                    plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
         self.add_laborant(name,vorname)
