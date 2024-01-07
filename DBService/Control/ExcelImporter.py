@@ -1,4 +1,5 @@
 import pandas as pd
+import concurrent.futures
 
 from DBService.Model.Plasmid import Plasmid
 from DBService.Control.DatabaseAdapter import DatabaseAdapter
@@ -51,8 +52,10 @@ class ExcelImporter:
     def import_data(self):
         print("import_data")
         df = pd.read_excel(self.file_path)
-        required_columns = ['Plasmid Nr.', 'Antibiotika', 'Vektor', 'Insert', 'Spezies/Quelle', 'Sequenz Nr. Name Datum Maxi',
-                            'Quelle + Datum der Konstruktion', 'Verdau', 'Klonierungsstrategie Bemerkung', 'Farbcode der Plasmide:']
+        required_columns = ['Plasmid Nr.', 'Antibiotika', 'Vektor', 'Insert', 'Spezies/Quelle',
+                            'Sequenz Nr. Name Datum Maxi',
+                            'Quelle + Datum der Konstruktion', 'Verdau', 'Klonierungsstrategie Bemerkung',
+                            'Farbcode der Plasmide:']
         ausgabe_data = []
 
         # Überprüfen, ob die erforderlichen Spalten vorhanden sind
@@ -60,26 +63,41 @@ class ExcelImporter:
             if column not in df.columns:
                 ausgabe_data.append(f"Die erforderliche Spalte '{column}' ist nicht in der Excel-Datei vorhanden.")
                 return ausgabe_data
-        # Überprüfen, ob die Tabelle 'Plasmid' existiert
-        if not self.adapter.does_table_exist("Plasmid"):
-            print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
-            self.adapter.create_plasmid_table()
-        for index, row in df.iterrows():
-            # Überspringe die Zeile, wenn 'Plasmid Nr.' leer ist
-            if pd.isna(row['Plasmid Nr.']):
-                continue
-            # Erstelle ein Plasmid-Objekt mit den erforderlichen Spalten
-            plasmid = Plasmid(
-                row['Plasmid Nr.'], row['Antibiotika'], row['Vektor'], row['Insert'], row['Spezies/Quelle'],
-                row['Sequenz Nr. Name Datum Maxi'], row['Quelle + Datum der Konstruktion'], row['Verdau'], row['Klonierungsstrategie Bemerkung'], row['Farbcode der Plasmide:']
-            )
-            self.plasmids.append(plasmid)
 
-        # Ausgabe der Daten
-        for plasmid in self.plasmids:
-            ausgabe_data.append(
-                f"Plasmid Nr: {plasmid.plasmid_nr}, Antibiotika: {plasmid.antibiotika},Vektor: {plasmid.vektor}, Insert: {plasmid.insert},Quelle:{plasmid.quelle}, Sequenz Nr: {plasmid.sequenz_nr}, Konstruktion: {plasmid.konstruktion}, Verdau: {plasmid.verdau}, Bemerkung: {plasmid.bemerkung}, Farbecode: {plasmid.farbecode}")
-            self.adapter.insert_plasmid(plasmid)
+        # Überprüfen, ob die Tabelle 'Plasmid' existiert
+        try:
+            if not self.adapter.does_table_exist("Plasmid"):
+                print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
+                self.adapter.create_plasmid_table()
+        except Exception as e:
+            return [f"Error checking Plasmid table existence: {str(e)}"]  # Return a list containing the error message
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # Submit tasks for each row in parallel
+            futures = [executor.submit(self.process_row, row) for index, row in df.iterrows()]
+
+            # Wait for all tasks to complete
+            concurrent.futures.wait(futures)
+
+            # Check results
+            for future in futures:
+                if not future.result():
+                    return ["Error inserting plasmid"]
 
         return ausgabe_data
 
+    def process_row(self, row):
+        # Überspringe die Zeile, wenn 'Plasmid Nr.' leer ist
+        if pd.isna(row['Plasmid Nr.']):
+            return
+
+        # Erstelle ein Plasmid-Objekt mit den erforderlichen Spalten
+        plasmid = Plasmid(
+            row['Plasmid Nr.'], row['Antibiotika'], row['Vektor'], row['Insert'], row['Spezies/Quelle'],
+            row['Sequenz Nr. Name Datum Maxi'], row['Quelle + Datum der Konstruktion'], row['Verdau'],
+            row['Klonierungsstrategie Bemerkung'], row['Farbcode der Plasmide:']
+        )
+
+        # Füge das Plasmid in die Datenbank ein
+        if not self.adapter.insert_plasmid(plasmid):
+            return False

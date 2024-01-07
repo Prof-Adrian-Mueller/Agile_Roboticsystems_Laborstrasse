@@ -151,21 +151,23 @@ class DatabaseAdapter:
     #         plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
     #         konstruktion_datum))
     def insert_plasmid(self, plasmid):
-        # # Überprüfen, ob die Tabelle existiert
-        # if not self.does_table_exist("Plasmid"):
-        #     print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
-        #     self.db.create_plasmid_table()
-        # # else:
-        # #     print("Tabelle 'Plasmid' existiert bereits.")
+        display_message = []
 
-        with self.db as conn:
-            quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
-            conn.execute('''
-                    INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (
-                    plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
-                    plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
+        try:
+            with self.db as conn:
+                quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
+                conn.execute('''
+                        INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (
+                        plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
+                        plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
+            display_message.append("Successfully imported Excel file")
+            return display_message
+        except Exception as e:
+            print(f"Error inserting plasmid: {str(e)}")
+            display_message.append(f"Error inserting plasmids: {str(e)}")
+            return display_message
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
         self.add_laborant(name,vorname)
