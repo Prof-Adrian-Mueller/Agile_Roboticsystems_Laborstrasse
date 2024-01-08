@@ -40,11 +40,11 @@ class InterprocessCommunication:
                 pass  # No new message
 
     def live_simulation(self):
-        file_path = "SimulationData\case_1\log_detail.csv"
-        data = pd.read_csv(file_path)
-        for index, row in data.iterrows():
-            print("LIVE " + str(row))
-            # time.sleep(2)
+        # file_path = "SimulationData\case_1\log_detail.csv"
+        # data = pd.read_csv(file_path)
+        # for index, row in data.iterrows():
+        #     print("LIVE " + str(row))
+        #     # time.sleep(2)
 
         file_path = "SimulationData\case_1\log.csv"
         data = pd.read_csv(file_path)

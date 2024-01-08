@@ -4,8 +4,9 @@ from typing import Dict
 
 import pandas as pd
 
+from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Model.LiveTubeStatus import LiveTubeStatus, FinalTubeStatus
-from GUI.Storage.BorgSingleton import TubeLayoutSingleton
+from GUI.Storage.BorgSingleton import TubeLayoutSingleton, MainWindowSingleton
 from GUI.Utils.LiveObservable import LiveObserver
 
 
@@ -42,6 +43,10 @@ class LiveViewMessageDisplay(LiveObserver):
 
     def save_result_in_db(self, final_result):
         print("TODO Save in DB " + str(final_result))
+        main_singleton = MainWindowSingleton()
+        ui_db = DBUIAdapter()
+        # probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel
+        ui_db.insert_tracking_log(final_result.tube_id, final_result.start_station, final_result.start_station_time, final_result.end_station, final_result.end_station_time, final_result.duration, final_result.video_timestamp)
 
     def update_button_color(self, tube_status, color):
         tube_layout = TubeLayoutSingleton()
@@ -86,9 +91,9 @@ class LiveViewMessageDisplay(LiveObserver):
         try:
             tube_id = str(data.get('tubeID', ''))
             start_station = str(data.get('startStation', ''))
-            start_station_time = pd.to_datetime(data.get('startStationTime', ''))
+            start_station_time = str(data.get('startStationTime', ''))
             end_station = str(data.get('endStation', ''))
-            end_station_time = pd.to_datetime(data.get('endStationTime', ''))
+            end_station_time = str(data.get('endStationTime', ''))
             duration = float(data.get('duration', 0.0))
             video_timestamp = float(data.get('videoTimestamp', 0.0))
 
