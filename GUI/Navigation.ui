@@ -424,7 +424,7 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>100</x>
@@ -492,9 +492,6 @@
             </item>
            </layout>
           </widget>
-          <zorder>plasmidMetaDataImport</zorder>
-          <zorder>chooseFileFromExplorer</zorder>
-          <zorder>importAreaDragDrop</zorder>
          </widget>
          <widget class="QWidget" name="qrGenPage">
           <property name="sizePolicy">

@@ -361,7 +361,8 @@ def tracker(tube_ids):
                                                 if tube.trackingID == detections.tracker_id[0]:
                                                     print(
                                                         "Tube " + str(tube.tubeID) + " ist in Station " + station.name)
-                                                    # TODO : check LIVE_INFO and show this in tube row
+                                                    # TODO : check LIVE_INFO and show this in tube row,
+                                                    #  show in GUI that this is current station
                                                     print("LIVE_INFO Tube " + str(
                                                         tube.tubeID) + " ist in Station " + station.name)
                                                     # wenn noch nicht in Tube Liste der Station, Tube kommt neu an
@@ -380,11 +381,14 @@ def tracker(tube_ids):
                                                                 # löscht aus Logliste
                                                                 log.remove(entry)
                                                                 # schreibt zeile in CSV Datei
-                                                                writer.writerow([entry.tubeID, entry.startStation,
-                                                                                 entry.startStationTime,
-                                                                                 entry.endStation,
-                                                                                 entry.endStationTime, entry.duration,
-                                                                                 entry.videoTimestamp])
+                                                                tube_result = [entry.tubeID, entry.startStation,
+                                                                              entry.startStationTime,
+                                                                              entry.endStation,
+                                                                              entry.endStationTime, entry.duration,
+                                                                              entry.videoTimestamp]
+                                                                writer.writerow(tube_result)
+                                                                print("RESULT "+str(tube_result))
+
 
                                                         # aktualisiert tube werte
                                                         tube.leftStation = False

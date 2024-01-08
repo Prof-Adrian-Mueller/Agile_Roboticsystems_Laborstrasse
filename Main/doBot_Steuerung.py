@@ -77,6 +77,7 @@ class SteuerungControl:
                 anzahl_tubes = self.anzahl_tubes
                 # Fehlerkennung: Eingabe muss eine Zahl zwischen 1 und 12 sein!
                 if anzahl_tubes < 1 or anzahl_tubes > 32:
+                    #TODO Show in dialog box,
                     print("Ungültige Eingabe -> Eingabe muss eine Zahl zwischen 1 und 32 sein!")
                     continue
                 # Ausgabe: Input

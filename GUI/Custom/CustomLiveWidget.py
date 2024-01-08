@@ -1,3 +1,5 @@
+import ast
+
 from PyQt6 import QtCore
 from PyQt6.QtWidgets import QFrame, QGroupBox, QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, \
     QPushButton, QLabel, QLineEdit, QTableWidgetItem, QAbstractItemView, QHeaderView, QScrollArea, QFileDialog, \
@@ -12,6 +14,7 @@ __last_changed__ = '01/12/2023'
 
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Menu.QRCodesWidget import QRCodesWidget
+from GUI.Model.LiveTubeStatus import LiveTubeStatus
 from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
     TubeLayoutSingleton
 
@@ -32,18 +35,18 @@ class CustomLiveWidget(QWidget):
 
         h_label_layout = QHBoxLayout()
         probe_label = QLabel("Tube Nr.")
-        start_label = QLabel("Start Station")
-        middle_label = QLabel("Zwischen Station")
-        end_label = QLabel("End Station")
+        start_label = QLabel("Beladung")
+        middle_label = QLabel("Thymio")
+        end_label = QLabel("Deckelentnahme")
         probe_label.setObjectName("live_row_label")
         start_label.setObjectName("live_row_label")
         middle_label.setObjectName("live_row_label")
         end_label.setObjectName("live_row_label")
         h_label_layout.addWidget(probe_label)
         h_label_layout.addWidget(start_label)
-        h_label_layout.addSpacing(10)
+        h_label_layout.addSpacing(75)
         h_label_layout.addWidget(middle_label)
-        h_label_layout.addSpacing(20)
+        h_label_layout.addSpacing(75)
         h_label_layout.addWidget(end_label)
         h_label_layout.addStretch(1)
         self.refresh_btn = self.create_refresh_btn()
@@ -117,11 +120,13 @@ class CustomLiveWidget(QWidget):
         tube_station_info = TubeLayoutSingleton()
         for index, button in enumerate(buttons):
             h_layout.addWidget(button)
+            h_layout.addStretch(10)
             stations.append(button)
             station_nr = index + 1
-            tube_station_info.add_station_info(str(tube_nr), station_nr,
-                                               {"name": f"Station {station_nr}",
-                                                "details": f"Details about Station {station_nr}"})
+            # TODO change station details
+            # tube_station_info.add_station_info(str(tube_nr), station_nr,
+            #                                    {"name": f"Station {station_nr}",
+            #                                     "details": f"Details about Station {station_nr}"})
 
             def create_click_handler(station_number):
                 return lambda: self.show_station_info(station_number, tube_nr)
@@ -153,7 +158,10 @@ class CustomLiveWidget(QWidget):
 
         tube_layout_singleton.add_button_layout(tube_nr, stations)
 
-        more_btn = QPushButton(" > ")
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/info.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+        more_btn = QPushButton()
+        more_btn.setIcon(icon)
         more_btn.setObjectName("more_btn")
         more_btn.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         more_btn.clicked.connect(lambda: self.more_btn_layout(tube))
@@ -185,12 +193,34 @@ class CustomLiveWidget(QWidget):
             print(ex)
 
     def show_station_info(self, station, tube_nr):
-        station_dialog = CustomDialog(self.main_window)
-        station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
-        tube_station_info = TubeLayoutSingleton()
-        station_dialog.addContent(f"Station {station}", ContentType.OUTPUT)
-        station_dialog.addContent(f"{tube_station_info.get_station_info(str(tube_nr))[station-1]}", ContentType.OUTPUT)
-        station_dialog.show()
+        try:
+            station_dialog = CustomDialog(self.main_window)
+            station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
+            tube_station_info = TubeLayoutSingleton()
+            if 'tube_station_info' in locals() and tube_station_info:
+                station_dialog.addContent(f"Station {station}", ContentType.OUTPUT)
+                station_info = tube_station_info.get_station_info(str(tube_nr))[station - 1]
+                if station_info:
+                    status_str = station_info['details']
+                    try:
+                        status = ast.literal_eval(status_str)
+                        status_lines = [f"{key}: {value}" for key, value in status.items()]
+                        formatted_status = "\n".join(status_lines)
+                        station_dialog.addContent(formatted_status, ContentType.OUTPUT)
+                    except ValueError:
+                        station_dialog.addContent("Invalid data format", ContentType.ERROR)
+                else:
+                    station_dialog.addContent(f"No Data", ContentType.OUTPUT)
+            else:
+                station_dialog.addContent(f"Station {station}", ContentType.OUTPUT)
+                station_dialog.addContent(f"No Data", ContentType.OUTPUT)
+            station_dialog.show()
+        except Exception as ex:
+            station_dialog = CustomDialog(self.main_window)
+            station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
+            station_dialog.addContent(f"{ex}", ContentType.ERROR)
+            station_dialog.show()
+
 
     def clear_layout(self, layout):
         """

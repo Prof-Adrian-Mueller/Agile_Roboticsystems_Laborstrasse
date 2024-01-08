@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class BorgSingleton:
     """
     Singleton Class to store shared data in Application Runtime
@@ -127,7 +130,7 @@ class TubeLayoutSingleton(BorgSingleton):
         if 'button_layouts' not in self._shared_state:
             self._shared_state['button_layouts'] = {}
         if 'station_info' not in self._shared_state:
-            self._shared_state['station_info'] = {}
+            self._shared_state['station_info'] = defaultdict(lambda: [None, None, None])
 
     def add_button_layout(self, tube_id, buttons):
         self._shared_state['button_layouts'][tube_id] = buttons

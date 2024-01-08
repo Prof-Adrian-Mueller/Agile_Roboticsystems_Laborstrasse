@@ -142,12 +142,14 @@ class CliInOutWorkerThreadManager(QWidget):
         """
         try:
             output = self.process.readAllStandardOutput().data().decode().strip()
-            if output:
-                if output.startswith("LIVE"):
-                    message = output[len("LIVE "):].strip()
-                    self.message_service.notify_observers(message)
-                else:
-                    self.appendOutput(output)
+            if output.startswith("LIVE"):
+                message = output[len("LIVE "):].strip()
+                self.message_service.notify_observers(message)
+            elif output.startswith("RESULT"):
+                message = output[len("RESULT "):].strip()
+                self.message_service.notify_observers(message)
+            else:
+                self.appendOutput(output)
         except Exception as ex:
             print(ex)
 
