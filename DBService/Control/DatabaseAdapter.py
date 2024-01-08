@@ -1,5 +1,7 @@
 from DBService.Model.Experiment import Experiment
 from DBService.Model.Experimente import Experimente
+import concurrent.futures
+
 import pandas as pd
 
 class DatabaseAdapter:
@@ -150,18 +152,21 @@ class DatabaseAdapter:
     #         ''', (
     #         plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
     #         konstruktion_datum))
-    def insert_plasmid(self, plasmid):
+
+
+    def insert_plasmid(self, plasmids):
         display_message = []
 
         try:
             with self.db as conn:
-                quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
-                conn.execute('''
-                        INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (
-                        plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
-                        plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
+                for plasmid in plasmids:
+                    quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
+                    conn.execute('''
+                            INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (
+                            plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
+                            plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
             display_message.append("Successfully imported Excel file")
             return display_message
         except Exception as e:

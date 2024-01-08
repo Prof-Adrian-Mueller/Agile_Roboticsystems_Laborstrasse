@@ -103,7 +103,8 @@ class DatabaseConnection:
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS TrackingLog (
-                probe_nr INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                probe_nr INTEGER  ,
                 Startstation TEXT,
                 Startzeit TEXT,  
                 Zielstation TEXT,

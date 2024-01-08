@@ -43,7 +43,7 @@ class DBUIAdapter:
     def get_all_experiments(self):
         return(self.experiment_adapter.get_all_experiments())
     def insert_metadaten(self,file_path):
-        self.metadata_adapter.insert_metadaten(file_path)
+        return self.metadata_adapter.insert_metadaten(file_path)
     def select_all_from_plasmid(self):
         return self.metadata_adapter.select_all_from_plasmid()
 
