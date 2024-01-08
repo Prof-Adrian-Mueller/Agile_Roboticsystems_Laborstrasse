@@ -72,32 +72,19 @@ class ExcelImporter:
         except Exception as e:
             return [f"Error checking Plasmid table existence: {str(e)}"]  # Return a list containing the error message
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            # Submit tasks for each row in parallel
-            futures = [executor.submit(self.process_row, row) for index, row in df.iterrows()]
+        for index, row in df.iterrows():
+            # Überspringe die Zeile, wenn 'Plasmid Nr.' leer ist
+            if pd.isna(row['Plasmid Nr.']):
+                continue
+            # Erstelle ein Plasmid-Objekt mit den erforderlichen Spalten
+            plasmid = Plasmid(
+                row['Plasmid Nr.'], row['Antibiotika'], row['Vektor'], row['Insert'], row['Spezies/Quelle'],
+                row['Sequenz Nr. Name Datum Maxi'], row['Quelle + Datum der Konstruktion'], row['Verdau'],
+                row['Klonierungsstrategie Bemerkung'], row['Farbcode der Plasmide:']
+            )
+            self.plasmids.append(plasmid)
 
-            # Wait for all tasks to complete
-            concurrent.futures.wait(futures)
-
-            # Check results
-            for future in futures:
-                if not future.result():
-                    return ["Error inserting plasmid"]
-
+            # Füge das Plasmid in die Datenbank ein
+        if not self.adapter.insert_plasmid(self.plasmids):
+            return ["Error inserting plasmid"]
         return ausgabe_data
-
-    def process_row(self, row):
-        # Überspringe die Zeile, wenn 'Plasmid Nr.' leer ist
-        if pd.isna(row['Plasmid Nr.']):
-            return
-
-        # Erstelle ein Plasmid-Objekt mit den erforderlichen Spalten
-        plasmid = Plasmid(
-            row['Plasmid Nr.'], row['Antibiotika'], row['Vektor'], row['Insert'], row['Spezies/Quelle'],
-            row['Sequenz Nr. Name Datum Maxi'], row['Quelle + Datum der Konstruktion'], row['Verdau'],
-            row['Klonierungsstrategie Bemerkung'], row['Farbcode der Plasmide:']
-        )
-
-        # Füge das Plasmid in die Datenbank ein
-        if not self.adapter.insert_plasmid(plasmid):
-            return False
