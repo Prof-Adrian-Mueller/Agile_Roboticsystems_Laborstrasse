@@ -17,6 +17,7 @@ __last_changed__ = '03/12/2023'
 
 from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
     MainWindowSingleton
+from GUI.Utils.CheckUtils import CheckUtils
 
 
 class ExperimentPreparation:
@@ -123,6 +124,8 @@ class ExperimentPreparation:
                 display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
 
+
+
             # # TODO check this before inserting data
             # elif not self.main_window.plasmidTubesList.check_duplicate_inputs():
             #     self.main_window.display_qr_from_main("Tube Ids sollten unterschiedlich sein.")
@@ -135,18 +138,40 @@ class ExperimentPreparation:
                 dialog = CustomDialog(self.main_window)
                 dialog.add_titlebar_name("Experimenttubes Details")
                 count_tubes = []
+
                 try:
+                    available_tubes = self.ui_database.available_qrcode(self.current_experiment.experiment_id)
+                    all_input_tubes = []
+                    for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
+                        all_input_tubes.append(tubes_list)
+                        for tube in tubes_list:
+                            if tube not in available_tubes:
+                                dialog.addContent(f"{tube} ist nicht verfügbar für {plasmid}", ContentType.ERROR)
+                                dialog.show()
+                                return
+
+                        if not CheckUtils.is_last_sequence_in_order(tubes_list):
+                            dialog.addContent(f"{tubes_list} sind nicht in einer Reihenfolge für Plasmid {plasmid}",
+                                              ContentType.ERROR)
+                            dialog.addContent(
+                                f"Geben Sie bitte die Tube Nr in einer Reihenfolge ein, wie z.B. 1,2,3",
+                                ContentType.OUTPUT)
+                            dialog.show()
+                            return
+
+                    if len(available_tubes) != len(all_input_tubes):
+                        dialog.addContent(f"Verfügbare Tubes und Eingegebene Tubes sind nicht gleich.", ContentType.ERROR)
+                        dialog.show()
+                        return
+
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
                         try:
                             self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
-                            print(plasmid + " - " + ', '.join(map(str, tubes_list)))
                             display_msg = f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
-                            dialog.addContent(
-                                dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                            dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
                             count_tubes.append(tubes_list)
                         except Exception as ex:
-                            dialog.addContent(
-                                dialog.addContent(f"{ex}", ContentType.OUTPUT))
+                            dialog.addContent(f"{ex}", ContentType.OUTPUT)
                             count_tubes.append(tubes_list)
 
                     tube_info_data = self.ui_database.adapter.get_tubes_by_exp_id(self.experiment_data.experiment_id)
@@ -155,7 +180,7 @@ class ExperimentPreparation:
                         self.tube_information.add_tube(tube['probe_nr'], tube['qr_code'],
                                                        tube['plasmid_nr'])
                         probe_list.append(tube['qr_code'])
-                    print(self.tube_information)
+
                     self.main_window.qr_codes_widget.refresh_data()
                     self.main_window.experiment_dashboard.refresh_data()
                     # TODO layout anpassen
@@ -165,15 +190,13 @@ class ExperimentPreparation:
 
                 except Exception as ex:
                     display_msg = f"Could not create tubes. \n{ex}"
-                    dialog.addContent(
-                        dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
                     return
 
                 # self.nextPage()
                 # Load back dashboard
                 display_msg = "Prima! Alle Daten sehen Gut aus."
-                dialog.addContent(
-                    dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
+                dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
                 dialog.show()
                 experiment_preparation_widget = ExperimentPreparationWidget(self.ui.vorbereitungStackedTab,
                                                                             self.ui.test_page_home)
@@ -291,6 +314,11 @@ class ExperimentPreparation:
         # Check if the count of plasmids matches 'anz_plasmid'
         if len(plasmid_list) != int(data['anz_plasmid']):
             display_msg = "Anzahl von Plasmid und Plasmid Liste stimmen nicht zu. \n"
+            self.show_message_in_dialog(display_msg)
+            return
+
+        if len(plasmid_list) != len(set(plasmid_list)):
+            display_msg = "Kein Duplikat für Plasmid wird akzeptiert. \n"
             self.show_message_in_dialog(display_msg)
             return
 
