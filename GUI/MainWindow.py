@@ -17,7 +17,6 @@ from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
-from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Menu.HomePageDashboard import HomePageDashboard

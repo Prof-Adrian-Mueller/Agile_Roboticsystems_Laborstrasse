@@ -72,7 +72,7 @@ class TableInformationFetchByParameter(QWidget):
                 data_for_table = self.main_window.ui_db.tube_adapter.get_tube_data_by_probe_nr(input_id)
 
                 qr_code_widget = QRCodesWidget(self.main_window)
-                pixmap, image_location = qr_code_widget.generate_qr_code(data_for_table['qr_code'])
+                pixmap, image_location = qr_code_widget.generate_micro_qr_code(data_for_table['qr_code'])
                 data_for_table['pixmap'] = pixmap
                 data_for_table['image_location'] = image_location
             self.filename_to_export = current_option

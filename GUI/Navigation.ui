@@ -238,7 +238,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>8</number>
+          <number>9</number>
          </property>
          <widget class="QWidget" name="test_page_home"/>
          <widget class="QWidget" name="home_page_dashboard">
@@ -694,6 +694,9 @@
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Experiment ID eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
+                       <property name="placeholderText">
+                        <string>Existierende Experiment z.B. Max1, bei neue nicht eingeben</string>
+                       </property>
                       </widget>
                      </widget>
                     </item>
@@ -722,6 +725,9 @@
                        </property>
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="placeholderText">
+                        <string>Deine Name z.B. Max</string>
                        </property>
                       </widget>
                      </widget>
@@ -752,6 +758,9 @@
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vorname eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
+                       <property name="placeholderText">
+                        <string>Deine Vorname z.B. Mustermann</string>
+                       </property>
                       </widget>
                      </widget>
                     </item>
@@ -780,6 +789,9 @@
                        </property>
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Plasmid eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       </property>
+                       <property name="placeholderText">
+                        <string>Zahl zwischen 1 bis 32 z.B. 2</string>
                        </property>
                       </widget>
                      </widget>
@@ -810,6 +822,9 @@
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Tube eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
+                       <property name="placeholderText">
+                        <string>Gerade Zahl zwischen 2 bis 32 z.B. 2 </string>
+                       </property>
                       </widget>
                      </widget>
                     </item>
@@ -839,6 +854,9 @@
                        <property name="toolTip">
                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Anzahl von Tube eingeben&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
+                       <property name="placeholderText">
+                        <string>Gültige Plasmide Liste  z.B. PHB655,PHB654</string>
+                       </property>
                       </widget>
                      </widget>
                     </item>
@@ -864,6 +882,11 @@
                          <width>400</width>
                          <height>16777215</height>
                         </size>
+                       </property>
+                       <property name="font">
+                        <font>
+                         <bold>true</bold>
+                        </font>
                        </property>
                       </widget>
                      </widget>

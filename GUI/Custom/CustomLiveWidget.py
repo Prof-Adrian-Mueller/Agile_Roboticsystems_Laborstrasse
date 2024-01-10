@@ -177,7 +177,7 @@ class CustomLiveWidget(QWidget):
             if tube:
                 for key, value in tube.items():
                     if key == 'qr_code':
-                        pixmap, location = self.qr_code_widget.generate_qr_code(value)
+                        pixmap, location = self.qr_code_widget.generate_micro_qr_code(value)
                         if pixmap is not None:
                             layout_field = QLabel()
                             layout_field.setPixmap(pixmap)

@@ -1,5 +1,4 @@
 import os
-import qrcode
 
 from GUI.Custom.CustomDialog import ContentType
 from GUI.Navigation import Ui_MainWindow
@@ -96,12 +95,14 @@ class DisplayPlasmidTubes(QWidget):
         probe_nr_input = QLineEdit()
         plasmid_tubes = mapped_plasmid_tubes.get(plasmid_nr)
         if plasmid_tubes:
-            probe_nr_input.setText(",".join(str(x) for x in plasmid_tubes))
+            probe_nr_input.setPlaceholderText(",".join(str(x) for x in plasmid_tubes))
+        else:
+            probe_nr_input.setPlaceholderText("Probe Nr eingeben. Bsp : 1,2,3")
+
         self.tubes_input_fields.append(probe_nr_input)
         probe_nr_input.editingFinished.connect(
             lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))
 
-        probe_nr_input.setPlaceholderText("Probe Nr eingeben. Bsp : 1,3,4,7")
         # probe_nr_input.setFixedWidth(120)
         h_layout = QHBoxLayout(widget)
 

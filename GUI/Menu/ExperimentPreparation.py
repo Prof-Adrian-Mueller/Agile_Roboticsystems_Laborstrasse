@@ -3,7 +3,6 @@ import traceback
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Custom.CustomLiveWidget import CustomLiveWidget
-from GUI.Menu.DisplayQRCode import DisplayQRCode
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Navigation import Ui_MainWindow
@@ -32,12 +31,10 @@ class ExperimentPreparation:
         self.experiment_data = ExperimentSingleton()
         self.ui = ui
         self.main_window = main_window
-        self.qr_code_display = DisplayQRCode(self.ui, self.main_window)
         self.ui.experimentIdLE.editingFinished.connect(lambda: self.checkExperimentID(self.ui.experimentIdLE.text()))
         self.ui.nameLE.editingFinished.connect(lambda: self.create_experiment_id(self.ui.nameLE.text()))
         self.dialog = CustomDialog(self.ui.centralwidget)
         self.ui_database = main_window.ui_db
-        self.qr_code_generator = DisplayQRCode(self.ui, self.main_window)
         self.current_experiment = None
 
         # Set the datumLE to current Date
@@ -115,7 +112,6 @@ class ExperimentPreparation:
                 self.main_window.dialog.show()
 
         elif page_data == 'AddProbeToPlasmid':
-            # TODO: add data to tubes table
             print("AddProbeToPlasmid")
             self.tube_information.clear_cache()
             self.main_window.removeDialogBoxContents()
@@ -123,16 +119,6 @@ class ExperimentPreparation:
             if self.check_duplicates(self.experiment_data.plasmid_tubes):
                 display_msg = "Experiment has duplicates, please re-enter!"
                 self.show_message_in_dialog(display_msg)
-
-
-
-            # # TODO check this before inserting data
-            # elif not self.main_window.plasmidTubesList.check_duplicate_inputs():
-            #     self.main_window.display_qr_from_main("Tube Ids sollten unterschiedlich sein.")
-            #     return
-            #
-            # elif self.main_window.plasmidTubesList.check_max_input():
-            #     self.main_window.display_qr_from_main("Anzahl von Tubes sollen nicht mehr als 32 sein.")
 
             else:
                 dialog = CustomDialog(self.main_window)
@@ -143,8 +129,9 @@ class ExperimentPreparation:
                     available_tubes = self.ui_database.available_qrcode(self.current_experiment.experiment_id)
                     all_input_tubes = []
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
-                        all_input_tubes.append(tubes_list)
+
                         for tube in tubes_list:
+                            all_input_tubes.append(int(tube))
                             if tube not in available_tubes:
                                 dialog.addContent(f"{tube} ist nicht verfügbar für {plasmid}", ContentType.ERROR)
                                 dialog.show()

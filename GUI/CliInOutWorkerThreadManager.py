@@ -148,6 +148,8 @@ class CliInOutWorkerThreadManager(QWidget):
             elif output.startswith("RESULT"):
                 message = output[len("RESULT "):].strip()
                 self.message_service.notify_observers(message)
+            elif len(output) < 1:
+                pass
             else:
                 self.appendOutput(output)
         except Exception as ex:

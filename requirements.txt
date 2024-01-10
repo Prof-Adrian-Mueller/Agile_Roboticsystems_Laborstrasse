@@ -13,3 +13,4 @@ qrcode
 openpyxl
 opencv-python
 xlrd
+segno

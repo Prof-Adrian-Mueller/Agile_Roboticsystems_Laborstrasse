@@ -1,6 +1,9 @@
 import os
+import shutil
+import subprocess
 
 import qrcode
+import segno
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap, QPainter, QImage, QPalette, QColor
 from PyQt6.QtPrintSupport import QPrinter
@@ -24,7 +27,10 @@ class QRCodesWidget(QWidget):
         h_layout.addWidget(self.header_label)
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
+
+        show_qr_images_btn = self.create_show_qr_images_btn()
         self.refresh_btn = self.create_refresh_btn()
+        h_layout.addWidget(show_qr_images_btn)
         h_layout.addWidget(self.refresh_btn)
         self.layout.addLayout(h_layout)
 
@@ -63,6 +69,39 @@ class QRCodesWidget(QWidget):
 
         return refresh_btn
 
+    def create_show_qr_images_btn(self):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+
+        show_qr_images_btn = QPushButton("")
+        show_qr_images_btn.clicked.connect(self.show_qr_images)
+        show_qr_images_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+        show_qr_images_btn.setToolTip("Show QR Images")
+        show_qr_images_btn.setIcon(icon)
+
+        return show_qr_images_btn
+
+    def show_qr_images(self):
+        # Path to the QRCodeImages folder
+        qr_code_images_path = "QRCodeImages"
+
+        # Check if the directory exists
+        if os.path.exists(qr_code_images_path):
+            # Open the directory in the file explorer
+            if os.name == 'nt':  # Windows
+                os.startfile(qr_code_images_path)
+            elif os.name == 'posix':  # macOS, Linux
+                subprocess.run(['open' if os.uname().sysname == 'Darwin' else 'xdg-open', qr_code_images_path])
+        else:
+            print("The QRCodeImages folder does not exist.")
+
     def refresh_data(self):
         print("refresh")
         # TODO add data to the list . here load the experiment, load all the tubes of exp and show using displayQr
@@ -93,27 +132,28 @@ class QRCodesWidget(QWidget):
         """
         Display generated QR Images and Text to respective Row.
         """
-        pixmap, img_location = self.generate_qr_code(qr_code)
+        pixmap, img_location = self.generate_micro_qr_code(qr_code)
         if pixmap is not None:
             layout_field = QLabel()
             layout_field.setPixmap(pixmap)
             self.appendOutput(layout_field, qr_code, tube_nr, plasmid_nr, img_location)
 
-    def generate_qr_code(self, number):
+    def generate_micro_qr_code(self, number):
         """
-        Generate QR Image and send back for respective
+        Generate MicroQR Image and send back for respective number
         """
         # Check if the number is 6 digits
         if len(number) == 6 and number.isdigit():
-            # Generate the QR code
-            img = qrcode.make(number)
-
             # Create the directory if it doesn't exist
             if not os.path.exists("QRCodeImages"):
                 os.makedirs("QRCodeImages")
-            img_location = f"QRCodeImages/qrcode{number}.png"
-            img.save(img_location)
-            pixmap = QPixmap(f"QRCodeImages/qrcode{number}.png")
+
+            # Generate the MicroQR code
+            qr = segno.make_micro(number)
+            img_location = f"QRCodeImages/microqrcode{number}.png"
+            qr.save(img_location, scale=3)
+
+            pixmap = QPixmap(img_location)
             pixmap_resized = pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio)
             return pixmap_resized, img_location
         else:
@@ -216,12 +256,18 @@ class QRCodesWidget(QWidget):
         return drucken, speichern
 
     def populate_table(self):
-        print("Populate")
         if self.experiments_qr_data:
             while self.outputLayout.count():
                 child = self.outputLayout.takeAt(0)
                 if child.widget():
                     child.widget().deleteLater()
+
+            try:
+                # Check if the directory exists and then delete it
+                if os.path.exists("QRCodeImages"):
+                    shutil.rmtree("QRCodeImages")
+            except Exception as ex:
+                print(f"Something went wrong {ex}")
+
             for elem in self.experiments_qr_data:
-                print(elem['qr_code'])
                 self.displayQrCode(str(elem['qr_code']), str(elem['probe_nr']), str(elem['plasmid_nr']))

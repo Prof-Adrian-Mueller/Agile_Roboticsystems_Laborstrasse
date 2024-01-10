@@ -41,6 +41,7 @@
 18. [x] Adjusted Custom Dialog
 19. [x] Only Current Experiment could be updated
 20. [x] Load tubes of specific plasmid while updating current Experiment
+21. [x] Export QR Code Images to a Folder
 
 ## Completed Tasks
 ### Wissam Alamareen
