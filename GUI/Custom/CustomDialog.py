@@ -217,15 +217,13 @@ class CustomDialog(QDialog):
         return row_widget
 
     def content_addition_template(self, content, row_box):
-        global label
+        row_widget = QWidget()
         if isinstance(content, str):
+            # If the content is a string, create a label and a copy button
             label = QLabel(content)
-        else:
-            label = content
-        label.setWordWrap(True)
-        row_box.addWidget(label)
-        # Create and configure the copy button
-        if isinstance(content, str):
+            label.setWordWrap(True)
+            row_box.addWidget(label)
+
             copy_button = QPushButton("")
             icon1 = QIcon()
             icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -233,8 +231,12 @@ class CustomDialog(QDialog):
             copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
             copy_button.setFixedHeight(30)
             copy_button.setFixedWidth(30)
-            # Add the copy button to the horizontal layout
             row_box.addWidget(copy_button)
+        else:
+            row_box.addWidget(content)
+        row_widget.setLayout(row_box)
+        self.scroll_area_layout.addWidget(row_widget)
+        self.row_widgets.append(row_widget)
 
     def emitTextChanged(self, text):
         self.lineEditTextChanged = text

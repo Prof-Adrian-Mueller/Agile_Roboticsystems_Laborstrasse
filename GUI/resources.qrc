@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>img/trash.svg</file>
     <file>img/info.svg</file>
     <file>img/search.svg</file>
     <file>img/pause.svg</file>

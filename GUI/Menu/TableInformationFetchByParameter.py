@@ -1,8 +1,10 @@
+from typing import Callable
+
 import pandas as pd
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QPixmap, QDesktopServices, QIcon
 from PyQt6.QtWidgets import QWidget, QLabel, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, \
-    QAbstractScrollArea, QPushButton, QHBoxLayout
+    QAbstractScrollArea, QPushButton, QHBoxLayout, QVBoxLayout
 from PyQt6.uic.properties import QtCore
 
 from GUI.Custom.CustomDialog import CustomDialog, ContentType
@@ -49,6 +51,7 @@ class TableInformationFetchByParameter(QWidget):
 
         data_for_table = None
         is_tube_selected = False
+        delete_button = None
         text_label_for_option = ""
         try:
             if current_option == 'Experiment':
@@ -58,6 +61,8 @@ class TableInformationFetchByParameter(QWidget):
                 # Convert the Experimente instance to a dictionary
                 if data_for_table:
                     data_for_table = vars(data_for_table)
+                    delete_button = self.create_delete_btn(input_id,
+                                                           f"Möchten Sie das Experiment {input_id} wirklich löschen?")
                 else:
                     data_for_table = {}
                     dialog = CustomDialog(self)
@@ -80,7 +85,6 @@ class TableInformationFetchByParameter(QWidget):
             self.main_window.removeDialogBoxContents()
             self.main_window.show_message_in_dialog(ex)
 
-
         self.text_qlabel_option.setText(text_label_for_option)
         self.text_qlabel_option.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -90,6 +94,9 @@ class TableInformationFetchByParameter(QWidget):
         h_layout.addWidget(self.text_qlabel_option)
         # Add a stretch item
         h_layout.addStretch()
+
+        if delete_button:
+            h_layout.addWidget(delete_button)
 
         # Add the export_btn
         export_btn = self.create_export_btn()
@@ -186,12 +193,17 @@ class TableInformationFetchByParameter(QWidget):
             print(ex)
 
     def create_export_btn(self):
+        return self.create_button(":/icons/img/file-export.svg", "Export", self.export_table_data)
+
+    def create_delete_btn(self, id, message):
+        return self.create_button(":/icons/img/trash.svg", "Delete", lambda: self.delete_table_data(id, message))
+
+    def create_button(self, icon_path: str, tooltip: str, on_click: Callable) -> QPushButton:
         icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal,
-                       QIcon.State.Off)
-        export_btn = QPushButton("")
-        export_btn.clicked.connect(self.export_table_data)
-        export_btn.setStyleSheet("""
+        icon.addPixmap(QPixmap(icon_path), QIcon.Mode.Normal, QIcon.State.Off)
+        button = QPushButton("")
+        button.clicked.connect(on_click)
+        button.setStyleSheet("""
             QPushButton {
                 background: transparent;
             }
@@ -199,7 +211,38 @@ class TableInformationFetchByParameter(QWidget):
                 background: #eee;
             }
         """)
-        export_btn.setToolTip("Export")
-        export_btn.setIcon(icon)
+        button.setToolTip(tooltip)
+        button.setIcon(icon)
 
-        return export_btn
+        return button
+
+    def delete_table_data(self, id, message):
+        try:
+            dialog = CustomDialog(self.main_window)
+            dialog.addContent(message, ContentType.OUTPUT)
+            dialog.add_titlebar_name("Delete Info")
+
+            # Create buttons
+            yes = QPushButton("Ja")
+            no = QPushButton("Nein")
+
+            # Connect buttons to functions
+            yes.clicked.connect(lambda: self.confirm_delete(id, dialog))
+            yes.setStyleSheet("background-color: red;")
+            no.clicked.connect(dialog.close)
+
+            # Create a horizontal layout and add buttons to it
+            h_layout = QHBoxLayout()
+
+            dialog.content_addition_template(yes, h_layout)
+            dialog.content_addition_template(no, h_layout)
+
+            dialog.show()
+        except Exception as ex:
+            print(ex)
+
+    def confirm_delete(self, id, dialog):
+        # TODO Implement the deletion logic here
+        # ...
+        print(f"Experiment {id} deleted")
+        dialog.close()
