@@ -31,26 +31,7 @@ class TubeAdapter:
                         # return(f"Tube mit QR-Code {qr_code} existiert bereits.")
 
 
-    # def get_tubes_by_exp_id(self, exp_id):
-    #     with self.db as conn:
-    #         # SQL-Abfrage, um alle Tubes für die gegebene Experiment-ID zu holen
-    #         cursor = conn.execute("SELECT * FROM Tubes WHERE exp_id = ?", (exp_id,))
-    #         tubes = cursor.fetchall()
 
-    #         # Konvertieren Sie die Ergebnisse in eine Liste von Dictionaries
-    #         tubes_list = []
-    #         for tube in tubes:
-    #             formatted_qr_code = f"{tube[0]:06d}"  # Fügt führende Nullen hinzu, um eine Länge von 6 zu erreichen
-
-    #             tube_dict = {
-    #                 'qr_code': formatted_qr_code,
-    #                 'probe_nr': tube[1],
-    #                 'exp_id': tube[2],
-    #                 'plasmid_nr': tube[3]
-    #             }
-    #             tubes_list.append(tube_dict)
-
-    #         return tubes_list    
     def get_tubes_by_exp_id(self, exp_id):
         try:
             with self.db as conn:
@@ -87,7 +68,6 @@ class TubeAdapter:
             cursor = conn.execute("SELECT * FROM Tubes")
             tubes = cursor.fetchall()
 
-            # Konvertieren Sie die Ergebnisse in eine Liste von Dictionaries
             tubes_list = []
             for tube in tubes:
                 formatted_qr_code = f"{tube[0]:06d}"  # Fügt führende Nullen hinzu, um eine Länge von 6 zu erreichen

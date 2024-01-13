@@ -27,19 +27,19 @@ ui_db = DBUIAdapter()
 # ui_db.insert_tracking_log(3, "Deckelstation", "20.06.23:12:14:10", "Thymio", "20.06.23:12:14:20", 10, "0:14:10")
 #
 # ui_db.insert_tracking_log(3, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
-ui_db.insert_tracking_log(4, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
-
-result = ui_db.get_tracking_logs_by_probe_nr("4")
+# ui_db.insert_tracking_log(4, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
+#
+# result = ui_db.get_tracking_logs_by_probe_nr("4")
 
 #
 # # 'result' enthält jetzt alle Tracking-Logs für die angegebene 'probe_nr'
-for row in result:
-    print(row)
+# for row in result:
+#     print(row)
 
 
 
 # ui_db.add_experiment("max", "sch", 14,3, '2023-10-22',"max1")
-
+#
 # probe_nr_list = [1, 2, 3, 4, 5]
 # ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 
@@ -89,7 +89,7 @@ for row in result:
 
 
 # delete ein Experiment
-# ui_db.delete_experiment("max2")
+# ui_db.delete_experiment("w2")
 
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)

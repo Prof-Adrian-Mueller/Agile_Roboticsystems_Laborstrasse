@@ -7,8 +7,7 @@ from DBService.Control.DatabaseConnection import DatabaseConnection
 
 
  # TODO
-    # get metadaten bei Plasmid_nr
-    # zurückgeben=>alle metadaten von Plasmid_nr
+
 class MetadataAdapter:
     def __init__(self,db):
         self.db =db

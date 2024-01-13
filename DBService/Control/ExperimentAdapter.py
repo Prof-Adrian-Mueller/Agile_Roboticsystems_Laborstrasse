@@ -52,11 +52,6 @@ class ExperimentAdapter:
         else:
             exp_id = exp_id_param
 
-        # if not self.database_adapter("Experiment"):
-        #     print("Tabelle 'Experiment' existiert nicht. Sie wird erstellt.")
-        #     # self.db.crt_experiment()
-        #     self.db.create_experiment_table()
-
         with self.db as conn:
             cursor = conn.execute('SELECT COUNT(*) FROM Experiment WHERE exp_id = ?', (exp_id,))
             exists = cursor.fetchone()[0] > 0
@@ -91,7 +86,6 @@ class ExperimentAdapter:
             result = cursor.fetchone()
 
             if result:
-                # Optional: Konvertieren Sie das Ergebnis in ein Experiment-Objekt
                 experiment = Experiment(exp_id=result[0], name=result[1], vorname=result[2], anz_tubes=result[3],
                                          anz_plasmid=result[4], datum=result[5],video_id=result[6],anz_fehler=result[7],bemerkung=result[8])
                 return experiment
@@ -101,38 +95,61 @@ class ExperimentAdapter:
 
                 # return None
 
-    def get_latest_tube(self, exp_id):
+    def available_qrcode(self, exp_id):
+        try:
+            von = self.get_latest_tube()
+            anz_tubes_exp_id = self.get_anz_tubes_exp_id(exp_id)
+            last = self.get_latest_tube_by_exp_id(exp_id)
+            print(f"last:{last}")
+            bis = von + abs(last - anz_tubes_exp_id)
+            print(f"bis:{bis}")
+            list_of_tubes = []
+            if bis is not None and bis >= von:
+                for x in range(von + 1, bis + 1):
+                    list_of_tubes.append(x)
+                    print(f"{x:06d}")
+                return list_of_tubes
+        except Exception as ex:
+            return []
+    def get_latest_tube(self):
         try:
             with self.db as conn:
-                print(f"Suche nach dem neuesten Tube für Experiment-ID: {exp_id}")
-                # Die SQL-Abfrage wurde geändert, um nur den Datensatz mit dem höchsten QR-Code zurückzugeben
-
-                # cursor = conn.execute("SELECT * FROM Tubes WHERE exp_id = ? ORDER BY qr_code DESC LIMIT 1", (exp_id,))
+                # print(f"Suche nach dem neuesten Tube für Experiment-ID: {exp_id}")
+                print(f"Suche nach dem neuesten Tube für Experiment")
                 cursor=conn.execute("SELECT COUNT(*) FROM Tubes")
                 latest_tube = cursor.fetchone()
                 if not latest_tube:
-                    print(f"Kein Tube für Experiment-ID {exp_id} gefunden.")
-                    return 0
+                    # print(f"Kein Tube für Experiment-ID {exp_id} gefunden.")
+                    print(f"Kein Tube für Experiment gefunden.")
 
-                # formatted_qr_code = f"{latest_tube[0]:06d}"
-                # tube_dict = {
-                #     'qr_code': formatted_qr_code,
-                #     'probe_nr': latest_tube[1],
-                #     'exp_id': latest_tube[2],
-                #     'plasmid_nr': latest_tube[3]
-                # }
+                    return 0
                 print(f"all tubes von :{latest_tube[0]}")
                 return latest_tube[0]
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return None
 
+    def get_anz_tubes_exp_id(self, exp_id):
+        try:
+            with self.db as conn:
+                cursor = conn.execute('SELECT anz_tubes FROM Experiment WHERE exp_id = ?', (exp_id,))
+                result = cursor.fetchone()
+
+                if result:
+                    # Die Anpassung hier: nur die Anzahl der Tubes zurückgeben
+                    anz_tubes = result[0]
+                    print(f"anz_tubes:von {exp_id}  ist:{anz_tubes}")
+                    return anz_tubes
+                else:
+                    print(f"Kein Experiment mit der ID {exp_id} gefunden.")
+                    return None
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")
+            return None
     def get_latest_tube_by_exp_id(self, exp_id):
         try:
             with self.db as conn:
                 print(f"Suche nach dem neuesten Tube für Experiment-ID: {exp_id}")
-                # Die SQL-Abfrage wurde geändert, um nur den Datensatz mit dem höchsten QR-Code zurückzugeben
-
                 cursor = conn.execute("SELECT * FROM Tubes WHERE exp_id = ? ORDER BY qr_code DESC LIMIT 1", (exp_id,))
                 latest_tube = cursor.fetchone()
                 if not latest_tube:
@@ -151,40 +168,9 @@ class ExperimentAdapter:
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return None
-    def get_anz_tubes_exp_id(self, exp_id):
-        try:
-            with self.db as conn:
-                cursor = conn.execute('SELECT anz_tubes FROM Experiment WHERE exp_id = ?', (exp_id,))
-                result = cursor.fetchone()
 
-                if result:
-                    # Die Anpassung hier: nur die Anzahl der Tubes zurückgeben
-                    anz_tubes = result[0]
-                    print(f"anz_tubes:von {exp_id}  ist:{anz_tubes}")
-                    return anz_tubes
-                else:
-                    print(f"Kein Experiment mit der ID {exp_id} gefunden.")
-                    return None
-        except Exception as e:
-            print(f"Ein Fehler ist aufgetreten: {e}")
-            return None
 
-    def available_qrcode(self, exp_id):
-        try:
-            von = self.get_latest_tube(exp_id)
-            anz_tubes_exp_id = self.get_anz_tubes_exp_id(exp_id)
-            last=self.get_latest_tube_by_exp_id(exp_id)
-            print(f"last:{last}")
-            bis=von+abs(last-anz_tubes_exp_id)
-            print(f"bis:{bis}")
-            list_of_tubes = []
-            if bis is not None and bis >= von:
-                for x in range(von + 1, bis + 1):
-                    list_of_tubes.append(x)
-                    print(f"{x:06d}")
-                return list_of_tubes
-        except Exception as ex:
-            return []
+
 
     # def available_qrcode(self,exp_id):
     #     try:
@@ -265,28 +251,6 @@ class ExperimentAdapter:
             print(f"Ein Fehler ist aufgetreten: {e}")
             return []
 
-    # def get_probe_numbers_by_plasmid_for_experiment(self, exp_id):
-    #     try:
-    #         with self.db as conn:
-    #             cursor = conn.execute('''
-    #                 SELECT
-    #                     t.plasmid_nr,
-    #                     t.probe_nr
-    #                 FROM Tubes t
-    #                 WHERE t.exp_id = ?
-    #             ''', (exp_id,))
-    #             tubes_data = cursor.fetchall()
-    #
-    #             plasmid_probe_dict = {}
-    #             for plasmid_nr, probe_nr in tubes_data:
-    #                 if plasmid_nr not in plasmid_probe_dict:
-    #                     plasmid_probe_dict[plasmid_nr] = []
-    #                 plasmid_probe_dict[plasmid_nr].append(probe_nr)
-    #
-    #             return plasmid_probe_dict
-    #     except Exception as e:
-    #         print(f"Ein Fehler ist aufgetreten: {e}")
-    #         return {}
     def get_probe_numbers_by_plasmid_for_experiment(self, exp_id):
         try:
             with self.db as conn:
