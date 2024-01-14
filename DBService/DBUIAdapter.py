@@ -94,3 +94,5 @@ class DBUIAdapter:
 
     def get_tracking_logs_by_probe_nr(self,probe_nr):
         return self.tracking_adapter.get_tracking_logs_by_probe_nr(probe_nr)
+
+

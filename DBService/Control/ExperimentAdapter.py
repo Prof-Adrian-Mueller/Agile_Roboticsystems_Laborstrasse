@@ -6,6 +6,7 @@ from DBService.Control.ExperimentImporter import ExperimentImporter
 from DBService.Control.LaborantAdapter import LaborantAdapter
 from DBService.Model.Experiment import Experiment
 from DBService.Model.Experimente import Experimente
+from DBService.Control.TubeAdapter import TubeAdapter
 
 
 class ExperimentAdapter:
@@ -22,6 +23,10 @@ class ExperimentAdapter:
             self.db.create_laborant_table()
             print("Tabelle 'Laborant' wurde erstellt.")
 
+        if not self.database_adapter.does_table_exist("GlobalIDs"):
+            self.db.create_global_ids_table()
+            print("Tabelle 'GlobalIDs' wurde erstellt.")
+
         if not self.database_adapter.does_table_exist("Tubes"):
             self.db.create_tubes_table()
             print("Tabelle 'Tubes' wurde erstellt.")
@@ -34,7 +39,7 @@ class ExperimentAdapter:
         # if anz_tubes % 2 != 0:
         #     print("Die Anzahl der Tubes muss eine gerade Zahl sein. Das Experiment wird nicht hinzugefügt.")
         #     return None
-
+        # self.update_global_id(anz_tubes)
         if self.laborant_adapter.does_laborant_exist(name):
             print(f"Ein Laborant mit dem Namen {name} existiert.")
         else:
@@ -48,7 +53,7 @@ class ExperimentAdapter:
             print("Kein Laborant mit dem Namen " + name + " gefunden.")
 
         if not exp_id_param:
-            exp_id = f"{name}{exp_anzahl + 1}"
+            exp_id = f"{name}{exp_anzahl + 1}{datum}"
         else:
             exp_id = exp_id_param
 
@@ -79,7 +84,31 @@ class ExperimentAdapter:
                 print(f"Experimentanzahl für Laborant {name} wurde um 1 erhöht.")
 
         return exp_id
+    def get_global_id(self):
+        with self.db as conn:
+            cursor = conn.execute("SELECT global_id FROM GlobalIDs")
+            result = cursor.fetchone()
+            if result and result[0] is not None:
+                return result[0]
+            else:
+                return 0
 
+    def update_global_id(self,anzahl_neue_tubes):
+        current_id = self.get_global_id()
+        new_id = current_id + int(anzahl_neue_tubes)
+        with self.db as conn:
+            # Überprüfen, ob ein Eintrag vorhanden ist
+            cursor = conn.execute("SELECT COUNT(*) FROM GlobalIDs")
+            exists = cursor.fetchone()[0] > 0
+
+            if exists:
+                # Aktualisiere den vorhandenen Eintrag
+                conn.execute("UPDATE GlobalIDs SET global_id = ?", (new_id,))
+            else:
+                # Füge den ersten Eintrag hinzu
+                conn.execute("INSERT INTO GlobalIDs (global_id) VALUES (?)", (new_id,))
+
+            return new_id
     def get_experiment_by_id(self, exp_id):
         with self.db as conn:
             cursor = conn.execute('SELECT * FROM Experiment WHERE exp_id = ?', (exp_id,))
@@ -97,7 +126,9 @@ class ExperimentAdapter:
 
     def available_qrcode(self, exp_id):
         try:
-            von = self.get_latest_tube()
+            # von = self.get_latest_tube()
+            von = self.get_global_id()
+
             anz_tubes_exp_id = self.get_anz_tubes_exp_id(exp_id)
             last = self.get_latest_tube_by_exp_id(exp_id)
             print(f"last:{last}")
@@ -283,6 +314,7 @@ class ExperimentAdapter:
 
     def delete_experiment(self, exp_id):
         try:
+            print("deleting exp")
             with self.db as conn:
                 # Überprüfe, ob das Experiment existiert
                 cursor = conn.execute("SELECT COUNT(*) FROM Experiment WHERE exp_id = ?", (exp_id,))

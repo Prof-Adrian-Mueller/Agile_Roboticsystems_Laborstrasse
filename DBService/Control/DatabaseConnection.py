@@ -30,6 +30,8 @@ class DatabaseConnection:
             )
     
             ''')
+
+
     def create_plasmid_table(self):
         with self as conn:
             conn.execute('''
@@ -45,7 +47,16 @@ class DatabaseConnection:
                 bemerkung TEXT,
                 farbecode TEXT
             )
-            ''')         
+            ''')
+
+    def create_global_ids_table(self):
+        with self as conn:
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS GlobalIDs (
+                global_id INTEGER PRIMARY KEY
+            )
+            ''')
+
     def create_experiment_table(self):
         with self as conn:
             conn.execute('''
@@ -61,7 +72,7 @@ class DatabaseConnection:
                 bemerkung TEXT
             )
             ''')
-      
+
     def crt_experiment(self):
         with self as conn:
             conn.execute('''

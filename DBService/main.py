@@ -89,7 +89,7 @@ ui_db = DBUIAdapter()
 
 
 # delete ein Experiment
-# ui_db.delete_experiment("w2")
+ui_db.delete_experiment("w1")
 
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)

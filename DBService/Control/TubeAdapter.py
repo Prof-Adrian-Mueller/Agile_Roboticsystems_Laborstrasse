@@ -9,10 +9,12 @@ class TubeAdapter:
         self.db = db
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
-
+            self.update_global_id(len(probe_nr_list)
+)
             with self.db as conn:
                 for probe_nr in probe_nr_list:
                     print("in insert")
+
                     # Generiere qr_code basierend auf probe_nr
                     qr_code = f"{probe_nr:06d}"  # Füllt die Zahl mit führenden Nullen auf 6 Stellen auf
                     # Fügen Sie das Tube in die Datenbank ein
@@ -30,8 +32,31 @@ class TubeAdapter:
                         print(f"Tube mit QR-Code {qr_code} existiert bereits.")
                         # return(f"Tube mit QR-Code {qr_code} existiert bereits.")
 
+    def get_global_id(self):
+        with self.db as conn:
+            cursor = conn.execute("SELECT global_id FROM GlobalIDs")
+            result = cursor.fetchone()
+            if result and result[0] is not None:
+                return result[0]
+            else:
+                return 0
 
+    def update_global_id(self, anzahl_neue_tubes):
+        current_id = self.get_global_id()
+        new_id = current_id + int(anzahl_neue_tubes)
+        with self.db as conn:
+            # Überprüfen, ob ein Eintrag vorhanden ist
+            cursor = conn.execute("SELECT COUNT(*) FROM GlobalIDs")
+            exists = cursor.fetchone()[0] > 0
 
+            if exists:
+                # Aktualisiere den vorhandenen Eintrag
+                conn.execute("UPDATE GlobalIDs SET global_id = ?", (new_id,))
+            else:
+                # Füge den ersten Eintrag hinzu
+                conn.execute("INSERT INTO GlobalIDs (global_id) VALUES (?)", (new_id,))
+
+            return new_id
     def get_tubes_by_exp_id(self, exp_id):
         try:
             with self.db as conn:
