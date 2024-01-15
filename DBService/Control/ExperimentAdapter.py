@@ -124,7 +124,7 @@ class ExperimentAdapter:
 
                 # return None
 
-    def available_qrcode(self, exp_id):
+    def available_qrcode(self, exp_id, is_experiment_new):
         try:
             # von = self.get_latest_tube()
             von = self.get_global_id()

@@ -327,6 +327,8 @@ class ExperimentPreparation:
             self.show_message_in_dialog(ex)
             return
 
+        is_experiment_new = True
+
         try:
             date_str = '-'.join(map(str, data['date']))
             experiment_id = data['exp_id'] or None
@@ -346,6 +348,7 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
                 self.main_window.cache_data = self.main_window.load_cache()
+                is_experiment_new = True
             else:
                 self.main_window.cache_data = self.main_window.load_cache()
                 if self.main_window.cache_data.experiment_id:
@@ -362,6 +365,8 @@ class ExperimentPreparation:
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
 
                 self.main_window.cache_data = self.main_window.load_cache()
+                is_experiment_new = False
+
             all_tubes_of_exp = self.ui_database.get_tubes_by_exp_id(self.main_window.cache_data.experiment_id)
             print("------------------------------------")
             print(all_tubes_of_exp)
@@ -373,7 +378,7 @@ class ExperimentPreparation:
         if self.current_experiment.experiment_id:
             if all_tubes_of_exp:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                    self.current_experiment.experiment_id), all_tubes_of_exp)
+                    self.current_experiment.experiment_id, is_experiment_new), all_tubes_of_exp)
             else:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
                     self.current_experiment.experiment_id), [])

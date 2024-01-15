@@ -29,7 +29,6 @@ class TableInformationFetchByParameter(QWidget):
         self.text_qlabel_option = QLabel("")
         # combo_option_class_type
 
-
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
         if tubeid_input_text:
@@ -62,8 +61,9 @@ class TableInformationFetchByParameter(QWidget):
                 # Convert the Experimente instance to a dictionary
                 if data_for_table:
                     data_for_table = vars(data_for_table)
-                    delete_button = self.create_delete_btn(input_id,
-                                                           f"Möchten Sie das Experiment {input_id} wirklich löschen?")
+                    if data_for_table['exp_id']:
+                        delete_button = self.create_delete_btn(input_id,
+                                                               f"Möchten Sie das Experiment {input_id} wirklich löschen?")
                 else:
                     data_for_table = {}
                     dialog = CustomDialog(self)
@@ -93,11 +93,13 @@ class TableInformationFetchByParameter(QWidget):
         h_layout = QHBoxLayout()
         h_layout.setObjectName("title_export_box")
         h_layout.addWidget(self.text_qlabel_option)
-        # Add a stretch item
         h_layout.addStretch()
 
         if delete_button:
-            h_layout.addWidget(delete_button)
+            if h_layout.indexOf(delete_button) != -1:
+                delete_button.setParent(None)
+            else:
+                h_layout.addWidget(delete_button)
 
         # Add the export_btn
         export_btn = self.create_export_btn()
@@ -243,8 +245,15 @@ class TableInformationFetchByParameter(QWidget):
             print(ex)
 
     def confirm_delete(self, id, dialog):
-        # TODO Implement the deletion logic here
-        # ...
-        self.main_window.ui_db.delete_experiment(id)
-        print(f"Experiment {id} deleted")
-        dialog.close()
+        dialog_new = CustomDialog(self.main_window)
+        dialog_new.add_titlebar_name("Delete Info")
+        try:
+            dialog.close()
+            self.main_window.ui_db.delete_experiment(id)
+            dialog_new.addContent(f"Experiment mit der ID {id} wurde gelöscht.", ContentType.OUTPUT)
+            dialog_new.show()
+            self.append_info_to_view(id, "Experiment")
+        except Exception as ex:
+            dialog_new.addContent(f"Experiment mit der ID {id} könnte nicht gelöscht werden.", ContentType.ERROR)
+            dialog_new.addContent(ex, ContentType.ERROR)
+            dialog_new.show()
