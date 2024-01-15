@@ -181,6 +181,8 @@ class ExperimentPreparation:
                     return
 
                 # self.nextPage()
+                #clear old nr of tubes
+                self.total_old_nr_of_tubes = 0
                 # Load back dashboard
                 display_msg = "Prima! Alle Daten sehen Gut aus."
                 dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
@@ -353,7 +355,9 @@ class ExperimentPreparation:
                 is_experiment_new = True
             else:
                 if exp_id_data.anz_tubes:
-                    total_old_nr_of_tubes = exp_id_data.anz_tubes
+                    if not self.total_old_nr_of_tubes:
+                        self.total_old_nr_of_tubes = exp_id_data.anz_tubes
+
                 self.main_window.cache_data = self.main_window.load_cache()
                 if self.main_window.cache_data.experiment_id:
                     self.check_if_current_experiment(experiment_id, self.main_window.cache_data.experiment_id)
@@ -380,7 +384,7 @@ class ExperimentPreparation:
         # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
 
         if self.current_experiment.experiment_id:
-            self.tubes_required = abs(int(total_nr_of_tubes) - int(total_old_nr_of_tubes))
+            self.tubes_required = abs(int(total_nr_of_tubes) - int(self.total_old_nr_of_tubes))
             if all_tubes_of_exp:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
                     self.current_experiment.experiment_id, self.tubes_required), all_tubes_of_exp)
