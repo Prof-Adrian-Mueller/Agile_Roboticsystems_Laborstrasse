@@ -340,7 +340,6 @@ class ExperimentPreparation:
                 exp_id_data = self.ui_database.adapter.get_experiment_by_id(experiment_id)
 
             if exp_id_data is None:
-                total_old_nr_of_tubes = exp_id_data.anz_tubes
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, None)
@@ -353,6 +352,8 @@ class ExperimentPreparation:
                 self.main_window.cache_data = self.main_window.load_cache()
                 is_experiment_new = True
             else:
+                if exp_id_data.anz_tubes:
+                    total_old_nr_of_tubes = exp_id_data.anz_tubes
                 self.main_window.cache_data = self.main_window.load_cache()
                 if self.main_window.cache_data.experiment_id:
                     self.check_if_current_experiment(experiment_id, self.main_window.cache_data.experiment_id)
