@@ -328,6 +328,8 @@ class ExperimentPreparation:
             return
 
         is_experiment_new = True
+        total_nr_of_tubes = data['anz_tubes']
+        total_old_nr_of_tubes = 0
 
         try:
             date_str = '-'.join(map(str, data['date']))
@@ -338,6 +340,7 @@ class ExperimentPreparation:
                 exp_id_data = self.ui_database.adapter.get_experiment_by_id(experiment_id)
 
             if exp_id_data is None:
+                total_old_nr_of_tubes = exp_id_data.anz_tubes
                 exp_data = self.ui_database.add_experiment(data['firstname'], data['lastname'],
                                                            data['anz_tubes'],
                                                            data['anz_plasmid'], date_str, None)
@@ -378,7 +381,7 @@ class ExperimentPreparation:
         if self.current_experiment.experiment_id:
             if all_tubes_of_exp:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                    self.current_experiment.experiment_id, is_experiment_new), all_tubes_of_exp)
+                    self.current_experiment.experiment_id, is_experiment_new, total_nr_of_tubes, total_old_nr_of_tubes), all_tubes_of_exp)
             else:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
                     self.current_experiment.experiment_id), [])
