@@ -29,6 +29,7 @@ class TableInformationFetchByParameter(QWidget):
         self.text_qlabel_option = QLabel("")
         # combo_option_class_type
 
+
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
         if tubeid_input_text:
@@ -244,5 +245,6 @@ class TableInformationFetchByParameter(QWidget):
     def confirm_delete(self, id, dialog):
         # TODO Implement the deletion logic here
         # ...
+        self.main_window.ui_db.delete_experiment(id)
         print(f"Experiment {id} deleted")
         dialog.close()
