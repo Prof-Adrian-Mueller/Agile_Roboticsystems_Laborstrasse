@@ -27,8 +27,8 @@ class DBUIAdapter:
 
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
         self.tube_adapter.insert_tubes(probe_nr_list, exp_id, plasmid_nr)
-    def available_qrcode(self,exp_id, is_experiment_new, total_nr_of_tubes, total_old_nr_of_tubes):
-        return (self.experiment_adapter.available_qrcode(exp_id, is_experiment_new, total_nr_of_tubes, total_old_nr_of_tubes))
+    def available_qrcode(self,exp_id, tubes_required):
+        return (self.experiment_adapter.available_qrcode(exp_id, tubes_required))
 
     def get_tubes_by_exp_id(self,exp_id):
         return(self.tube_adapter.get_tubes_by_exp_id(exp_id))  

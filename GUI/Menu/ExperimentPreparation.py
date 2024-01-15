@@ -126,16 +126,16 @@ class ExperimentPreparation:
                 count_tubes = []
 
                 try:
-                    available_tubes = self.ui_database.available_qrcode(self.current_experiment.experiment_id)
+                    # available_tubes = self.ui_database.available_qrcode(self.current_experiment.experiment_id, )
                     all_input_tubes = []
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
 
-                        for tube in tubes_list:
-                            all_input_tubes.append(int(tube))
-                            if tube not in available_tubes:
-                                dialog.addContent(f"{tube} ist nicht verfügbar für {plasmid}", ContentType.ERROR)
-                                dialog.show()
-                                return
+                        # for tube in tubes_list:
+                        #     all_input_tubes.append(int(tube))
+                        #     if tube not in available_tubes:
+                        #         dialog.addContent(f"{tube} ist nicht verfügbar für {plasmid}", ContentType.ERROR)
+                        #         dialog.show()
+                        #         return
 
                         if not CheckUtils.is_last_sequence_in_order(tubes_list):
                             dialog.addContent(f"{tubes_list} sind nicht in einer Reihenfolge für Plasmid {plasmid}",
@@ -146,10 +146,10 @@ class ExperimentPreparation:
                             dialog.show()
                             return
 
-                    if len(available_tubes) != len(all_input_tubes):
-                        dialog.addContent(f"Verfügbare Tubes und Eingegebene Tubes sind nicht gleich.", ContentType.ERROR)
-                        dialog.show()
-                        return
+                    # if len(available_tubes) != len(all_input_tubes):
+                    #     dialog.addContent(f"Verfügbare Tubes und Eingegebene Tubes sind nicht gleich.", ContentType.ERROR)
+                    #     dialog.show()
+                    #     return
 
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
                         try:
@@ -380,12 +380,13 @@ class ExperimentPreparation:
         # TODO Load all tubes for plasmids and while creating check if the id exists, if exists dont add in db , only add if not
 
         if self.current_experiment.experiment_id:
+            tubes_required = abs(int(total_nr_of_tubes) - int(total_old_nr_of_tubes))
             if all_tubes_of_exp:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                    self.current_experiment.experiment_id, is_experiment_new, total_nr_of_tubes, total_old_nr_of_tubes), all_tubes_of_exp)
+                    self.current_experiment.experiment_id, tubes_required), all_tubes_of_exp)
             else:
                 self.main_window.plasmidTubesList.displayPlasmidTubes(plasmid_list, self.ui_database.available_qrcode(
-                    self.current_experiment.experiment_id), [])
+                    self.current_experiment.experiment_id, tubes_required), [])
             self.nextPage()
 
     def map_prev_next(self, ui):
