@@ -26,6 +26,7 @@ class ExperimentPreparation:
     sendButtonClicked = pyqtSignal(str)
 
     def __init__(self, ui: Ui_MainWindow, main_window):
+        self.total_old_nr_of_tubes = 0
         self.is_current_experiment = False
         self.tube_information = TubesSingleton()
         self.experiment_data = ExperimentSingleton()

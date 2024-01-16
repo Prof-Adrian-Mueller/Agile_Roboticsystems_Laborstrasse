@@ -53,7 +53,7 @@ class ExperimentAdapter:
             print("Kein Laborant mit dem Namen " + name + " gefunden.")
 
         if not exp_id_param:
-            exp_id = f"{name}{exp_anzahl + 1}{datum}"
+            exp_id = f"{name}{exp_anzahl + 1}_{datum}"
         else:
             exp_id = exp_id_param
 
@@ -126,13 +126,15 @@ class ExperimentAdapter:
 
     def available_qrcode(self, exp_id, tubes_required):
         try:
+
             # von = self.get_latest_tube()
             von = self.get_global_id()
 
             anz_tubes_exp_id = self.get_anz_tubes_exp_id(exp_id)
             last = self.get_latest_tube_by_exp_id(exp_id)
             print(f"last:{last}")
-            bis = von + abs(last - anz_tubes_exp_id)
+            # bis = von + abs(last - anz_tubes_exp_id)
+            bis = von + tubes_required
             print(f"bis:{bis}")
             list_of_tubes = []
             if bis is not None and bis >= von:
@@ -313,35 +315,52 @@ class ExperimentAdapter:
             return {}
 
     def delete_experiment(self, exp_id):
-        try:
-            print("deleting exp")
-            with self.db as conn:
-                # Überprüfe, ob das Experiment existiert
-                cursor = conn.execute("SELECT COUNT(*) FROM Experiment WHERE exp_id = ?", (exp_id,))
-                experiment_exists = cursor.fetchone()[0] > 0
 
-                if not experiment_exists:
-                    print(f"Kein Experiment mit ID {exp_id} gefunden.")
-                    return
 
-                # Überprüfe, ob das Experiment Tubes hat
-                cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE exp_id = ?", (exp_id,))
-                tube_count = cursor.fetchone()[0]
+            try:
+                if (self.is_experiment_last_entry(exp_id)):
+                    self.update_global_id(self.get_anz_tubes_exp_id(exp_id) * -1)
 
-                if tube_count > 0:
-                    # Löschen aller Tubes, die mit dem Experiment verknüpft sind
-                    conn.execute("DELETE FROM Tubes WHERE exp_id = ?", (exp_id,))
-                    print(f"Alle Tubes für Experiment-ID {exp_id} wurden gelöscht.")
-                else:
-                    print(f"Keine Tubes für Experiment-ID {exp_id} gefunden.")
 
-                # Löschen des Experiments
-                conn.execute("DELETE FROM Experiment WHERE exp_id = ?", (exp_id,))
-                print(f"Experiment mit ID {exp_id} wurde gelöscht.")
+                print("deleting exp")
+                with self.db as conn:
+                    # Überprüfe, ob das Experiment existiert
+                    cursor = conn.execute("SELECT COUNT(*) FROM Experiment WHERE exp_id = ?", (exp_id,))
+                    experiment_exists = cursor.fetchone()[0] > 0
 
-        except Exception as e:
-            print(f"Ein Fehler ist aufgetreten: {e}")
-            
+                    if not experiment_exists:
+                        print(f"Kein Experiment mit ID {exp_id} gefunden.")
+                        return
+
+                    # Überprüfe, ob das Experiment Tubes hat
+                    cursor = conn.execute("SELECT COUNT(*) FROM Tubes WHERE exp_id = ?", (exp_id,))
+                    tube_count = cursor.fetchone()[0]
+
+                    if tube_count > 0:
+                        # Löschen aller Tubes, die mit dem Experiment verknüpft sind
+                        conn.execute("DELETE FROM Tubes WHERE exp_id = ?", (exp_id,))
+                        print(f"Alle Tubes für Experiment-ID {exp_id} wurden gelöscht.")
+                    else:
+                        print(f"Keine Tubes für Experiment-ID {exp_id} gefunden.")
+
+                    # Löschen des Experiments
+                    conn.execute("DELETE FROM Experiment WHERE exp_id = ?", (exp_id,))
+                    print(f"Experiment mit ID {exp_id} wurde gelöscht.")
+
+            except Exception as e:
+                print(f"Ein Fehler ist aufgetreten: {e}")
+
+    def is_experiment_last_entry(self, exp_id):
+        with self.db as conn:
+            # Abfrage des zuletzt eingetragenen Experiments
+            result = conn.execute('''
+                SELECT exp_id FROM Experiment 
+                ORDER BY ROWID DESC 
+                LIMIT 1
+            ''').fetchone()
+
+            return result[0] == exp_id if result else False
+
     def insert_experiment_data(self,file_path):
         # file_path = self.select_file()
 
@@ -352,7 +371,28 @@ class ExperimentAdapter:
             return self.experiment_importer.import_data()
         else:
             return "Keine Datei ausgewählt."
-        
+
+    def get_experiments_by_date(self, date):
+        try:
+            # Formatieren des Datums, um es in der exp_id zu suchen
+            date_str = f"%{date}"
+            with self.db as conn:
+                # SQL-Abfrage, um Experimente zu finden, deren exp_id das Datum enthält
+                cursor = conn.execute("SELECT * FROM Experiment WHERE exp_id LIKE ?", (date_str,))
+                experiments = cursor.fetchall()
+
+                experiment_list = []
+                for exp in experiments:
+                    experiment_obj = Experiment(exp_id=exp[0], name=exp[1], vorname=exp[2], anz_tubes=exp[3],
+                                                anz_plasmid=exp[4], datum=exp[5], video_id=exp[6], anz_fehler=exp[7],
+                                                bemerkung=exp[8])
+                    experiment_list.append(experiment_obj)
+
+                return experiment_list
+        except Exception as e:
+            print(f"Ein Fehler ist aufgetreten: {e}")
+            return []
+
     def select_file(self):
         root = tkinter.Tk()
         root.withdraw()  # Verstecken Sie das Hauptfenster

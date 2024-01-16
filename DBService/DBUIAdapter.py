@@ -54,7 +54,8 @@ class DBUIAdapter:
         return self.experiment_adapter.get_probe_numbers_by_plasmid_for_experiment(exp_id)
     def delete_experiment(self,exp_id):
         self.experiment_adapter.delete_experiment(exp_id)
-
+    def get_experiments_by_date(self,exp_id):
+        return self.experiment_adapter.get_experiments_by_date(exp_id)
     def get_tube_data_by_probe_nr(self,probe_nr):
         return self.tube_adapter.get_tube_data_by_probe_nr(probe_nr)
     def get_plasmid_data_by_nr(self,plasmid_nr):

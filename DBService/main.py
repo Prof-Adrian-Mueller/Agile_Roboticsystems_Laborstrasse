@@ -89,8 +89,11 @@ ui_db = DBUIAdapter()
 
 
 # delete ein Experiment
-ui_db.delete_experiment("w1")
-
+# ui_db.delete_experiment("w1")
+# print(ui_db.get_experiments_by_date("2024-1-16"))
+# experimente_am_datum = ui_db.experiment_adapter.get_experiments_by_date("2024-1-16")
+# for experiment in experimente_am_datum:
+#     print(experiment)
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
 # print(tubes_data)
 
