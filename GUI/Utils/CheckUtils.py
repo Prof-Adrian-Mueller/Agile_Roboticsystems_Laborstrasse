@@ -1,3 +1,5 @@
+from datetime import datetime
+
 
 class CheckUtils:
 
@@ -8,3 +10,11 @@ class CheckUtils:
         last_three = arr[-3:]
         last_three.sort()
         return last_three == list(range(last_three[0], last_three[-1] + 1))
+
+    @staticmethod
+    def is_date(input_id):
+        try:
+            datetime.strptime(input_id, '%Y-%m-%d')
+            return True
+        except ValueError:
+            return False

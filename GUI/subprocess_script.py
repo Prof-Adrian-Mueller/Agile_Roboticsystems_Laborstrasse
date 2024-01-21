@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton,
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
+from DBService.DBUIAdapter import DBUIAdapter
+
 
 class CustomDialog(QDialog):
     def __init__(self, parent=None):
@@ -45,6 +47,11 @@ class CustomDialog(QDialog):
         self.layout.addLayout(self.header_layout)
         self.layout.addWidget(self.body_label)
         self.layout.addLayout(self.footer_layout)
+
+
+        ## Exmple code
+        db_ui_adapter = DBUIAdapter()
+        db_ui_adapter.get_all_experiments()
 
         # Styling
         self.setStyleSheet("""

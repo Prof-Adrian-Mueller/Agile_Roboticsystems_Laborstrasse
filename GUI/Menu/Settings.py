@@ -88,13 +88,13 @@ class Settings(QWidget):
 
         # Update only the background color in the style sheets
         main_style = self.update_style(main_style, "QWidget", "background-color", widget_color)
-        table_style = self.update_style(main_style, "QLabel", "background-color", table_color)
-        button_style = self.update_style(main_style, "QPushButton", "background-color", button_color)
+        table_style = self.update_style(table_style, "QLabel", "background-color", table_color)
+        button_style = self.update_style(button_style, "QPushButton", "background-color", button_color)
 
         # Apply the updated styles
         self.main_window.setStyleSheet(main_style)
-        # self.table_label.setStyleSheet(table_style)
-        # self.button_label.setStyleSheet(button_style)
+        self.table_label.setStyleSheet(table_style)
+        self.button_label.setStyleSheet(button_style)
 
     def update_style(self, current_style, widget_selector, property_name, new_value):
         import re
@@ -127,8 +127,26 @@ class Settings(QWidget):
                 widget.setMaximumSize(new_width * 1.1, new_height * 1.1)
 
     def resize_window(self, value):
-        self.store_original_sizes()
+        child_widgets = self.ui.leftNavigation.findChildren(QWidget)
+        original_sizes = {}
+
+        # Store original sizes of child widgets
+        for widget in child_widgets:
+            original_sizes[widget] = widget.size()
+
+        # Calculate new window size and resize the window
         new_width = 800 + value * 10
         new_height = 600 + value * 10
         self.main_window.resize(QSize(new_width, new_height))
-        self.resize_child_sizes(value)
+
+        # Resize child widget sizes based on original sizes and scale factor
+        for widget in child_widgets:
+            if not isinstance(widget, (QHBoxLayout, QVBoxLayout, QGridLayout)):
+                original_size = original_sizes.get(widget, QSize(100, 100))
+                scale_factor = 1 + value / 100
+                new_width = original_size.width() * scale_factor
+                new_height = original_size.height() * scale_factor
+
+                widget.setMinimumSize(new_width, new_height)
+                widget.setMaximumSize(new_width * 1.1, new_height * 1.1)
+
