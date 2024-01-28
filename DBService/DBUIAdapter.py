@@ -10,6 +10,13 @@ from DBService.QRGenAdapter import QRGenAdapter
 import tkinter as tk
 from tkinter import filedialog
 
+
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
+
+
 class DBUIAdapter:
     def __init__(self):
         self.db = DatabaseConnection("laborstreet_management.db")
@@ -24,7 +31,8 @@ class DBUIAdapter:
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id):
         return self.experiment_adapter.add_experiment(name, vorname, anz_tubes, anz_plasmid, datum, exp_id)
-
+    def update_experiment(self,exp_id, video_id, anz_fehler, bemerkung):
+        return self.experiment_adapter.update_experiment(exp_id, video_id, anz_fehler, bemerkung)
     def insert_tubes(self, probe_nr_list, exp_id, plasmid_nr):
         self.tube_adapter.insert_tubes(probe_nr_list, exp_id, plasmid_nr)
     def available_qrcode(self,exp_id, tubes_required):

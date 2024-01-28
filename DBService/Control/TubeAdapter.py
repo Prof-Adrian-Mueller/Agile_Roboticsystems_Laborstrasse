@@ -1,8 +1,9 @@
 from DBService.Control.DatabaseConnection import DatabaseConnection
 
- # TODO   
-    # get tubedate by tubeId
-    # zurückgeben=> exp_id plasmidnr,qr_code
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/01/2023'
 
 class TubeAdapter:
     def __init__(self,db):

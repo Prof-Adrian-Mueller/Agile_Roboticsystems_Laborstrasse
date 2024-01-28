@@ -3,6 +3,10 @@ from DBService.Model.Experimente import Experimente
 import concurrent.futures
 
 import pandas as pd
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
 
 class DatabaseAdapter:
     def __init__(self, db):

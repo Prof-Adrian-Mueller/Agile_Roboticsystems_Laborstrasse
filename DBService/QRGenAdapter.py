@@ -2,6 +2,11 @@ import datetime
 
 from DBService.TubeQrcode import TubeQrcode
 
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
+
 class QRGenAdapter:
     def __init__(self, db_adapter):        
         self.db_adapter = db_adapter

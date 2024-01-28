@@ -3,6 +3,10 @@ import concurrent.futures
 
 from DBService.Model.Plasmid import Plasmid
 from DBService.Control.DatabaseAdapter import DatabaseAdapter
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
 
 class ExcelImporter:
     def __init__(self, adapter,file_path):

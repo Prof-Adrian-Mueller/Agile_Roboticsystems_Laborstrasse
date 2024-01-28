@@ -5,8 +5,10 @@ from DBService.Control.ExcelImporter import ExcelImporter
 from DBService.Control.DatabaseAdapter import DatabaseAdapter
 from DBService.Control.DatabaseConnection import DatabaseConnection
 
-
- # TODO
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
 
 class MetadataAdapter:
     def __init__(self,db):

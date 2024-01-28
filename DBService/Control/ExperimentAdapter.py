@@ -9,6 +9,11 @@ from DBService.Model.Experimente import Experimente
 from DBService.Control.TubeAdapter import TubeAdapter
 
 
+__author__ = 'Wissam Alamareen'
+__date__ = '01/12/2023'
+__version__ = '1.0'
+__last_changed__ = '18/12/2023'
+
 class ExperimentAdapter:
     def __init__(self, db):
         self.experiment_importer = None
@@ -84,6 +89,17 @@ class ExperimentAdapter:
                 print(f"Experimentanzahl für Laborant {name} wurde um 1 erhöht.")
 
         return exp_id
+
+    def update_experiment(self, exp_id, video_id, anz_fehler, bemerkung):
+        with self.db as conn:
+            # SQL-Update-Anweisung, um die Attribute zu aktualisieren
+            conn.execute('''
+                UPDATE Experiment
+                SET video_id = ?, anz_fehler = ?, bemerkung = ?
+                WHERE exp_id = ?
+            ''', (video_id, anz_fehler, bemerkung, exp_id))
+            print(f"Experiment mit ID {exp_id} wurde aktualisiert.")
+
     def get_global_id(self):
         with self.db as conn:
             cursor = conn.execute("SELECT global_id FROM GlobalIDs")
