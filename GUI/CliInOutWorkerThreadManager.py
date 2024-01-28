@@ -4,6 +4,8 @@ from PyQt6.QtCore import QProcess
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QApplication, QSizePolicy, QScrollArea, QFrame
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel
 from PyQt6.QtCore import Qt
+
+from GUI.Custom.CustomDialog import CustomDialog, ContentType
 from GUI.Navigation import Ui_MainWindow
 import sys
 import os
@@ -97,7 +99,6 @@ class CliInOutWorkerThreadManager(QWidget):
             self.process.write('exit\n'.encode())
             self.ui.inputTextFromCli.clear()
 
-
     def isProcessStarted(self):
         return self.process and self.process.state() == QProcess.ProcessState.Running
 
@@ -149,6 +150,16 @@ class CliInOutWorkerThreadManager(QWidget):
             elif output.startswith("RESULT"):
                 message = output[len("RESULT "):].strip()
                 self.message_service.notify_observers(message)
+            elif output.startswith("ERROR_DATA"):
+                message = output[len("ERROR_DATA "):].strip()
+                print(message)
+                self.message_service.notify_observers(message)
+            elif output.startswith("ERROR_MESSAGE"):
+                message = output[len("ERROR_MESSAGE "):].strip()
+                print(message)
+                custom_dialog = CustomDialog()
+                custom_dialog.addContent(message, ContentType.ERROR)
+                custom_dialog.show()
             elif len(output) < 1:
                 pass
             else:

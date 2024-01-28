@@ -11,6 +11,8 @@ __last_changed__ = '04/01/2024'
 
 import pandas as pd
 
+from Monitoring.monitoring import Tube
+
 
 class InterprocessCommunication:
     """
@@ -41,16 +43,21 @@ class InterprocessCommunication:
                 pass  # No new message
 
     def live_simulation(self):
-        file_path = "SimulationData\case_1\log_detail.csv"
-        data = pd.read_csv(file_path)
-        for index, row in data.iterrows():
-            print("LIVE " + str(row))
-
-        file_path = "SimulationData\case_1\log.csv"
-        data = pd.read_csv(file_path)
-        for index, row in data.iterrows():
-            print("RESULT " + str(row))
+        # file_path = "SimulationData\case_1\log_detail.csv"
+        # data = pd.read_csv(file_path)
+        # for index, row in data.iterrows():
+        #     print("LIVE " + str(row))
+        #
+        # file_path = "SimulationData\case_1\log.csv"
+        # data = pd.read_csv(file_path)
+        # for index, row in data.iterrows():
+        #     print("RESULT " + str(row))
             # time.sleep(2)
+        strmsg = "Tube " + str(1) + " ist seit " + str(
+                            10) + " Sekunden in keiner Station aufgetaucht"
+        print(f"ERROR_MESSAGE {strmsg}")
+        tube_example = Tube(1, 101)
+        print(f"ERROR_DATA {tube_example}")
         print("Simulation Complete!")
 
     def run(self, args):
