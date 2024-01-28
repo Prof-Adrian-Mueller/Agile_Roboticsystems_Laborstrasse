@@ -69,9 +69,9 @@ class DBUIAdapter:
         file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
         return file_path
         
-    def create_qr_code(self, total: int):
-        self.db.create_table()
-        return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
+    # def create_qr_code(self, total: int):
+    #     self.db.create_table()
+    #     return [self.qr_gen.create_tube_qrcode() for _ in range(total)]
 
     # def insert_metadaten(self):
     #     file_path=self.select_file()
@@ -89,9 +89,11 @@ class DBUIAdapter:
     def delete_all_experiment(self):
         self.adapter.delete_all_experiments()
 
-    def insert_tracking_log(self, probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel):
-        self.tracking_adapter.insert_tracking_log(probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel)
+    def insert_tracking_log(self,exp_id, probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel):
+        self.tracking_adapter.insert_tracking_log(exp_id,probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel)
 
+    def get_tracking_logs_by_exp_id(self,exp_id):
+        return self.tracking_adapter.get_tracking_logs_by_exp_id(exp_id)
 
     def get_tracking_logs_by_probe_nr(self,probe_nr):
         return self.tracking_adapter.get_tracking_logs_by_probe_nr(probe_nr)

@@ -31,7 +31,7 @@ class MetadataAdapter:
         else:
             return ("Keine Datei ausgewählt.")
 
-
+    
     def select_file(self):
         root = tk.Tk()
         root.withdraw()  # Verstecken Sie das Hauptfenster

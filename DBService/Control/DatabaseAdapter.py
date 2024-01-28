@@ -81,25 +81,25 @@ class DatabaseAdapter:
             conn.execute("INSERT INTO TubeQrcode (qr_code, datum) VALUES (?, ?)",
                          (tubeQrcode.qr_code, tubeQrcode.datum))
 
-    def get_last_qr_code(self):
-        if not self.does_table_exist("TubeQrcode"):
-            print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
-            self.db.create_table()
-        else:
-            print("Tabelle 'TubeQrcode' existiert bereits.")
-        with self.db as conn:
-            row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
-            return int(row[0]) if row[0] else 0
+    # def get_last_qr_code(self):
+    #     if not self.does_table_exist("TubeQrcode"):
+    #         print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_table()
+    #     else:
+    #         print("Tabelle 'TubeQrcode' existiert bereits.")
+    #     with self.db as conn:
+    #         row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
+    #         return int(row[0]) if row[0] else 0
 
-    def get_last_qr_code(self):
-        if not self.does_table_exist("TubeQrcode"):
-            print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
-            self.db.create_table()
-        else:
-            print("Tabelle 'TubeQrcode' existiert bereits.")
-        with self.db as conn:
-            row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
-            return int(row[0]) if row[0] else 0
+    # def get_last_qr_code(self):
+    #     if not self.does_table_exist("TubeQrcode"):
+    #         print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_table()
+    #     else:
+    #         print("Tabelle 'TubeQrcode' existiert bereits.")
+    #     with self.db as conn:
+    #         row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
+    #         return int(row[0]) if row[0] else 0
 
     def select_all_from_tubeqrcode(self):
         # Überprüfen, ob die Tabelle existiert
