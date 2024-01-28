@@ -12,7 +12,6 @@ class ExcelImporter:
 
 
     def import_data(self):
-        print("import_data")
         df = pd.read_excel(self.file_path)
         required_columns = ['Plasmid Nr.', 'Antibiotika', 'Vektor', 'Insert', 'Spezies/Quelle',
                             'Sequenz Nr. Name Datum Maxi',

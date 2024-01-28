@@ -26,15 +26,15 @@ ui_db = DBUIAdapter()
 # Beispiel für das Einfügen eines Datensatzes
 # ui_db.insert_tracking_log(3, "Deckelstation", "20.06.23:12:14:10", "Thymio", "20.06.23:12:14:20", 10, "0:14:10")
 #
-# ui_db.insert_tracking_log(3, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
+ui_db.insert_tracking_log("mustermann1_2024-1-21",3, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
 # ui_db.insert_tracking_log(4, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
 #
-# result = ui_db.get_tracking_logs_by_probe_nr("4")
-
+# result = ui_db.get_tracking_logs_by_probe_nr("3")
+result1=ui_db.get_tracking_logs_by_exp_id("mustermann1_2024-1-21")
 #
-# # 'result' enthält jetzt alle Tracking-Logs für die angegebene 'probe_nr'
-# for row in result:
-#     print(row)
+# 'result' enthält jetzt alle Tracking-Logs für die angegebene 'probe_nr'
+for row in result1:
+    print(row)
 
 
 
@@ -44,7 +44,7 @@ ui_db = DBUIAdapter()
 # ui_db.insert_tubes(probe_nr_list, 'max1', 'PHB 371 ')
 
 
-# tubes_for_exp=ui_db.get_tubes_by_exp_id("max1")
+# tubes_for_exp=ui_db.get_tubes_by_exp_id("mustermann1_2024-1-21")
 # for tube in tubes_for_exp:
 #     print(tube)
 # print(ui_db.get_latest_tube_by_exp_id("max1"))
@@ -66,7 +66,7 @@ ui_db = DBUIAdapter()
 
 # insert metadaten----------------------------------------------------------------------
 # meta_adapter=MetaAdapter()
-# print(ui_db.insert_metadaten(""))
+print(ui_db.insert_metadaten(""))
 # print(ui_db.select_all_from_plasmid())
 # meta_adapter.delete_plasmid("PHB 371 ")
 
@@ -83,7 +83,7 @@ ui_db = DBUIAdapter()
 # ++++++++++++++++++
 # Return alle data eines Plasmid
 
-# print(ui_db.get_plasmid_data_by_nr("PHB 20"))
+# print(ui_db.get_plasmid_data_by_nr("PHB655"))
 # print(ui_db.select_all_from_plasmid())
 
 
@@ -91,7 +91,7 @@ ui_db = DBUIAdapter()
 # delete ein Experiment
 # ui_db.delete_experiment("w1")
 # print(ui_db.get_experiments_by_date("2024-1-16"))
-# experimente_am_datum = ui_db.experiment_adapter.get_experiments_by_date("2024-1-16")
+# experimente_am_datum = ui_db.experiment_adapter.get_experiments_by_date("2024-1-18")
 # for experiment in experimente_am_datum:
 #     print(experiment)
 # tubes_data=ui_db.get_tubes_data_for_experiment("max1")
@@ -124,7 +124,8 @@ ui_db = DBUIAdapter()
 #     print(tube)
 
 # Diese methode erwartet exp_id und dann liefert daten von  Expriment zurück
-# print(ui_db.adapter.get_experiment_by_id("max1"))
+# print(ui_db.adapter.get_experiment_by_id("w11_2024-1-18"))
+# print(ui_db.experiment_adapter.get_experiment_by_id("mustermann1_2024-1-21"))
 
 # Methode insert_tube
 # ui_db.adapter.insert_tube('000006',6,'maxi1','PHB 377')

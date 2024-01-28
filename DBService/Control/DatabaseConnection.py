@@ -19,17 +19,17 @@ class DatabaseConnection:
                 self.conn.commit()
             self.conn.close()
 
-    def create_table(self):
-        print("Hello, World!-------------------------------------------------------")
-
-        with self as conn:
-            conn.execute('''
-            CREATE TABLE IF NOT EXISTS TubeQrcode (
-                qr_code INTEGER PRIMARY KEY,
-                datum DATE
-            )
-    
-            ''')
+    # def create_table(self):
+    #     print("Hello, World!-------------------------------------------------------")
+    #
+    #     with self as conn:
+    #         conn.execute('''
+    #         CREATE TABLE IF NOT EXISTS TubeQrcode (
+    #             qr_code INTEGER PRIMARY KEY,
+    #             datum DATE
+    #         )
+    #
+    #         ''')
 
 
     def create_plasmid_table(self):
@@ -73,21 +73,8 @@ class DatabaseConnection:
             )
             ''')
 
-    def crt_experiment(self):
-        with self as conn:
-            conn.execute('''
-            CREATE TABLE IF NOT EXISTS Experiment (
-                exp_id TEXT PRIMARY KEY,
-                name TEXT,
-                vorname TEXT,
-                anz_tubes INTEGER,
-                anz_plasmid INTEGER,
-                datum DATE
-            )
-            ''')
-            print("Tabelle 'Experiment' wurde erstellt.")
+
     def create_tubes_table(self):
-        print("Erstelle Tabelle 'Tubes'")
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS Tubes (
@@ -115,6 +102,7 @@ class DatabaseConnection:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS TrackingLog (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                exp_id TEXT,
                 probe_nr INTEGER  ,
                 Startstation TEXT,
                 Startzeit TEXT,  
