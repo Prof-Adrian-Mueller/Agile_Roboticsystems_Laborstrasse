@@ -6,7 +6,7 @@ import pandas as pd
 
 from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Model.LiveTubeStatus import LiveTubeStatus, FinalTubeStatus
-from GUI.Storage.BorgSingleton import TubeLayoutSingleton, MainWindowSingleton
+from GUI.Storage.BorgSingleton import TubeLayoutSingleton, MainWindowSingleton, CurrentExperimentSingleton
 from GUI.Utils.LiveObservable import LiveObserver
 
 
@@ -45,8 +45,9 @@ class LiveViewMessageDisplay(LiveObserver):
         print("TODO Save in DB " + str(final_result))
         main_singleton = MainWindowSingleton()
         ui_db = DBUIAdapter()
+        current_exp_id = CurrentExperimentSingleton()
         # probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel
-        ui_db.insert_tracking_log(final_result.tube_id, final_result.start_station, final_result.start_station_time, final_result.end_station, final_result.end_station_time, final_result.duration, final_result.video_timestamp)
+        ui_db.insert_tracking_log(current_exp_id.experiment_id, final_result.tube_id, final_result.start_station, final_result.start_station_time, final_result.end_station, final_result.end_station_time, final_result.duration, final_result.video_timestamp)
 
     def update_button_color(self, tube_status, color):
         tube_layout = TubeLayoutSingleton()

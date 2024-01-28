@@ -178,6 +178,13 @@ class Tube:
         self.coords = None
         self.error = False
 
+    def __str__(self):
+        return f"Tube(ID: {self.tubeID}, Tracking ID: {self.trackingID}, " \
+               f"Last Station: {self.lastStation}, Last Station Time: {self.lastStationTime}, " \
+               f"Left Station: {self.leftStation}, Next Station: {self.nextStation}, " \
+               f"Next Station Distance: {self.nextStationDistance}, Coordinates: {self.coords}, " \
+               f"Error: {self.error})"
+
 
 def tracker(tube_ids):
     """ Ausführung des BOTSort-Trackers und Verwaltung aller Tubes, mit Überwachung und dem Schreiben von Logeinträgen
@@ -387,7 +394,7 @@ def tracker(tube_ids):
                                                                               entry.endStationTime, entry.duration,
                                                                               entry.videoTimestamp]
                                                                 writer.writerow(tube_result)
-                                                                print("RESULT "+str(tube_result))
+                                                                print("RESULT " + str(tube_result))
 
 
                                                         # aktualisiert tube werte
@@ -530,6 +537,7 @@ def tracker(tube_ids):
                         # für Startstation einmal zu Beginn eintragen
                         stations[0].tubes.append(tube)
 
+                experiment_zusammenfassung(live_tracking)
                 # prüfe für jede Tube
 
                 for tube in live_tracking:
@@ -540,12 +548,21 @@ def tracker(tube_ids):
                         send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
                             ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
                         tube.error = True
+                        print("ERROR_MESSAGE Tube " + str(tube.tubeID) + " ist seit " + str(
+                            ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+                        print(f"ERROR_DATA {tube}")
 
             # beende auslesen der Kamera
             video.release()
             cap.release()
             # beende alle Fenster
             cv2.destroyAllWindows()
+
+def experiment_zusammenfassung(live_tracking):
+    # TODO check how many tube are correct, videoid
+    # Tube(ID: 1, Tracking ID: 101, Last Station: Thymio, Last Station Time: 2024-01-28 18:51:05.595174, Left Station: False, Next Station: Thymio, Next Station Distance: None, Coordinates: None, Error: False)
+    # Bsp : Exp Max1 hat 32 Tube mit 4 Fehler, anzahl_fehler = 4
+    print()
 
 
 def start_tracking(tube_ids):

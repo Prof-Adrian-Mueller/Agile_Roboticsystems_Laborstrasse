@@ -19,6 +19,7 @@ from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
 from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
+from GUI.Menu.ExperimentResultWidget import ExperimentResultWidget
 from GUI.Menu.HomePageDashboard import HomePageDashboard
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Menu.Settings import Settings
@@ -210,6 +211,8 @@ class MainWindow(QMainWindow):
                                                                      main_window=self)
             self.experiment_details = ExperimentTubesDetails(main_window=self)
 
+            self.experiment_results = ExperimentResultWidget(self.ui.experiment_info_view, main_window=self)
+
             stacked_layout.addWidget(self.experiment_dashboard)
             stacked_layout.addWidget(self.experiment_details)
 
@@ -226,6 +229,8 @@ class MainWindow(QMainWindow):
             self.tab_widget_experiment_qr.addTab(self.qr_codes_widget, "QR Codes")
             # Load data to the Row
             self.qr_codes_widget.refresh_data()
+
+            self.tab_widget_experiment_qr.addTab(self.experiment_results, "Experiment Result")
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_experiment_qr)

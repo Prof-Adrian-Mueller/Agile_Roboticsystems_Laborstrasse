@@ -40,7 +40,7 @@ class ExperimentPreparationWidget(QWidget):
         except Exception as ex:
             dialog = CustomDialog(self)
             dialog.add_titlebar_name("Experiment Preparation Widget")
-            dialog.addContent(ex, ContentType.OUTPUT)
+            dialog.addContent(ex, ContentType.ERROR)
             dialog.show()
 
     def remove_vorbereitung_tab_if_exists(self, main_window):

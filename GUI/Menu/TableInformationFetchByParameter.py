@@ -1,15 +1,19 @@
+import re
+from functools import partial
 from typing import Callable
 
 import pandas as pd
-from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtGui import QPixmap, QDesktopServices, QIcon
+from PyQt6.QtCore import Qt, QUrl, pyqtSignal, QTimer
+from PyQt6.QtGui import QPixmap, QDesktopServices, QIcon, QCursor
 from PyQt6.QtWidgets import QWidget, QLabel, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, \
-    QAbstractScrollArea, QPushButton, QHBoxLayout, QVBoxLayout
+    QAbstractScrollArea, QPushButton, QHBoxLayout, QVBoxLayout, QApplication, QToolTip
 from PyQt6.uic.properties import QtCore
 
+from DBService.Model.Experiment import Experiment
 from GUI.Custom.CustomDialog import CustomDialog, ContentType
 from GUI.Menu.QRCodesWidget import QRCodesWidget
 from GUI.Navigation import Ui_MainWindow
+from GUI.Utils.CheckUtils import CheckUtils
 from GUI.Utils.FileUtils import FileUtils
 
 
@@ -24,7 +28,6 @@ class TableInformationFetchByParameter(QWidget):
         self.current_table = QTableWidget()
         self.ui = ui
         self.main_window = main_window
-        self.current_table.cellDoubleClicked.connect(self.open_image)
         self.filename_to_export = None
         self.text_qlabel_option = QLabel("")
         # combo_option_class_type
@@ -46,30 +49,36 @@ class TableInformationFetchByParameter(QWidget):
                 image_path = self.data_for_table.get('image_location')
                 if image_path:
                     QDesktopServices.openUrl(QUrl.fromLocalFile(image_path))
+            # else:
+            #     self.copy_to_clipboard(row, column)
 
     def append_info_to_view(self, input_id, current_option):
-
         data_for_table = None
         is_tube_selected = False
         delete_button = None
         text_label_for_option = ""
         try:
             if current_option == 'Experiment':
-                # Create the left-aligned label
-                text_label_for_option = f"{current_option} {input_id} details: "
-                data_for_table = self.main_window.ui_db.adapter.get_experiment_by_id(input_id)
-                # Convert the Experimente instance to a dictionary
-                if data_for_table:
-                    data_for_table = vars(data_for_table)
-                    if data_for_table['exp_id']:
-                        delete_button = self.create_delete_btn(input_id,
-                                                               f"Möchten Sie das Experiment {input_id} wirklich löschen?")
+                if CheckUtils.is_date(input_id):
+                    data_for_table = self.main_window.ui_db.get_experiments_by_date(input_id)
+                    # data_for_table = vars(data_for_table)
+                    print(data_for_table)
                 else:
-                    data_for_table = {}
-                    dialog = CustomDialog(self)
-                    dialog.add_titlebar_name("Experiment Query")
-                    dialog.addContent(f"Kein Ergebnis für {input_id}", ContentType.OUTPUT)
-                    dialog.show()
+                    # Create the left-aligned label
+                    text_label_for_option = f"{current_option} {input_id} details: "
+                    data_for_table = self.main_window.ui_db.adapter.get_experiment_by_id(input_id)
+                    # Convert the Experimente instance to a dictionary
+                    if data_for_table:
+                        data_for_table = vars(data_for_table)
+                        if data_for_table['exp_id']:
+                            delete_button = self.create_delete_btn(input_id,
+                                                                   f"Möchten Sie das Experiment {input_id} wirklich löschen?")
+                    else:
+                        data_for_table = {}
+                        dialog = CustomDialog(self)
+                        dialog.add_titlebar_name("Experiment Query")
+                        dialog.addContent(f"Kein Ergebnis für {input_id}", ContentType.OUTPUT)
+                        dialog.show()
             elif current_option == 'Plasmid':
                 text_label_for_option = f"{current_option} {input_id} details: "
                 data_for_table = self.main_window.ui_db.metadata_adapter.get_plasmid_data_by_nr(input_id)
@@ -151,30 +160,50 @@ class TableInformationFetchByParameter(QWidget):
             # Hide the row and column headers
             table.verticalHeader().hide()
 
-            # Populate the table with data
-            for i, (key, value) in enumerate(data_for_table.items()):
-                key_item = QTableWidgetItem(key)
-                key_item.setFlags(key_item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Make the item non-editable
-                self.current_table.setItem(i, 0, key_item)
+            if CheckUtils.is_date(input_id):
+                for i, experiment in enumerate(data_for_table):
+                    key_item = QTableWidgetItem(experiment.exp_id)
+                    key_item.setFlags(key_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                    experiment_str = f"{experiment.vorname}, {experiment.name}"
+                    self.current_table.setItem(i, 0, key_item)
+                    value_item = QTableWidgetItem(experiment_str)
+                    value_item.setFlags(value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                    self.current_table.setItem(i, 1, value_item)
+                    self.current_table.cellClicked.connect(
+                        partial(self.handle_cell_click_experiment_date, experiment=experiment))
 
-                if key == 'pixmap':
-                    label = QLabel()
-                    label.setPixmap(value)
-                    self.current_table.setCellWidget(i, 1, label)
-                elif key == 'image_location':
-                    value_item = QTableWidgetItem(value)
-                    value_item.setFlags(value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Make the item non-editable
-                    self.current_table.setItem(i, 1, value_item)
-                else:
-                    value_item = QTableWidgetItem(str(value))
-                    value_item.setFlags(value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Make the item non-editable
-                    self.current_table.setItem(i, 1, value_item)
+            else:
+                # Populate the table with data
+                for i, (key, value) in enumerate(data_for_table.items()):
+                    key_item = QTableWidgetItem(key)
+                    key_item.setFlags(key_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                    self.current_table.setItem(i, 0, key_item)
+
+                    if key == 'pixmap':
+                        label = QLabel()
+                        label.setPixmap(value)
+                        self.current_table.setCellWidget(i, 1, label)
+                    elif key == 'image_location':
+                        value_item = QTableWidgetItem(value)
+                        value_item.setFlags(
+                            value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                        self.current_table.setItem(i, 1, value_item)
+                    else:
+                        value_item = QTableWidgetItem(str(value))
+                        value_item.setFlags(
+                            value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Make the item non-editable
+                        self.current_table.setItem(i, 1, value_item)
+                        # if key == 'anz_tubes':
+                        #     # TODO load Logging MonitoringData
+                        #     self.current_table.clicked.connect(
+                        #         partial(self.show_all_tubes_of_experiment, key=key))
 
             # Remove the background
             table.setObjectName('tube_info_table')
 
             # Set the size policy to expand to the available space
             table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            self.current_table.cellDoubleClicked.connect(self.copy_to_clipboard)
 
             # Add the table to the grid layout
             self.ui.tube_info_grid_layout.addWidget(table, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -184,6 +213,21 @@ class TableInformationFetchByParameter(QWidget):
             dialog = CustomDialog(self)
             dialog.addContent(f"{ex}", ContentType.OUTPUT)
             dialog.show()
+
+    def show_all_tubes_of_experiment(self, row, column, key):
+        print(f"Key - {key} {row} {column}")
+
+    def copy_to_clipboard(self, row, column):
+        item = self.current_table.item(row, column)
+        if item is not None:
+            text = item.text()
+            if text:
+                try:
+                    QApplication.clipboard().setText(text)
+                    QToolTip.showText(QCursor.pos(), "Copied")
+                    QTimer.singleShot(5000, QToolTip.hideText)
+                except Exception as ex:
+                    print(ex)
 
     def export_table_data(self):
         if not self.data_for_table:
@@ -257,3 +301,10 @@ class TableInformationFetchByParameter(QWidget):
             dialog_new.addContent(f"Experiment mit der ID {id} könnte nicht gelöscht werden.", ContentType.ERROR)
             dialog_new.addContent(ex, ContentType.ERROR)
             dialog_new.show()
+
+    def handle_cell_click_experiment_date(self, row, col, experiment):
+        experiment_id = self.current_table.item(row, 0).text()
+
+        if experiment.exp_id == experiment_id:
+            print(f"Cell ({row}, {col}) clicked for experiment {experiment_id} - \n - {experiment}")
+            self.append_info_to_view(experiment_id, 'Experiment')
