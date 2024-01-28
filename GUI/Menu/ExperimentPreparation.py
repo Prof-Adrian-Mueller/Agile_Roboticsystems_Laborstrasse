@@ -138,14 +138,15 @@ class ExperimentPreparation:
                                 dialog.show()
                                 return
 
-                        if not CheckUtils.is_last_sequence_in_order(tubes_list):
-                            dialog.addContent(f"{tubes_list} sind nicht in einer Reihenfolge für Plasmid {plasmid}",
-                                              ContentType.ERROR)
-                            dialog.addContent(
-                                f"Geben Sie bitte die Tube Nr in einer Reihenfolge ein, wie z.B. 1,2,3",
-                                ContentType.OUTPUT)
-                            dialog.show()
-                            return
+                        # Checks if the sequence is in order
+                        # if not CheckUtils.is_last_sequence_in_order(tubes_list):
+                        #     dialog.addContent(f"{tubes_list} sind nicht in einer Reihenfolge für Plasmid {plasmid}",
+                        #                       ContentType.ERROR)
+                        #     dialog.addContent(
+                        #         f"Geben Sie bitte die Tube Nr in einer Reihenfolge ein, wie z.B. 1,2,3",
+                        #         ContentType.OUTPUT)
+                        #     dialog.show()
+                        #     return
 
                     if len(available_tubes) != len(all_input_tubes):
                         dialog.addContent(f"Verfügbare Tubes und Eingegebene Tubes sind nicht gleich.", ContentType.ERROR)
@@ -356,8 +357,7 @@ class ExperimentPreparation:
                 is_experiment_new = True
             else:
                 if exp_id_data.anz_tubes:
-                    if not self.total_old_nr_of_tubes:
-                        self.total_old_nr_of_tubes = exp_id_data.anz_tubes
+                    self.total_old_nr_of_tubes = len(self.ui_database.get_tubes_by_exp_id(experiment_id))
 
                 self.main_window.cache_data = self.main_window.load_cache()
                 if self.main_window.cache_data.experiment_id:
@@ -394,11 +394,17 @@ class ExperimentPreparation:
                     self.current_experiment.experiment_id, self.tubes_required), [])
             self.nextPage()
 
+
     def map_prev_next(self, ui):
         ui.vorbereitungPrev_2.clicked.connect(self.prevPage)
-        ui.vorbereitungPrev_4.clicked.connect(self.prevPage)
+        ui.vorbereitungPrev_4.clicked.connect(lambda: self.prevPageWithControl("CreateExperiment"))
         ui.vorbereitungNext.clicked.connect(
             lambda: self.nextPageWithControl("CreateExperiment"))
         ui.probe_to_plasmid_next.clicked.connect(
             lambda: self.nextPageWithControl("AddProbeToPlasmid"))
         ui.vorbereitungWeiter_3.clicked.connect(self.nextPage)
+
+    def prevPageWithControl(self, type):
+        if type == "CreateExperiment":
+            self.total_old_nr_of_tubes = 0
+            self.prevPage()

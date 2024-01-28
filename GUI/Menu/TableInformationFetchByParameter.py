@@ -28,11 +28,9 @@ class TableInformationFetchByParameter(QWidget):
         self.current_table = QTableWidget()
         self.ui = ui
         self.main_window = main_window
-        self.current_table.cellDoubleClicked.connect(self.open_image)
         self.filename_to_export = None
         self.text_qlabel_option = QLabel("")
         # combo_option_class_type
-
 
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
@@ -51,6 +49,8 @@ class TableInformationFetchByParameter(QWidget):
                 image_path = self.data_for_table.get('image_location')
                 if image_path:
                     QDesktopServices.openUrl(QUrl.fromLocalFile(image_path))
+            # else:
+            #     self.copy_to_clipboard(row, column)
 
     def append_info_to_view(self, input_id, current_option):
         data_for_table = None
@@ -160,7 +160,6 @@ class TableInformationFetchByParameter(QWidget):
             # Hide the row and column headers
             table.verticalHeader().hide()
 
-
             if CheckUtils.is_date(input_id):
                 for i, experiment in enumerate(data_for_table):
                     key_item = QTableWidgetItem(experiment.exp_id)
@@ -194,14 +193,17 @@ class TableInformationFetchByParameter(QWidget):
                         value_item.setFlags(
                             value_item.flags() & ~Qt.ItemFlag.ItemIsEditable)  # Make the item non-editable
                         self.current_table.setItem(i, 1, value_item)
+                        # if key == 'anz_tubes':
+                        #     # TODO load Logging MonitoringData
+                        #     self.current_table.clicked.connect(
+                        #         partial(self.show_all_tubes_of_experiment, key=key))
 
             # Remove the background
             table.setObjectName('tube_info_table')
 
             # Set the size policy to expand to the available space
             table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-            # table.doubleClicked.connect(self.copy_to_clipboard)
-            
+            self.current_table.cellDoubleClicked.connect(self.copy_to_clipboard)
 
             # Add the table to the grid layout
             self.ui.tube_info_grid_layout.addWidget(table, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -212,15 +214,20 @@ class TableInformationFetchByParameter(QWidget):
             dialog.addContent(f"{ex}", ContentType.OUTPUT)
             dialog.show()
 
+    def show_all_tubes_of_experiment(self, row, column, key):
+        print(f"Key - {key} {row} {column}")
+
     def copy_to_clipboard(self, row, column):
         item = self.current_table.item(row, column)
         if item is not None:
-            try:
-                QApplication.clipboard().setText(item.text())
-                QToolTip.showText(QCursor.pos(), "Copied")
-                QTimer.singleShot(5000, QToolTip.hideText)
-            except Exception as ex:
-                print(ex)
+            text = item.text()
+            if text:
+                try:
+                    QApplication.clipboard().setText(text)
+                    QToolTip.showText(QCursor.pos(), "Copied")
+                    QTimer.singleShot(5000, QToolTip.hideText)
+                except Exception as ex:
+                    print(ex)
 
     def export_table_data(self):
         if not self.data_for_table:

@@ -30,6 +30,7 @@ class InterprocessCommunication:
                 if line == 'exit':
                     self.is_running = False
 
+
     def run_child_process(self):
         while self.is_running:
             try:

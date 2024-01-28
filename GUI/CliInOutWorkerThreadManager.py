@@ -97,6 +97,7 @@ class CliInOutWorkerThreadManager(QWidget):
             self.process.write('exit\n'.encode())
             self.ui.inputTextFromCli.clear()
 
+
     def isProcessStarted(self):
         return self.process and self.process.state() == QProcess.ProcessState.Running
 
