@@ -41,8 +41,10 @@ class CustomTitleBar(QWidget):
         layout.addLayout(self.layout_logo)
         # self.setStyleSheet("background-color: #E0E0E0; min-width: 60px;")
 
-        layout.addStretch(1)
+        # layout.addStretch(0.2)
         self.app_title = QLabel("Dashboard UI")
+        self.app_title.setStyleSheet("font-weight:bold;font-size:15px;")
+        layout.addWidget(QLabel("\t"))
         layout.addWidget(self.app_title)
         layout.addStretch(1)
 

@@ -1,16 +1,13 @@
-from PyQt6.QtCore import pyqtSignal, Qt, QSize, QTimer
+from PyQt6.QtCore import pyqtSignal, Qt, QTimer
 from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap, QCursor
 from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QAbstractItemView, QHeaderView, QApplication, QMessageBox, QSystemTrayIcon, QToolTip,
+                             QAbstractItemView, QHeaderView, QToolTip,
                              QHBoxLayout)
-from PyQt6.uic.properties import QtGui
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
 from GUI.Utils.FileUtils import FileUtils
-from GUI.button_back_design_test import CustomBackButton
-import os
-import pandas as pd
-from PyQt6.QtWidgets import QApplication, QFileDialog
+from GUI.Custom.button_back_design_test import CustomBackButton
+from PyQt6.QtWidgets import QApplication
 
 
 class ExperimentTubesDetails(QWidget):
