@@ -9,8 +9,9 @@ class LeftNavigation:
     Left Navigation Buttons
     """
 
-    def __init__(self, ui):
+    def __init__(self, ui, main_window):
         self.ui = ui
+        self.main_window = main_window
         self.buttons = [self.ui.home_btn_dashboard, self.ui.statistik, self.ui.importBtn,
                         self.ui.settingsBtn, self.ui.cliBtn,
                         self.ui.experimentPreparationBtn,
@@ -48,16 +49,23 @@ class LeftNavigation:
 
             # Change the color of the clicked (active) button
             button.setStyleSheet("background-color: #1B5E20")
-            # self.change_button_icon_color(button, 'red')
+            self.update_title_bar(button)
         except Exception as ex:
             print(f"Error while highlighting button: {ex}")
 
-    # def change_button_icon_color(self, button, color):
-    #     # Define the desired size for the icon
-    #     icon_size = QSize(64, 64)
-    #     # Create a new icon with the specified color
-    #     colored_icon = ColoredSVGIcon(":/icons/img/command-line.svg", color)
-    #     # Set the new icon to the button
-    #     button.setIcon(colored_icon)
-    #     # Set the icon size if it's different from the default
-    #     button.setIconSize(icon_size)
+    def update_title_bar(self, button):
+        # Check which button was clicked and update the title bar text
+        if button == self.ui.home_btn_dashboard:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Home Dashboard")
+        elif button == self.ui.statistik:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Statistics")
+        elif button == self.ui.importBtn:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Import")
+        elif button == self.ui.settingsBtn:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Settings")
+        elif button == self.ui.cliBtn:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Command Line Interface")
+        elif button == self.ui.experimentPreparationBtn:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Search")
+        elif button == self.ui.experiment_info_btn:
+            self.main_window.setCustomWindowTitle("Dashboard UI | Experiment Information")

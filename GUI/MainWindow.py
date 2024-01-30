@@ -84,7 +84,6 @@ class MainWindow(QMainWindow):
         # Custom Titlebar
         self.title_bar = CustomTitleBar(self)
         self.setMenuWidget(self.title_bar)
-        self.setWindowTitle("Dashboard UI")
 
         # TODO delete later
         self.ui.experimentImportierenVorbereitung.hide()
@@ -116,7 +115,7 @@ class MainWindow(QMainWindow):
         self.experiment_preparation = ExperimentPreparation(self.ui, self)
         self.experiment_preparation.map_prev_next(self.ui)
 
-        left_navigation = LeftNavigation(self.ui)
+        left_navigation = LeftNavigation(self.ui, self)
         left_navigation.map_buttons_to_pages()
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
@@ -156,6 +155,10 @@ class MainWindow(QMainWindow):
         self.tube_info = TableInformationFetchByParameter(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
         MainWindowSingleton().set_main_window(self)
+
+    def setCustomWindowTitle(self, title):
+        print(title)
+        self.title_bar.setCustomWindowTitle(title)
 
     def save_cache(self, arg, value):
         arg = "user_preferences"
