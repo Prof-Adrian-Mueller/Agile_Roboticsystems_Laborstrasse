@@ -1,0 +1,28 @@
+Probe id - wie soll es Probe id sein?
+
+Plasmid Id = PHB655
+QR Code = Tube id = 000001 - 999999
+Nachname = Mustermann 
+anzahl_experimente = Wie viele Experimente ein Laborant(schlüssel = Nachname) gemacht hat = im Laborstraße gestartet : 0 bis n?
+Experiment id = Nachname+anzahl_experimente(nachname)+datum
+
+
+Probe Id = QR Code
+
+Import
+Welche von den Spalten werden importiert?
+- Plasmid Id
+- Vektor
+- Insert
+
+Export
+- export Tracking Log
+
+________
+debug - how to debug using pycharm
+
+-- load data -> retrive data
+
+presentation:
+- qt designer, widgets, custom widgets
+- todo notes for the demo, step wise, 3 4 experiments, delete experiments

@@ -1,34 +1,41 @@
-import os
-import subprocess
+import cv2
 
-from PyQt6.QtCore import QThread, pyqtSignal
-from main import InterprocessCommunication
+from Monitoring.monitoring import cameraConf
 
-class WorkerThread(QThread):
-    messageSignal = pyqtSignal(str)
+# Specify the filename of the input and output videos
+input_filename = 'C:\\Users\\Fujitsu\\Documents\\video.mkv'
+output_filename = 'output_video.mp4'
 
-    def run(self):
-        # Create an instance of InterprocessCommunication
-        ipc = InterprocessCommunication(is_debug=True)
+# Open the input video
+cap = cv2.VideoCapture(input_filename)
+# RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp"] + ':554/11'
+# cap = cv2.VideoCapture(RTSP_URL)
 
-        while True:
-            received_message = ipc.receive_message()
+# Check if the video was opened successfully
+if not cap.isOpened():
+    print(f"Error: Could not open video {input_filename}")
+    exit()
 
-            if received_message == 'q':
-                self.messageSignal.emit('Program Exited!')
-                break
+# Get the video frame width and height
+frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-            if received_message:
-                self.messageSignal.emit(received_message)
+# Define the codec and create VideoWriter object using H264 codec
+fourcc = cv2.VideoWriter_fourcc(*'H264')
+out = cv2.VideoWriter(output_filename, fourcc, 20.0, (frame_width, frame_height))
 
-            # Simulate sending a message to the child process
-            ipc.send_message("Hello from WorkerThread!")
+# Read and write the video frame by frame
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-        # Clean up and stop the child process
-        ipc.send_message('q')
-        ipc.stop_child_process()
+    # Write the frame to the output video
+    out.write(frame)
 
-if __name__ == "__main__":
-    # Example usage:
-    worker_thread = WorkerThread()
-    worker_thread.start()
+# Release everything when done
+cap.release()
+out.release()
+cv2.destroyAllWindows()
+
+print("Video processing complete.")

@@ -157,7 +157,6 @@ class MainWindow(QMainWindow):
         MainWindowSingleton().set_main_window(self)
 
     def setCustomWindowTitle(self, title):
-        print(title)
         self.title_bar.setCustomWindowTitle(title)
 
     def save_cache(self, arg, value):
@@ -214,7 +213,7 @@ class MainWindow(QMainWindow):
                                                                      main_window=self)
             self.experiment_details = ExperimentTubesDetails(main_window=self)
 
-            self.experiment_results = ExperimentResultWidget(self.ui.experiment_info_view, main_window=self)
+            # self.experiment_results = ExperimentResultWidget(self.ui.experiment_info_view, main_window=self)
 
             stacked_layout.addWidget(self.experiment_dashboard)
             stacked_layout.addWidget(self.experiment_details)
@@ -233,7 +232,7 @@ class MainWindow(QMainWindow):
             # Load data to the Row
             self.qr_codes_widget.refresh_data()
 
-            self.tab_widget_experiment_qr.addTab(self.experiment_results, "Experiment Result")
+            # self.tab_widget_experiment_qr.addTab(self.experiment_results, "Experiment Result")
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_experiment_qr)

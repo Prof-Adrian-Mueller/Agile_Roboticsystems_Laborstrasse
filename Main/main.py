@@ -9,6 +9,7 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '04/01/2024'
 
+import cv2
 import pandas as pd
 
 from Monitoring.monitoring import Tube
@@ -19,7 +20,7 @@ class InterprocessCommunication:
     Process to be run by GUI. Could Send and Receive Message to GUI.
     """
 
-    def __init__(self, is_debug=True):
+    def __init__(self, is_debug=False):
         self.is_debug = is_debug
         self.message_queue = queue.Queue()
         self.is_running = True
@@ -93,6 +94,7 @@ class InterprocessCommunication:
 if __name__ == "__main__":
     ipc = InterprocessCommunication()
     args = sys.argv[1:]
+    print(cv2.__version__)
     try:
         ipc.run(args)
     except KeyboardInterrupt:

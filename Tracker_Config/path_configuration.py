@@ -22,6 +22,21 @@ class PathConfiguration:
         self.validate_configuration(config_object)
         return config_object
 
+    def load_calibration_yml(self):
+        """Load and return the configuration from the ini file."""
+        script_dir = os.path.dirname(__file__)
+        ini_path = os.path.join(script_dir, "calibration_charuco.yml")
+        config_object = ConfigParser()
+
+        if not os.path.exists(ini_path):
+            self.logger.error(f"Config file not found: {ini_path}")
+            raise FileNotFoundError(f"Config file not found: {ini_path}")
+
+        # config_object.read(ini_path)
+        # # Optional: Validate the configuration here
+        # self.validate_configuration(config_object)
+        return ini_path
+
     def validate_configuration(self, config):
         """Validate the loaded configuration."""
         # Example validation: check for a specific section
