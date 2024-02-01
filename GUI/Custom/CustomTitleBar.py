@@ -27,7 +27,6 @@ class CustomTitleBar(QWidget):
         layout = QHBoxLayout(self)
         self.layout_logo = QHBoxLayout(self)
 
-
         # App logo
         app_logo = QLabel(self)
         pixmap = QPixmap(":/icons/img/laboratory.svg")
@@ -44,7 +43,7 @@ class CustomTitleBar(QWidget):
         # layout.addStretch(0.2)
         self.app_title = QLabel("Dashboard UI")
         self.app_title.setObjectName("app_title")
-        self.app_title.setStyleSheet("font-weight:bold;font-size:15px;")
+        self.app_title.setStyleSheet("font-size:15px;")
         layout.addWidget(QLabel("\t"))
         layout.addWidget(self.app_title)
         layout.addStretch(1)
@@ -62,7 +61,6 @@ class CustomTitleBar(QWidget):
         layout.addWidget(close_btn)
 
     def setCustomWindowTitle(self, title):
-        print(title)
         self.app_title.setText(title)
 
     def add_back_btn(self, button: QPushButton):

@@ -49,7 +49,7 @@ class TableInformationFetchByParameter(QWidget):
         if tubeid_input_text:
             self.append_info_to_view(tubeid_input_text, self.ui.combo_option_class_type.currentText())
         else:
-            self.main_window.dialog.add_titlebar_name("Query Info")
+            self.main_window.dialog.add_titlebar_name("Abfrage-Infos")
             self.main_window.show_message_in_dialog("Bitte geben Sie eine gültige ID ein, um fortzufahren!")
 
     def open_image(self, row, column):
@@ -131,7 +131,7 @@ class TableInformationFetchByParameter(QWidget):
         self.ui.tube_info_grid_layout.addLayout(h_layout, 0, 0)
 
         if not data_for_table:
-            self.text_qlabel_option.setText(f"Could not load data for {current_option} with id {input_id}")
+            self.text_qlabel_option.setText(f"Daten für {current_option} mit der ID {input_id} konnten nicht abgerufen werden.")
             pass
 
         try:
