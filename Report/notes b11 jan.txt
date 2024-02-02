@@ -1,0 +1,50 @@
+debug off 
+main.py line 20  def __init__(self, is_debug=False):
+
+Notiz: #tubes in cam = # im Experiment, sonst Fehler
+
+Daten werde im Betrieb in SQL Lite regelmäßig (wie oft?) gesynced
+
+Beim ersten mal:
+1. Metadaten importieren (icon #4)
+C:\Users\Fujitsu\IdeaProjects\Agile_Roboticsystems_Laborstrasse\DBService\DefaultTemplate
+Plasmidliste25C325C32520PHB100.xls
+
+Probe Nr: sortiert aufsteigend, mit Komma
+Bsp:
+1,2
+3,4
+oder
+2,1
+4,3
+
+falsch
+1,3
+2,4
+PHB655,PHB654
+
+copy icon erklären Created Tubes successfully for PHB655 : [1, 2]. 
+
+(Experiment anlegen_ eenfalls vom letzen Mal im System)
+> START 
+
+BUG: Experiment ID wird intern automatischb vergeben - s. 2. Fenster "Exp ID", erater Char wird uebernommen
+--> 
+Cam staret automatisch
+see CLI (2. v.unten) 
+
+
+===== Fehler gemacht
+a) Exp. ändern: Home, Exp PId eingeben _> Daten sind editierbar -> Nur hochzählbar 
+b) löschen und neu an legen
+
+LÖSCHEN fehlt im GUI
+
+Reset / Edit DV Browser for ...
+tabl Tubes 
+tab Experiment
+
+Tabelle leer == initial Zustand 
+
+Datenbank Löschen : C:\Users\Fujitsu\IdeaProjects\Agile_Roboticsystems_Laborstrasse\laborstreet_management.db
+

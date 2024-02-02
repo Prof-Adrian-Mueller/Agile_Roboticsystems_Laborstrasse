@@ -23,7 +23,7 @@ class QRCodesWidget(QWidget):
         # Create the refresh button and add it to the layout
         # Header area
         h_layout = QHBoxLayout()
-        self.header_label = QLabel('QR Overview')
+        self.header_label = QLabel('QR-Übersicht')
         h_layout.addWidget(self.header_label)
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
@@ -168,14 +168,15 @@ class QRCodesWidget(QWidget):
 
             qr_vertical_box = QVBoxLayout()
             qr_vertical_box.addWidget(label)
-            qr_code_label = QLabel(qr_code_nr)
+            qr_code_label = QLabel("Micro QR : "+str(qr_code_nr))
             qr_code_label.setObjectName("qrCodeLabel")
+
             qr_vertical_box.addWidget(qr_code_label)
 
             v_widget = QWidget()
             v_widget.setLayout(qr_vertical_box)
 
-            probe_nr_text = QLabel(tube_nr)
+            probe_nr_text = QLabel("Tube Nr: "+str(tube_nr))
             probe_nr_text.setFixedWidth(120)
 
             drucken, speichern = self.create_buttons(img_location)
@@ -183,7 +184,7 @@ class QRCodesWidget(QWidget):
             h_layout.addWidget(v_widget)
             h_layout.addWidget(probe_nr_text)
             h_layout.addWidget(speichern)
-            h_layout.addWidget(drucken)
+            # h_layout.addWidget(drucken)
 
             self.outputLayout.addWidget(widget)
         except Exception as ex:

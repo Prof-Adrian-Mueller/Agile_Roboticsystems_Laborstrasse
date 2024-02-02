@@ -1,16 +1,13 @@
-from PyQt6.QtCore import pyqtSignal, Qt, QSize, QTimer
+from PyQt6.QtCore import pyqtSignal, Qt, QTimer
 from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap, QCursor
 from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QAbstractItemView, QHeaderView, QApplication, QMessageBox, QSystemTrayIcon, QToolTip,
+                             QAbstractItemView, QHeaderView, QToolTip,
                              QHBoxLayout)
-from PyQt6.uic.properties import QtGui
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
 from GUI.Utils.FileUtils import FileUtils
-from GUI.button_back_design_test import CustomBackButton
-import os
-import pandas as pd
-from PyQt6.QtWidgets import QApplication, QFileDialog
+from GUI.Custom.button_back_design_test import CustomBackButton
+from PyQt6.QtWidgets import QApplication
 
 
 class ExperimentTubesDetails(QWidget):
@@ -137,7 +134,7 @@ class ExperimentTubesInfoDashboard(QWidget):
         layout = QVBoxLayout(self)
         # Header area
         h_layout = QHBoxLayout()
-        header_label = QLabel('Experiments Overview')
+        header_label = QLabel('Übersicht über das aktuelle Experiment')
         h_layout.addWidget(header_label)
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
@@ -154,7 +151,7 @@ class ExperimentTubesInfoDashboard(QWidget):
         # Creates the experiments table
         self.experiments_table = QTableWidget(row, 10)
         self.experiments_table.setHorizontalHeaderLabels(
-            ['Probe Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
+            ['Tube Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
              'Anz Fehler'])
 
         header = self.experiments_table.horizontalHeader()
@@ -164,6 +161,12 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         # Set the last column to resize to contents
         header.setSectionResizeMode(9, QHeaderView.ResizeMode.ResizeToContents)
+
+        self.empty_label = QLabel("Die Tabelle ist leer.")
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty_label.setStyleSheet("color: gray; font-style: italic;font-sze:12px;")
+        self.empty_label.setGeometry(self.experiments_table.geometry())  # Position the label
+        layout.addWidget(self.empty_label)
 
         self.populate_table()
 
@@ -262,11 +265,23 @@ class ExperimentTubesInfoDashboard(QWidget):
                 # Check if the table is empty
                 if self.experiments_table.rowCount() == 0:
                     self.main_window.removeDialogBoxContents()
-                    self.main_window.show_message_in_dialog("Empty Table, No Data!")
+                    self.main_window.show_message_in_dialog("Leere Tabelle, keine Daten!")
         except Exception as ex:
             print(ex)
             print(ex.with_traceback())
 
+        # Initially check if the table is empty and update UI accordingly
+        self.update_ui_based_on_data()
+
     def row_selected(self, row, column):
         experiment_data = self.experiments_data[row]
         self.experiment_selected.emit(experiment_data)
+
+    def update_ui_based_on_data(self):
+        row_count = self.experiments_table.rowCount()
+        if row_count == 0:
+            self.empty_label.show()
+            self.experiments_table.hide()
+        else:
+            self.empty_label.hide()
+            self.experiments_table.show()

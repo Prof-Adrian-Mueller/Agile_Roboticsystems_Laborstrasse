@@ -201,17 +201,19 @@ def tracker(tube_ids):
     # Lade Yolo Weights
     model = YOLO(os.getcwd() + TRACKING_WEIGHTS_PATH)
 
+    # TODO correct folder format
+
     # Lade Kalibrierdaten
-    mtx, dist = calibrate_Camera.load_coefficients('..\\Tracker_Config\\calibration_charuco.yml')
+    mtx, dist = calibrate_Camera.load_coefficients(path_config.load_calibration_yml())
 
     # Bereite Kamera vor
     # cv2.VideoCapture() gibt ein Frame nacheinander zurück. Kann hinterherhängen.
     # VideoCapture() ist eine Klasse aus tracker_utils, die immer den aktuellsten Frame zurückgibt
 
     # aus Deckenkamera oder Video, gewünschte Zeile nutzen
-    # cap = VideoCapture(RTSP_URL)
+    cap = VideoCapture(RTSP_URL)
     # cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
-    cap = cv2.VideoCapture("C:\\Users\\Mirko\\Downloads\\20230809_121620.mp4")
+    # cap = cv2.VideoCapture("C:\\Users\\Mirko\\Downloads\\20230809_121620.mp4")
 
     # Berechne Kameramatrix mit Kalibrierdaten
     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (3840, 2160), 0, (3840, 2160))
@@ -269,14 +271,14 @@ def tracker(tube_ids):
                 # überspringen, wenn kein frame vorhanden
                 if img is None:
                     # neue Verbindung versuchen
-                    # cap = VideoCapture(RTSP_URL)
+                    cap = VideoCapture(RTSP_URL)
                     continue
 
                 # entzerre frame mit Kameramatrix,
                 # aus performance gründen auskommentiert, fals gewünscht in model.track() die source auf dst stellen
-                # dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
-                # x, y, w, h = roi
-                # dst = dst[y:y + h, x:x + w]
+                dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+                x, y, w, h = roi
+                dst = dst[y:y + h, x:x + w]
 
                 # Tracking für den aktuellen Frame
                 track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=True
@@ -514,7 +516,7 @@ def tracker(tube_ids):
                 im_array = results.plot()  # plot a BGR numpy array of predictions
                 cv2.imshow("Monitoring", im_array)
                 # für performance deaktiviert
-                # video.write(im_array)
+                video.write(im_array)
                 # nach erstem Frame
                 if start:
 
@@ -579,6 +581,20 @@ def experiment_zusammenfassung(live_tracking):
     # TODO check how many tube are correct, videoid
     # Tube(ID: 1, Tracking ID: 101, Last Station: Thymio, Last Station Time: 2024-01-28 18:51:05.595174, Left Station: False, Next Station: Thymio, Next Station Distance: None, Coordinates: None, Error: False)
     # Bsp : Exp Max1 hat 32 Tube mit 4 Fehler, anzahl_fehler = 4
+    for tube in live_tracking:
+
+        # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
+        if ((
+                datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME and tube.error == False):
+            send_to_telegram("Tube " + str(tube.tubeID) + " ist seit " + str(
+                ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+            tube.error = True
+            print("ERROR_MESSAGE Tube " + str(tube.tubeID) + " ist seit " + str(
+                ERROR_WAIT_TIME) + " Sekunden in keiner Station aufgetaucht")
+            print(f"ERROR_DATA {tube}")
+        else:
+            print(f"END_RESULT {tube}")
+
     print()
 
 

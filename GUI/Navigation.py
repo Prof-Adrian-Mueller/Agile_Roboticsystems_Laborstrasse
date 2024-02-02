@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI\Navigation.ui'
+# Form implementation generated from reading ui file 'Navigation.ui'
 #
 # Created by: PyQt6 UI code generator 6.6.0
 #
@@ -204,9 +204,6 @@ class Ui_MainWindow(object):
         self.cliOutputArea_2.setObjectName("cliOutputArea_2")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.cliOutputArea_2)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.label_4 = QtWidgets.QLabel(parent=self.cliOutputArea_2)
-        self.label_4.setObjectName("label_4")
-        self.verticalLayout_3.addWidget(self.label_4)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
@@ -627,7 +624,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(9)
+        self.stackedWidget.setCurrentIndex(5)
         self.tabWidgetHome.setCurrentIndex(0)
         self.vorbereitungStackedTab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -643,7 +640,6 @@ class Ui_MainWindow(object):
         self.experimentPreparationBtn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Search</p></body></html>"))
         self.settingsBtn.setToolTip(_translate("MainWindow", "<html><head/><body><p>Settings</p></body></html>"))
         self.sendBtnInputFromCli.setText(_translate("MainWindow", "Send"))
-        self.label_4.setText(_translate("MainWindow", "Load Tube Information"))
         self.combo_option_class_type.setItemText(0, _translate("MainWindow", "Experiment"))
         self.combo_option_class_type.setItemText(1, _translate("MainWindow", "Tube"))
         self.combo_option_class_type.setItemText(2, _translate("MainWindow", "Plasmid"))

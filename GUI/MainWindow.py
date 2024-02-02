@@ -84,7 +84,6 @@ class MainWindow(QMainWindow):
         # Custom Titlebar
         self.title_bar = CustomTitleBar(self)
         self.setMenuWidget(self.title_bar)
-        self.setWindowTitle("Dashboard UI")
 
         # TODO delete later
         self.ui.experimentImportierenVorbereitung.hide()
@@ -116,7 +115,7 @@ class MainWindow(QMainWindow):
         self.experiment_preparation = ExperimentPreparation(self.ui, self)
         self.experiment_preparation.map_prev_next(self.ui)
 
-        left_navigation = LeftNavigation(self.ui)
+        left_navigation = LeftNavigation(self.ui, self)
         left_navigation.map_buttons_to_pages()
 
         self.ui.generateQrBtn.clicked.connect(self.add_qr_generation_info)
@@ -156,6 +155,9 @@ class MainWindow(QMainWindow):
         self.tube_info = TableInformationFetchByParameter(self.ui, self)
         self.ui.tube_info_load_btn.clicked.connect(self.tube_info.load_and_display_tube_info)
         MainWindowSingleton().set_main_window(self)
+
+    def setCustomWindowTitle(self, title):
+        self.title_bar.setCustomWindowTitle(title)
 
     def save_cache(self, arg, value):
         arg = "user_preferences"
@@ -222,15 +224,15 @@ class MainWindow(QMainWindow):
             self.experiment_details.back_to_dashboard.connect(lambda: stacked_layout.setCurrentIndex(0))
 
             experiment_tubes_layout.addLayout(stacked_layout)
-            self.tab_widget_experiment_qr.addTab(experiment_tubes_widget, "Experiment Tubes")
+            self.tab_widget_experiment_qr.addTab(experiment_tubes_widget, "Übersicht ")
 
             # Creates and adds tab for QR Codes
             self.qr_codes_widget = QRCodesWidget(self.ui.experiment_info_view, self)
-            self.tab_widget_experiment_qr.addTab(self.qr_codes_widget, "QR Codes")
+            self.tab_widget_experiment_qr.addTab(self.qr_codes_widget, "Micro-QR-Codes")
             # Load data to the Row
             self.qr_codes_widget.refresh_data()
 
-            self.tab_widget_experiment_qr.addTab(self.experiment_results, "Experiment Result")
+            self.tab_widget_experiment_qr.addTab(self.experiment_results, "Tracking-Ergebnis")
 
             # Add the tab widget to the main layout
             main_layout.addWidget(self.tab_widget_experiment_qr)
@@ -269,7 +271,7 @@ class MainWindow(QMainWindow):
         dialog = CustomDialog(self)
         dialog.add_titlebar_name(f"Import {file_type} Info")
         if file_name:
-            print(f'Selected file: {file_name}')
+            print(f'Ausgewählte Datei: {file_name}')
             try:
                 # df = pd.read_excel(file_name)
                 # TODO show message in dialogbox
@@ -282,11 +284,10 @@ class MainWindow(QMainWindow):
                 if message is not None:
                     display_msg = " ".join(str(item) for item in message)
                     dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
-                    dialog.addContent(f'Successfully imported Excel file: {file_name}', ContentType.OUTPUT)
+                    dialog.addContent(f'Excel-Datei erfolgreich importiert: {file_name}', ContentType.OUTPUT)
                 else:
                     display_msg = "Unknown Error, No Content Received!"
                     dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
-
 
             except Exception as e:
                 print(f'Error occurred while importing Excel file: {file_name}\n{str(e)}')
@@ -342,7 +343,6 @@ class MainWindow(QMainWindow):
         self.dialogBoxContents.append(
             self.dialog.addContent(f"Erfassung & Tracking gestartet mit {text} Tubes. \n ", ContentType.OUTPUT))
         return text
-
 
     def apply_stylesheet(self):
         """

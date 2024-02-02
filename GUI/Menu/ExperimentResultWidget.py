@@ -18,6 +18,7 @@ class ExperimentResultWidget(QWidget):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
         self.experiments_results = None
+        self.main_window = main_window
         self.db_adapter = main_window.ui_db
         self.initUI()
 
@@ -57,9 +58,12 @@ class ExperimentResultWidget(QWidget):
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         scroll_layout.addWidget(self.table_widget)
         self.current_experiment = CurrentExperimentSingleton()
+        self.main_window.cache_data = self.main_window.load_cache()
 
-        if self.current_experiment.experiment_id:
-            self.fetch_and_display_results(self.current_experiment.experiment_id)
+        if self.main_window.cache_data:
+            if self.main_window.cache_data.experiment_id:
+                self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
+                self.fetch_and_display_results(self.main_window.cache_data.experiment_id)
 
         # Set the layout to the QWidget
         self.setLayout(self.layout)
@@ -105,6 +109,9 @@ class ExperimentResultWidget(QWidget):
         try:
             # Fetch the data
             data = self.db_adapter.get_tracking_logs_by_exp_id(experiment_id)
+
+            if not data:
+                return
 
             # Map the data to model objects
             mapped_results = ExperimentResult.map_data_to_model(data)

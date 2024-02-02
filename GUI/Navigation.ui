@@ -238,7 +238,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>9</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="test_page_home"/>
          <widget class="QWidget" name="home_page_dashboard">
@@ -345,13 +345,6 @@
                </sizepolicy>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_3">
-               <item>
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Load Tube Information</string>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_15">
                  <property name="sizeConstraint">

@@ -30,14 +30,26 @@ class TableInformationFetchByParameter(QWidget):
         self.main_window = main_window
         self.filename_to_export = None
         self.text_qlabel_option = QLabel("")
+        self.ui.tube_info_tubeid_input.setPlaceholderText("Bsp. Max2_2024-1-28 oder 2024-1-28")
+        self.ui.combo_option_class_type.currentIndexChanged.connect(
+            lambda index: self.update_placeholder_text(self.ui.combo_option_class_type.itemText(index))
+        )
         # combo_option_class_type
+
+    def update_placeholder_text(self, text):
+        if text == "Experiment":
+            self.ui.tube_info_tubeid_input.setPlaceholderText("Bsp. Max2_2024-1-28 oder 2024-1-28")
+        elif text == "Tube":
+            self.ui.tube_info_tubeid_input.setPlaceholderText("Bsp. 1")
+        elif text == "Plasmid":
+            self.ui.tube_info_tubeid_input.setPlaceholderText("Bsp. PHB655")
 
     def load_and_display_tube_info(self):
         tubeid_input_text = self.ui.tube_info_tubeid_input.text()
         if tubeid_input_text:
             self.append_info_to_view(tubeid_input_text, self.ui.combo_option_class_type.currentText())
         else:
-            self.main_window.dialog.add_titlebar_name("Query Info")
+            self.main_window.dialog.add_titlebar_name("Abfrage-Infos")
             self.main_window.show_message_in_dialog("Bitte geben Sie eine gültige ID ein, um fortzufahren!")
 
     def open_image(self, row, column):
@@ -59,6 +71,7 @@ class TableInformationFetchByParameter(QWidget):
         text_label_for_option = ""
         try:
             if current_option == 'Experiment':
+
                 if CheckUtils.is_date(input_id):
                     data_for_table = self.main_window.ui_db.get_experiments_by_date(input_id)
                     # data_for_table = vars(data_for_table)
@@ -118,7 +131,7 @@ class TableInformationFetchByParameter(QWidget):
         self.ui.tube_info_grid_layout.addLayout(h_layout, 0, 0)
 
         if not data_for_table:
-            self.text_qlabel_option.setText(f"Could not load data for {current_option} with id {input_id}")
+            self.text_qlabel_option.setText(f"Daten für {current_option} mit der ID {input_id} konnten nicht abgerufen werden.")
             pass
 
         try:
@@ -213,9 +226,6 @@ class TableInformationFetchByParameter(QWidget):
             dialog = CustomDialog(self)
             dialog.addContent(f"{ex}", ContentType.OUTPUT)
             dialog.show()
-
-    def show_all_tubes_of_experiment(self, row, column, key):
-        print(f"Key - {key} {row} {column}")
 
     def copy_to_clipboard(self, row, column):
         item = self.current_table.item(row, column)
