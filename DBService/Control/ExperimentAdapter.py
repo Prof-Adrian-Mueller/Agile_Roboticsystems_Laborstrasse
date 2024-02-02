@@ -28,9 +28,9 @@ class ExperimentAdapter:
             self.db.create_laborant_table()
             print("Tabelle 'Laborant' wurde erstellt.")
 
-        if not self.database_adapter.does_table_exist("GlobalIDs"):
+        if not self.database_adapter.does_table_exist("IDSequence "):
             self.db.create_global_ids_table()
-            print("Tabelle 'GlobalIDs' wurde erstellt.")
+            print("Tabelle 'IDSequence ' wurde erstellt.")
 
         if not self.database_adapter.does_table_exist("Tubes"):
             self.db.create_tubes_table()
@@ -102,7 +102,7 @@ class ExperimentAdapter:
 
     def get_global_id(self):
         with self.db as conn:
-            cursor = conn.execute("SELECT global_id FROM GlobalIDs")
+            cursor = conn.execute("SELECT global_id FROM IDSequence ")
             result = cursor.fetchone()
             if result and result[0] is not None:
                 return result[0]
@@ -114,15 +114,15 @@ class ExperimentAdapter:
         new_id = current_id + int(anzahl_neue_tubes)
         with self.db as conn:
             # Überprüfen, ob ein Eintrag vorhanden ist
-            cursor = conn.execute("SELECT COUNT(*) FROM GlobalIDs")
+            cursor = conn.execute("SELECT COUNT(*) FROM IDSequence ")
             exists = cursor.fetchone()[0] > 0
 
             if exists:
                 # Aktualisiere den vorhandenen Eintrag
-                conn.execute("UPDATE GlobalIDs SET global_id = ?", (new_id,))
+                conn.execute("UPDATE IDSequence  SET global_id = ?", (new_id,))
             else:
                 # Füge den ersten Eintrag hinzu
-                conn.execute("INSERT INTO GlobalIDs (global_id) VALUES (?)", (new_id,))
+                conn.execute("INSERT INTO IDSequence  (global_id) VALUES (?)", (new_id,))
 
             return new_id
     def get_experiment_by_id(self, exp_id):

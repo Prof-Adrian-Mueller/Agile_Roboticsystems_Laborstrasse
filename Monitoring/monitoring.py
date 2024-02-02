@@ -559,6 +559,23 @@ def tracker(tube_ids):
             cv2.destroyAllWindows()
 
 def experiment_zusammenfassung(live_tracking):
+    # anz_fehler=0
+    #  bemerkung=[ f"im Experiment{exp_nr } haben die Tubes " ]
+    #
+    # for tube in live_tracking:
+    #     if ((
+    #             datetime.datetime.now() - tube.lastStationTime).total_seconds() > ERROR_WAIT_TIME and tube.error == False):
+    #         anz_fehler+=1
+    #         bemerkung.append(str(tube.tubeID))
+    #
+    #
+    # bemerkung.append(" die station nicht erreicht")
+
+
+
+    # Methode aufrufen:update_experiment(self, exp_id, video_id, anz_fehler, bemerkung):
+
+
     # TODO check how many tube are correct, videoid
     # Tube(ID: 1, Tracking ID: 101, Last Station: Thymio, Last Station Time: 2024-01-28 18:51:05.595174, Left Station: False, Next Station: Thymio, Next Station Distance: None, Coordinates: None, Error: False)
     # Bsp : Exp Max1 hat 32 Tube mit 4 Fehler, anzahl_fehler = 4

@@ -22,9 +22,9 @@ ui_db = DBUIAdapter()
 # ui_db.get_latest_tube_by_exp_id("w1")
 # ui_db.get_anz_tubes_exp_id("w1")
 # ui_db.available_qrcode("w2")
-ui_db.update_experiment("Mustermann1_2024-1-25",0,1,"ein tube wurde ncht erkannt")
+ui_db.update_experiment("Mustermann1_2024-2-2",0,1,"ein tube wurde nicht erkannt")
 # Beispiel für das Einfügen eines Datensatzes
-# ui_db.insert_tracking_log(3, "Deckelstation", "20.06.23:12:14:10", "Thymio", "20.06.23:12:14:20", 10, "0:14:10")
+# ui_db.insert_tracking_log("Mustermann1_2024", 3,"Deckelstation", "20.06.23:12:14:10", "Thymio", "20.06.23:12:14:20", 10, "0:14:10")
 #
 # ui_db.insert_tracking_log("mustermann1_2024-1-21",3, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")
 # ui_db.insert_tracking_log(4, "Thymio", "20.06.23:12:14:10", "Deckelstation", "20.06.23:12:14:20", 10, "0:14:10")

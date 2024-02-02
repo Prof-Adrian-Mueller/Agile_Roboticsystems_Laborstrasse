@@ -7,6 +7,16 @@ __author__ = 'Wissam Alamareen'
 __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '18/12/2023'
+"""
+Die vorliegende Python-Datei implementiert die 'DatabaseAdapter'-Klasse, die als Schnittstelle für Datenbankoperationen dient.
+Sie verwendet die 'DatabaseConnection'-Klasse für die Verwaltung der SQLite-Datenbankverbindung.
+Die Klasse bietet Funktionen zum Einfügen, Abrufen und Verwalten von Experimenten, Plasmiden und Tubes in der Datenbank.
+
+
+Die Klasse enthält Methoden wie 'insert_tubes', 'get_all_tubes', 'insert_plasmid', 'add_experiment' und viele andere,
+die spezifische Operationen auf verschiedenen Tabellen der Datenbank durchführen.
+
+"""
 
 class DatabaseAdapter:
     def __init__(self, db):

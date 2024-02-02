@@ -3,18 +3,36 @@ __author__ = 'Wissam Alamareen'
 __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '18/12/2023'
+
+
+
+"""
+Die vorliegende Python-Datei definiert eine Klasse namens 'DatabaseConnection' für die Verwaltung einer SQLite-Datenbankverbindung.
+Die Klasse implementiert das Kontext-Management-Protokoll, um sicherzustellen, dass die Datenbankverbindung ordnungsgemäß geöffnet
+und geschlossen wird. Sie enthält auch Methoden zum Erstellen verschiedener Tabellen in der Datenbank,
+darunter 'Plasmid', 'IDSequence ', 'Experiment', 'Tubes', 'Laborant' und 'TrackingLog'.
+
+Die Klasse 'DatabaseConnection' dient als zentrales Werkzeug für die Kommunikation mit der Datenbank und bietet eine saubere 
+Schnittstelle für Datenbankoperationen.
+"""
+
 class DatabaseConnection:
     def __init__(self, db_name):
+        # Konstruktor, initialisiert die Datenbankverbindungsinformationen
         self.db_name = db_name
         self.conn = None
         self.cursor = None
 
     def __enter__(self):
+        # Methode für das Kontext-Management, öffnet die Datenbankverbindung
+
         self.conn = sqlite3.connect(self.db_name)
         self.cursor = self.conn.cursor()
         return self.conn
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # Methode für das Kontext-Management, schließt die Datenbankverbindung
+
         if self.conn:
             if exc_type or exc_val or exc_tb:  # If an error occurred, rollback any changes
                 self.conn.rollback()
@@ -36,6 +54,8 @@ class DatabaseConnection:
 
 
     def create_plasmid_table(self):
+        # Methode zur Erstellung der 'Plasmid'-Tabelle
+
         with self as conn:
             conn.execute('''
             CREATE TABLE IF NOT EXISTS Plasmid (
@@ -53,9 +73,11 @@ class DatabaseConnection:
             ''')
 
     def create_global_ids_table(self):
+        # Methode zur Erstellung der 'IDSequence '-Tabelle
+
         with self as conn:
             conn.execute('''
-            CREATE TABLE IF NOT EXISTS GlobalIDs (
+            CREATE TABLE IF NOT EXISTS IDSequence  (
                 global_id INTEGER PRIMARY KEY
             )
             ''')
@@ -85,7 +107,7 @@ class DatabaseConnection:
                 probe_nr INTEGER,
                 exp_id TEXT,
                 plasmid_nr TEXT,
-                FOREIGN KEY (exp_id) REFERENCES Experiment(exp_id),
+                FOREIGN KEY (exp_id) REFERENCES Experiment(exp_id) ON DELETE CASCADE,
                 FOREIGN KEY (plasmid_nr) REFERENCES Plasmid(plasmid_nr)
             )
             ''')

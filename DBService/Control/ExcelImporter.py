@@ -9,6 +9,9 @@ __version__ = '1.0'
 __last_changed__ = '18/12/2023'
 
 class ExcelImporter:
+    """ Die Klasse verwendet die pandas-Bibliothek zum Lesen der Excel-Datei und überprüft das Vorhandensein erforderlicher Spalten.
+        Die importierten Plasmid-Metadaten werden in Plasmid-Objekte umgewandelt und in die Datenbank eingefügt.
+    """
     def __init__(self, adapter,file_path):
         self.adapter=adapter
         self.file_path = file_path
