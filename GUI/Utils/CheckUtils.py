@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from GUI.Storage.CacheModel import CacheModel
+
 
 class CheckUtils:
 
@@ -18,3 +20,18 @@ class CheckUtils:
             return True
         except ValueError:
             return False
+
+
+def load_cache(cache):
+    try:
+        preferences = cache.load()
+        if preferences:
+            # Assuming preferences is a dictionary with the key "user_preferences"
+            user_prefs = preferences.get("user_preferences", {})
+            cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"),
+                                    language=user_prefs.get("language"))
+            print(cache_data)
+            return cache_data
+    except Exception as ex:
+        print(ex)
+    return None

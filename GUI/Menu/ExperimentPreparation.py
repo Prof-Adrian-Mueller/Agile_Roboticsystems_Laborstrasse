@@ -16,7 +16,7 @@ __last_changed__ = '03/12/2023'
 
 from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
     MainWindowSingleton
-from GUI.Utils.CheckUtils import CheckUtils
+from GUI.Utils.CheckUtils import CheckUtils, load_cache
 
 
 class ExperimentPreparation:
@@ -156,7 +156,7 @@ class ExperimentPreparation:
                     for plasmid, tubes_list in self.experiment_data.plasmid_tubes.items():
                         try:
                             self.ui_database.insert_tubes(tubes_list, self.experiment_data.experiment_id, plasmid)
-                            display_msg = f"Created Tubes successfully for {plasmid} : {tubes_list}. \n"
+                            display_msg = f"Es wurden erfolgreich Tubes erstellt für Plasmid [{plasmid}] : Tubes[{tubes_list}]. \n"
                             dialog.addContent(f"{display_msg}", ContentType.OUTPUT)
                             count_tubes.append(tubes_list)
                         except Exception as ex:
@@ -353,13 +353,13 @@ class ExperimentPreparation:
                                                            date=data['date'])
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
                 print(self.main_window.save_cache("exp_id", self.experiment_data.experiment_id))
-                self.main_window.cache_data = self.main_window.load_cache()
+                self.main_window.cache_data = load_cache(self.main_window.cache)
                 is_experiment_new = True
             else:
                 if exp_id_data.anz_tubes:
                     self.total_old_nr_of_tubes = len(self.ui_database.get_tubes_by_exp_id(experiment_id))
 
-                self.main_window.cache_data = self.main_window.load_cache()
+                self.main_window.cache_data = load_cache(self.main_window.cache)
                 if self.main_window.cache_data.experiment_id:
                     self.check_if_current_experiment(experiment_id, self.main_window.cache_data.experiment_id)
                 if not self.is_current_experiment:
@@ -373,7 +373,7 @@ class ExperimentPreparation:
                                                            date=data['date'])
                 self.current_experiment = CurrentExperimentSingleton(self.experiment_data.experiment_id)
 
-                self.main_window.cache_data = self.main_window.load_cache()
+                self.main_window.cache_data = load_cache(self.main_window.cache)
                 is_experiment_new = False
 
             all_tubes_of_exp = self.ui_database.get_tubes_by_exp_id(self.main_window.cache_data.experiment_id)

@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWi
                              QHBoxLayout)
 
 from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
+from GUI.Utils.CheckUtils import load_cache
 from GUI.Utils.FileUtils import FileUtils
 from GUI.Custom.button_back_design_test import CustomBackButton
 from PyQt6.QtWidgets import QApplication
@@ -233,7 +234,7 @@ class ExperimentTubesInfoDashboard(QWidget):
 
     def refresh_data(self):
         try:
-            self.main_window.cache_data = self.main_window.load_cache()
+            self.main_window.cache_data = load_cache(self.main_window.cache)
             if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
                                                        'experiment_id') and self.current_experiment.experiment_id is not None):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id

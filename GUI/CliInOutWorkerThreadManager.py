@@ -145,10 +145,12 @@ class CliInOutWorkerThreadManager(QWidget):
         try:
             output = self.process.readAllStandardOutput().data().decode().strip()
             if output.startswith("LIVE"):
+                print("_______ \n LIVE " + str(output) + "\n ----------")
                 message = output[len("LIVE "):].strip()
                 self.message_service.notify_observers(message)
             elif output.startswith("RESULT"):
                 message = output[len("RESULT "):].strip()
+                print("_______ \n Result "+str(output) + "\n ----------")
                 self.message_service.notify_observers(message)
             elif output.startswith("ERROR_DATA"):
                 message = output[len("ERROR_DATA "):].strip()
@@ -157,9 +159,12 @@ class CliInOutWorkerThreadManager(QWidget):
             elif output.startswith("ERROR_MESSAGE"):
                 message = output[len("ERROR_MESSAGE "):].strip()
                 print(message)
-                custom_dialog = CustomDialog()
+                custom_dialog = CustomDialog(self)
+                custom_dialog.add_titlebar_name("Error : Erfassung und Tracking")
                 custom_dialog.addContent(message, ContentType.ERROR)
                 custom_dialog.show()
+            elif output.startswith('MONITORING_COMPLETED'):
+                self.message_service.notify_observers('MONITORING_COMPLETED')
             elif len(output) < 1:
                 pass
             else:

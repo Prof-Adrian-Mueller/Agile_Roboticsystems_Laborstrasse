@@ -2,7 +2,7 @@ import os
 import sys
 
 from PyQt6 import QtCore
-from PyQt6.QtCore import QEvent, QRect, Qt
+from PyQt6.QtCore import QEvent, QRect
 from PyQt6.QtWidgets import QSizePolicy, QApplication, QMainWindow, QVBoxLayout, \
     QFileDialog, QStackedLayout, QTabWidget
 from PyQt6.QtWidgets import QWidget
@@ -11,14 +11,12 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.CliInOutWorkerThreadManager import CliInOutWorkerThreadManager
 from GUI.Custom.CustomDataTable import CustomDataTable
 from GUI.Custom.CustomDragDropWidget import DragDropWidget
-from GUI.Custom.CustomLiveWidget import CustomLiveWidget
 from GUI.Custom.CustomTitleBar import CustomTitleBar
 from GUI.Custom.DummyDataGenerator import DummyDataGenerator
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.LeftNavigation import LeftNavigation
 from GUI.Menu.DisplayPlasmidTubes import DisplayPlasmidTubes
 from GUI.Menu.ExperimentPreparation import ExperimentPreparation
-from GUI.Menu.ExperimentPreparationWidget import ExperimentPreparationWidget
 from GUI.Menu.ExperimentResultWidget import ExperimentResultWidget
 from GUI.Menu.HomePageDashboard import HomePageDashboard
 from GUI.Menu.QRCodesWidget import QRCodesWidget
@@ -32,10 +30,10 @@ __date__ = '01/12/2023'
 __version__ = '1.0'
 __last_changed__ = '04/01/2024'
 
-from GUI.Storage.BorgSingleton import TubesSingleton, CurrentExperimentSingleton, MainWindowSingleton
+from GUI.Storage.BorgSingleton import CurrentExperimentSingleton, MainWindowSingleton
 from GUI.Menu.experiment_tubes_info_view import ExperimentTubesInfoDashboard, ExperimentTubesDetails
 from GUI.Storage.Cache import Cache
-from GUI.Storage.CacheModel import CacheModel
+from GUI.Utils.CheckUtils import load_cache
 
 
 class MainWindow(QMainWindow):
@@ -52,7 +50,7 @@ class MainWindow(QMainWindow):
         self.tab_widget_home_dashboard = None
         self.cache = Cache("application_cache.json")
         try:
-            self.cache_data = self.load_cache()
+            self.cache_data = load_cache(self.cache)
             if self.cache_data:
                 if self.cache_data.experiment_id:
                     self.current_experiment = CurrentExperimentSingleton(self.cache_data.experiment_id)
@@ -164,20 +162,6 @@ class MainWindow(QMainWindow):
         value = {"experiment_id": value, "language": "en"}
         self.cache.save({f"{arg}": value})
 
-    def load_cache(self):
-        try:
-            preferences = self.cache.load()
-            if preferences:
-                # Assuming preferences is a dictionary with the key "user_preferences"
-                user_prefs = preferences.get("user_preferences", {})
-                cache_data = CacheModel(experiment_id=user_prefs.get("experiment_id"),
-                                        language=user_prefs.get("language"))
-                print(cache_data)
-                return cache_data
-        except Exception as ex:
-            print(ex)
-        return None
-
     def setupHomeDashboardView(self):
         try:
             # Create a QVBoxLayout for the main layout
@@ -245,6 +229,7 @@ class MainWindow(QMainWindow):
         stacked_layout.setCurrentIndex(1)
 
     def show_message_in_dialog(self, display_msg):
+        self.dialog.add_titlebar_name("Dashboard Info")
         self.dialogBoxContents.append(
             self.dialog.addContent(f"{display_msg}", ContentType.OUTPUT))
         self.dialog.show()

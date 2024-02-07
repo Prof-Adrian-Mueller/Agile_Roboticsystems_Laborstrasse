@@ -131,6 +131,10 @@ class TubeLayoutSingleton(BorgSingleton):
             self._shared_state['button_layouts'] = {}
         if 'station_info' not in self._shared_state:
             self._shared_state['station_info'] = defaultdict(lambda: [None, None, None])
+        if 'station_details' not in self._shared_state:
+            self._shared_state['station_details'] = {}
+        if 'more_button_layout' not in self._shared_state:
+            self._shared_state['more_button_layout'] = None
 
     def add_button_layout(self, tube_id, buttons):
         self._shared_state['button_layouts'][tube_id] = buttons
@@ -153,7 +157,48 @@ class TubeLayoutSingleton(BorgSingleton):
         # Retrieve station info for the given tube_id
         return self._shared_state['station_info'].get(tube_id)
 
+    def add_station_details(self, tube_id, station_details):
+        self._shared_state['station_details'][tube_id] = station_details
 
+    def get_station_details(self, tube_id):
+        return self._shared_state['station_details'].get(tube_id)
+
+    def set_more_button_layout(self, buttons):
+        """
+        Sets the layout for the "more" button, which likely shows additional buttons.
+
+        Args:
+            buttons (list): A list of button definitions for the "more" layout.
+        """
+        self._shared_state['more_button_layout'] = buttons
+
+    def get_more_button_layout(self):
+        """
+        Retrieves the layout for the "more" button.
+
+        Returns:
+            list: The list of button definitions for the "more" layout, or None if not set.
+        """
+        return self._shared_state['more_button_layout']
+
+
+class LiveDataResult(BorgSingleton):
+    def __init__(self):
+        super().__init__()
+        if not hasattr(self, 'live_data'):
+            self.live_data = {}
+
+    def add_data(self, key, value):
+        self.live_data[key] = value
+
+    def get_data(self, key):
+        return self.live_data.get(key)
+
+    def get_all_data(self):
+        return self.live_data
+
+
+## Usage Example
 if __name__ == "__main__":
     # Use cases test, could be ignored
     borg = BorgSingleton()
