@@ -20,7 +20,7 @@ class InterprocessCommunication:
     Process to be run by GUI. Could Send and Receive Message to GUI.
     """
 
-    def __init__(self, is_debug=True):
+    def __init__(self, is_debug=False):
         self.is_debug = is_debug
         self.message_queue = queue.Queue()
         self.is_running = True

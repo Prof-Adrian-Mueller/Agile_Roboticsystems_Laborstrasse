@@ -1,3 +1,4 @@
+import time
 from collections import deque
 
 from PyQt6.QtCore import QProcess
@@ -98,6 +99,16 @@ class CliInOutWorkerThreadManager(QWidget):
         if self.isProcessStarted():
             self.process.write('exit\n'.encode())
             self.ui.inputTextFromCli.clear()
+            # time.sleep(10)
+            # TODO fix
+            if self.process:
+                self.terminate_qprocess(self.process)
+
+    def terminate_qprocess(self, process):
+        if self.process is not None and self.process.state() != QProcess.NotRunning:
+            self.process.terminate()  # Send termination request
+            if not self.process.waitForFinished(5000):  # Wait up to 5000 ms (5 seconds) for the process to finish
+                self.process.kill()  # Forcefully kill the process if it didn't terminate gracefully
 
     def isProcessStarted(self):
         return self.process and self.process.state() == QProcess.ProcessState.Running
@@ -150,7 +161,7 @@ class CliInOutWorkerThreadManager(QWidget):
                 self.message_service.notify_observers(message)
             elif output.startswith("RESULT"):
                 message = output[len("RESULT "):].strip()
-                print("_______ \n Result "+str(output) + "\n ----------")
+                print("_______ \n Result " + str(output) + "\n ----------")
                 self.message_service.notify_observers(message)
             elif output.startswith("ERROR_DATA"):
                 message = output[len("ERROR_DATA "):].strip()
