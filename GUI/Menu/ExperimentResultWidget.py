@@ -7,6 +7,7 @@ from DBService.DBUIAdapter import DBUIAdapter
 from GUI.Custom.CustomDialog import CustomDialog, ContentType
 from GUI.Model.ExperimentResult import ExperimentResult
 from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
+from GUI.Utils.CheckUtils import load_cache
 from GUI.Utils.FileUtils import FileUtils
 
 
@@ -58,7 +59,7 @@ class ExperimentResultWidget(QWidget):
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         scroll_layout.addWidget(self.table_widget)
         self.current_experiment = CurrentExperimentSingleton()
-        self.main_window.cache_data = self.main_window.load_cache()
+        self.main_window.cache_data = load_cache(self.main_window.cache)
 
         if self.main_window.cache_data:
             if self.main_window.cache_data.experiment_id:

@@ -1,8 +1,0 @@
-tubeID,lastStation,leftStation,nextStation,nextStationDistance
-1,Start,False,Thymio,10.0
-2,Thymio,True,Deckelentnahme,5.0
-2,Thymio,False,Deckelentnahme,
-3,Deckelentnahme,True,End,0.0
-4,Thymio,True,Deckelentnahme,3.0
-4,Deckelentnahme,False,Deckelentnahme,
-5,Thymio,False,Deckelentnahme,

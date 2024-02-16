@@ -1,4 +1,6 @@
 """ Beinhaltet den Tracker, das Lesen der notwendigen Konfigwerte und die Klassen für die Tube, Station und das Log"""
+from asyncio.log import logger
+
 from Tracker_Config.path_configuration import PathConfiguration
 
 """ Inhaltsverzeichnis:
@@ -57,6 +59,7 @@ telegramConf = config_object["Telegram"]
 
 # Lese Camera Ips aus der Config Datei und fügt sie in die URLS des Videostreams ein
 RTSP_URL = 'rtsp://admin:admin@' + cameraConf["cameraIp"] + ':554/11'
+
 
 # Lese Tracking Config Werte aus
 STATION_NAMES = ast.literal_eval(trackerConf["station_names"])
@@ -200,6 +203,8 @@ def tracker(tube_ids):
 
     # Lade Yolo Weights
     model = YOLO(os.getcwd() + TRACKING_WEIGHTS_PATH)
+    print("------------------------------------------------------------")
+    print(model)
 
     # TODO correct folder format
 
@@ -211,6 +216,7 @@ def tracker(tube_ids):
     # VideoCapture() ist eine Klasse aus tracker_utils, die immer den aktuellsten Frame zurückgibt
 
     # aus Deckenkamera oder Video, gewünschte Zeile nutzen
+    print("RTSP_URL " + str(RTSP_URL))
     cap = VideoCapture(RTSP_URL)
     # cap = cv2.VideoCapture("C:\\Users\\Fujitsu\\Documents\\20230809_121620.mp4")
     # cap = cv2.VideoCapture("C:\\Users\\Mirko\\Downloads\\20230809_121620.mp4")
@@ -245,15 +251,21 @@ def tracker(tube_ids):
                             4, (3840,
                                 2160))  # falls entzerrung ein pixel kleiner. muss immer mit Bildgröße übereinstimmen ansonsten ist das Video leer
 
+    if video:
+        print("Monitoring Video Konfiguration fertig!")
     cv2.namedWindow("Monitoring", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Monitoring", 1920, 1080)
+    cv2.resizeWindow("Monitoring", 1200, 1080)
+    # print(video)
 
     # zum Speichern der Log.csv Datei
     with open(DIRECTORY + '\\log.csv', 'w', newline='') as f:
+        print("log.csv is loaded")
+        f.write("Test")
         writer = csv.writer(f)
         writer.writerow(headerLog)
         # zum Speichern der log_detail.csv Datei
         with open(DIRECTORY + '\\log_detail.csv', 'w', newline='') as f2:
+            print("log_detail.csv is loaded")
             writer2 = csv.writer(f2)
             writer2.writerow(headerLogDetail)
             # für jeden Frame
@@ -274,24 +286,35 @@ def tracker(tube_ids):
                     cap = VideoCapture(RTSP_URL)
                     continue
 
+                if cap:
+                    print(str(cap) + "- Cap fertig!")
+
                 # entzerre frame mit Kameramatrix,
                 # aus performance gründen auskommentiert, fals gewünscht in model.track() die source auf dst stellen
                 dst = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
                 x, y, w, h = roi
                 dst = dst[y:y + h, x:x + w]
-
+                print("Starting to track models ...")
+                tracker_botsort = load_yml("botsort_custom.yaml")
                 # Tracking für den aktuellen Frame
-                track = model.track(source=img, conf=0.3, iou=0.3, tracker="botsort_custom.yaml", stream=True
+                track = model.track(source=img, conf=0.3, iou=0.3, tracker=tracker_botsort, stream=True
                                     , save_txt=False, show=False, imgsz=1920,
                                     device='cpu', save=False,
                                     persist=True)  # bei vorhandener Nvidia Grafikkarte device auf 0 setzen
+
+                # if results:
+                #     print("---------------- Tracking Results --------------")
+                #     print(str(results))
                 # generator to list
                 for results in track:
 
                     # fängt neue Tracking ID ab und weist ihn der der richtigen Tube zu
                     for result in results:
-                        detections = sv.Detections.from_yolov8(result)
-                        detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
+                        if result is not None and result.boxes.id is not None:
+                            detections = sv.Detections.from_yolov8(result)
+                            detections.tracker_id = result.boxes.id.cpu().numpy().astype(int)
+                        else:
+                            print("ERROR_MESSAGE No detection or ID is None")
                         if not any(r.trackingID == detections.tracker_id for r in live_tracking) and not any(
                                 s.trackingID == detections.tracker_id for s in stations) and not start:
                             coords = result.boxes.xywh.tolist()[0]
@@ -511,7 +534,7 @@ def tracker(tube_ids):
                                             station.coords = newCoords
 
                 writer2.writerow("")
-
+                print("Writing Frame in File")
                 # schreibe Frame in Datei
                 im_array = results.plot()  # plot a BGR numpy array of predictions
                 cv2.imshow("Monitoring", im_array)
@@ -535,13 +558,15 @@ def tracker(tube_ids):
                         id1, id2 = index
                         tube = Tube(id1, id2)
                         live_tracking.append(Tube(id1, id2))
-
-                        # für Startstation einmal zu Beginn eintragen
-                        stations[0].tubes.append(tube)
+                        if len(stations) > 0:
+                            stations[0].tubes.append(tube)
+                        else:
+                            # Handle the case where there are no stations
+                            print("No stations available to append the tube")
 
                 experiment_zusammenfassung(live_tracking)
                 # prüfe für jede Tube
-
+                print("Almost Done, Evaluating ...")
                 for tube in live_tracking:
 
                     # Schreibe Warnung über Telegram, wenn Wait_Time überschritten
@@ -560,6 +585,17 @@ def tracker(tube_ids):
             # beende alle Fenster
             cv2.destroyAllWindows()
 
+
+def load_yml(filename):
+    """Load and return the configuration from the ini file."""
+    script_dir = os.path.dirname(__file__)
+    ini_path = os.path.join(script_dir, filename)
+
+    if not os.path.exists(ini_path):
+        logger.error(f"Config file not found: {ini_path}")
+        raise FileNotFoundError(f"Config file not found: {ini_path}")
+
+    return ini_path
 def experiment_zusammenfassung(live_tracking):
     # anz_fehler=0
     #  bemerkung=[ f"im Experiment{exp_nr } haben die Tubes " ]

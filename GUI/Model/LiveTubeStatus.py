@@ -36,3 +36,25 @@ class FinalTubeStatus:
             "duration": self.duration,
             "video_timestamp": self.video_timestamp
         })
+
+    def __iter__(self):
+        # Example: yield each attribute value
+        yield self.tube_id
+        yield self.start_station
+        yield self.start_station_time
+        yield self.end_station
+        yield self.end_station_time
+        yield self.duration
+        yield self.video_timestamp
+
+    def to_dict(self):
+        # Convert the object's attributes to a dictionary
+        return {
+            'tube_id': self.tube_id,
+            'start_station': self.start_station,
+            'start_station_time': self.start_station_time,
+            'end_station': self.end_station,
+            'end_station_time': self.end_station_time,
+            'duration': self.duration,
+            'video_timestamp': self.video_timestamp,
+        }

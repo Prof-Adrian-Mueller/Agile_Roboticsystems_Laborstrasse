@@ -14,9 +14,10 @@ __last_changed__ = '01/12/2023'
 
 from GUI.Custom.CustomDialog import ContentType, CustomDialog
 from GUI.Menu.QRCodesWidget import QRCodesWidget
-from GUI.Model.LiveTubeStatus import LiveTubeStatus
+from GUI.Model.LiveTubeStatus import LiveTubeStatus, FinalTubeStatus
 from GUI.Storage.BorgSingleton import ExperimentSingleton, TubesSingleton, CurrentExperimentSingleton, \
     TubeLayoutSingleton
+from GUI.Utils.CheckUtils import load_cache
 
 
 class CustomLiveWidget(QWidget):
@@ -35,9 +36,9 @@ class CustomLiveWidget(QWidget):
 
         h_label_layout = QHBoxLayout()
         probe_label = QLabel("Tube Nr.")
-        start_label = QLabel("Beladung")
-        middle_label = QLabel("Thymio")
-        end_label = QLabel("Deckelentnahme")
+        start_label = QLabel("Startstation")
+        middle_label = QLabel("Zwischenstation")
+        end_label = QLabel("Endstation")
         probe_label.setObjectName("live_row_label")
         start_label.setObjectName("live_row_label")
         middle_label.setObjectName("live_row_label")
@@ -86,7 +87,7 @@ class CustomLiveWidget(QWidget):
 
     def refresh_data(self):
         try:
-            self.main_window.cache_data = self.main_window.load_cache()
+            self.main_window.cache_data = load_cache(self.main_window.cache)
             if self.main_window.cache_data:
                 tube_info_data = self.main_window.ui_db.adapter.get_tubes_by_exp_id(
                     self.main_window.cache_data.experiment_id)
@@ -167,6 +168,7 @@ class CustomLiveWidget(QWidget):
         more_btn.clicked.connect(lambda: self.more_btn_layout(tube))
         h_layout.insertStretch(h_layout.indexOf(more_btn), 1)
         h_layout.addWidget(more_btn)
+        # tube_layout_singleton.add_button_layout(tube_nr, more_btn)
 
     def more_btn_layout(self, tube):
         global layout_field
@@ -174,8 +176,11 @@ class CustomLiveWidget(QWidget):
             # self.main_window.removeDialogBoxContents()
             self.dialog = CustomDialog(self.main_window)
             self.dialog.add_titlebar_name("Details")
+            tube_station_info = TubeLayoutSingleton()
             if tube:
                 for key, value in tube.items():
+                    print(tube)
+
                     if key == 'qr_code':
                         pixmap, location = self.qr_code_widget.generate_micro_qr_code(value)
                         if pixmap is not None:
@@ -185,12 +190,53 @@ class CustomLiveWidget(QWidget):
                             self.dialog.addContent(f"QR : {value}", ContentType.OUTPUT))
                         self.dialogBoxContents.append(
                             self.dialog.addContent(layout_field, ContentType.OUTPUT))
+                        self.dialogBoxContents.append(
+                            self.dialog.addContent(layout_field, ContentType.OUTPUT))
+                    elif key == 'probe_nr':
+                        details_result = tube_station_info.get_station_details(str(value))
+                        print(details_result)
+                        self.display_station_details(details_result)
                     else:
                         self.dialogBoxContents.append(
                             self.dialog.addContent(f"{key.capitalize()} : {value}", ContentType.OUTPUT))
+
                 self.dialog.show()
         except Exception as ex:
             print(ex)
+
+    def display_station_details(self, final_tube_status):
+        # Create a widget to hold all the detail labels
+        details_widget = QWidget()
+        details_layout = QVBoxLayout(details_widget)
+
+        details_keys = ['tube_id', 'start_station', 'start_station_time', 'end_station', 'end_station_time', 'duration',
+                        'video_timestamp']
+
+        for key in details_keys:
+            # Use getattr to safely get attributes from the object, with a default of None if not found
+            value = getattr(final_tube_status, key, None)
+            if value is not None:
+                # Create a label for the detail
+                detail_label = QLabel(f"{key.replace('_', ' ').title()}: {value}")
+                detail_label.setWordWrap(True)  # Enable word wrap for longer texts
+                details_layout.addWidget(detail_label)
+
+            if key == 'start_station':
+                if not value:
+                    detail_label = QLabel("Tube konnte keine Stationen erreichen!")
+                    detail_label.setWordWrap(True)  # Enable word wrap for longer texts
+                    details_layout.addWidget(detail_label)
+                    self.dialogBoxContents.append(self.dialog.addContent(details_widget, ContentType.ERROR))
+
+            if key == 'end_station':
+                if not value:
+                    detail_label = QLabel("Tube konnte die Endstation nicht erreichen!")
+                    detail_label.setWordWrap(True)  # Enable word wrap for longer texts
+                    details_layout.addWidget(detail_label)
+                    self.dialogBoxContents.append(self.dialog.addContent(details_widget, ContentType.ERROR))
+
+        # Add the details_widget to the dialog
+        self.dialogBoxContents.append(self.dialog.addContent(details_widget, ContentType.OUTPUT))
 
     def show_station_info(self, station, tube_nr):
         try:
@@ -218,6 +264,7 @@ class CustomLiveWidget(QWidget):
         except Exception as ex:
             station_dialog = CustomDialog(self.main_window)
             station_dialog.add_titlebar_name(f"Station {station} of Tube {tube_nr} Status")
+            station_dialog.addContent("Keine Daten verfügbar", ContentType.OUTPUT)
             station_dialog.addContent(f"{ex}", ContentType.ERROR)
             station_dialog.show()
 

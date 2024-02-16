@@ -1,19 +1,26 @@
 import json
 import re
+import time
 from typing import Dict
 
 import pandas as pd
 
 from DBService.DBUIAdapter import DBUIAdapter
+from GUI import Utils
 from GUI.Model.LiveTubeStatus import LiveTubeStatus, FinalTubeStatus
-from GUI.Storage.BorgSingleton import TubeLayoutSingleton, MainWindowSingleton, CurrentExperimentSingleton
+from GUI.Storage.BorgSingleton import TubeLayoutSingleton, MainWindowSingleton, CurrentExperimentSingleton, \
+    LiveDataResult, ExperimentSingleton
+from GUI.Storage.Cache import Cache
+from GUI.Utils.CheckUtils import CheckUtils, load_cache
 from GUI.Utils.LiveObservable import LiveObserver
 
 
 class LiveViewMessageDisplay(LiveObserver):
     def __init__(self):
+
         self.live_data = {}
-        self.final_results = {}
+        self.final_results = LiveDataResult()
+        self.ui_db = DBUIAdapter()
 
     def notify(self, message):
         global tube_status
@@ -36,18 +43,25 @@ class LiveViewMessageDisplay(LiveObserver):
             except ValueError as e:
                 # Handle parsing or processing errors
                 print(f"Error processing data: {str(e)}")
+        elif 'MONITORING_COMPLETED' in message:
+            print("validating ...")
+            self.validate_end_result()
         else:
             # Unrecognized message format
             print("Unrecognized message format.")
-        print(f"Received message LiveViewMessageDisplay: {tube_status}")
+        # print(f"Received message LiveViewMessageDisplay: {tube_status}")
 
     def save_result_in_db(self, final_result):
-        print("TODO Save in DB " + str(final_result))
         main_singleton = MainWindowSingleton()
-        ui_db = DBUIAdapter()
+
         current_exp_id = CurrentExperimentSingleton()
+        self.update_final_result(final_result)
+        self.final_results.add_data(final_result.tube_id, final_result)
         # probe_nr, Startstation, Startzeit, Zielstation, Zielzeit, Dauer, Zeitstempel
-        ui_db.insert_tracking_log(current_exp_id.experiment_id, final_result.tube_id, final_result.start_station, final_result.start_station_time, final_result.end_station, final_result.end_station_time, final_result.duration, final_result.video_timestamp)
+        self.ui_db.insert_tracking_log(current_exp_id.experiment_id, final_result.tube_id, final_result.start_station,
+                                       final_result.start_station_time, final_result.end_station,
+                                       final_result.end_station_time, final_result.duration,
+                                       final_result.video_timestamp)
 
     def update_button_color(self, tube_status, color):
         tube_layout = TubeLayoutSingleton()
@@ -60,6 +74,10 @@ class LiveViewMessageDisplay(LiveObserver):
                 tube_layout._shared_state['station_info'].setdefault(str(tube_status.tube_id), [None, None, None])
                 tube_layout._shared_state['station_info'][str(tube_status.tube_id)][button_index] = {
                     "name": f"Station {button_index}", "details": f"{tube_status}"}
+
+    def update_final_result(self, final_result):
+        tube_layout = TubeLayoutSingleton()
+        tube_layout.add_station_details(final_result.tube_id, final_result)
 
     @staticmethod
     def parse_live_message(message):
@@ -105,9 +123,44 @@ class LiveViewMessageDisplay(LiveObserver):
             raise ValueError(f"Error processing data: {str(e)}")
 
     def validate_end_result(self):
-        for tube_id, result_status in self.final_results.items():
-            live_status = self.live_data.get(tube_id)
-            if live_status and not live_status.left_station and result_status.end_station != "End":
-                self.update_button_color(result_status, "#FF0000")  # Red for failure or incomplete
-            else:
-                self.update_button_color(result_status, "#4CAF50")  # Green for success
+        try:
+            print("validate_end_result")
+
+            # Assuming CurrentExperimentSingleton provides current experiment ID in some manner
+            current_exp = CurrentExperimentSingleton()
+            experiment_id = current_exp.experiment_id if current_exp.experiment_id else \
+            load_cache(Cache("application_cache.json"))["experiment_id"]
+
+            if experiment_id:
+                tubes = self.ui_db.get_tubes_by_exp_id(experiment_id)
+                if tubes:
+                    print("tubes")
+                    print(tubes)
+
+                for tube in tubes:
+                    tube_id = tube['probe_nr']
+                    if self.final_results.get_data(str(tube_id)):
+                        print(f"{tube_id}: Success")
+                    else:
+                        print(f"{tube_id}: Failed")
+                        tube_layout = TubeLayoutSingleton()
+                        buttons = tube_layout.get_button_layout(tube_id)
+                        if buttons:
+                            color = "#FF0000"
+                            buttons[0].setStyleSheet(f"QPushButton {{ background-color: {color}; }}")
+                            buttons[1].setStyleSheet(f"QPushButton {{ background-color: {color}; }}")
+                            buttons[2].setStyleSheet(f"QPushButton {{ background-color: {color}; }}")
+                            final_tube_status = FinalTubeStatus(tube_id, None, None, None, None, None, None)
+                            self.update_final_result(final_tube_status)
+
+        except Exception as ex:
+            print(ex)
+        #         self.update_button_color(result_status, "#FF0000")  # Red for failure or incomplete
+        #     else:
+        #         self.update_button_color(result_status, "#4CAF50")  # Green for success
+        # # for tube_id, result_status in self.final_results.get_all_data():
+        #     live_status = self.final_results.get_data(tube_id)
+        #     if live_status and not live_status.left_station and result_status.end_station != "End":
+        #         self.update_button_color(result_status, "#FF0000")  # Red for failure or incomplete
+        #     else:
+        #         self.update_button_color(result_status, "#4CAF50")  # Green for success

@@ -10,6 +10,7 @@ from PyQt6.QtPrintSupport import QPrinter
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QScrollArea, QHBoxLayout, QPushButton, QSizePolicy, QFrame
 
 from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
+from GUI.Utils.CheckUtils import load_cache
 
 
 class QRCodesWidget(QWidget):
@@ -106,7 +107,7 @@ class QRCodesWidget(QWidget):
         print("refresh")
         # TODO add data to the list . here load the experiment, load all the tubes of exp and show using displayQr
         try:
-            self.main_window.cache_data = self.main_window.load_cache()
+            self.main_window.cache_data = load_cache(self.main_window.cache)
             if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
                                                        'experiment_id') and self.current_experiment.experiment_id is not None):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id

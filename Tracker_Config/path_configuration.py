@@ -37,6 +37,17 @@ class PathConfiguration:
         # self.validate_configuration(config_object)
         return ini_path
 
+    def load_yml(self, filename):
+        """Load and return the configuration from the ini file."""
+        script_dir = os.path.dirname(__file__)
+        ini_path = os.path.join(script_dir, filename)
+
+        if not os.path.exists(ini_path):
+            self.logger.error(f"Config file not found: {ini_path}")
+            raise FileNotFoundError(f"Config file not found: {ini_path}")
+
+        return ini_path
+
     def validate_configuration(self, config):
         """Validate the loaded configuration."""
         # Example validation: check for a specific section
