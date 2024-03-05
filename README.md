@@ -1,4 +1,7 @@
-# Agile_Roboticsystems_Laborstrasse
+
+#![git](https://github.com/Prof-Adrian-Mueller/Agile_Roboticsystems_Laborstrasse/assets/136337224/a3d2050a-7dae-4e77-876f-ed539fcca5f0)
+
+Agile_Roboticsystems_Laborstrasse
 Repository für die automatische Laborstraße des Agile Roboticsystems Projekt, 2023
 
 Das System besteht aus 3 Teilprojekten:
