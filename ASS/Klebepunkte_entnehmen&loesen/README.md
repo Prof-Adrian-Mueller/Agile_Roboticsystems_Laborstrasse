@@ -1,0 +1,7 @@
+Die Micro-QR-Codes wurden in einem handelsüblich Laserprinter auf "classic white Recycling Papier”, 80 g/m², A4, 70 ISO gedruckt. 
+Für den abgelegten Code zum Schneiden eines Punktes wurde das Programm LaserGRBL (Version 7.8.0) verwendet. Der Nullpunkt liegt unten links (an der Ecke des Controllers). Der Offset zum Schneidepunkt, auf den auch der Dobot Lite fährt, ist im Code integriert. Die Parameter für den Lasercutter sind: 1000 mm/min, 25 %, Ausschneiden der QR-Codes möglich, halten noch minimal fest. Bei Suction lösen sie sich. Das verwendete Papier ist “classic white Recycling Papier”, 80 g/m², A4, 70 ISO. 
+Eine Druckvorlage mit den Micro-QR-Codes und den dazugehörigen Nummern zum überprüfen der Druckqualität mit der Kamera leigt vor. 
+In DobotLab (Desktop-Version: 2.3.14-x86-64) wurden all TeachIn-Programme erstellt und auch wieder zu den Demo abgespielt. Die aktuellste Version leigt in Git. 
+Alle im Labor vorhandenen Klebestoffe (flüssige, Prit, etc.) halten den Durchgang in der Zentrifuge bei maximaler Umdrehung aus. 
+Die Option einen Lack zum Transfer der Micro-QR-Codes direkt auf die Tubes funktionierte nicht. Zum einen liegt es, an der zu langen Einwirkdauer und dem aufwendigen nachfolgenden Entfernen der Papierreste. 
+Beim Druck von Micro-QR-Codes auf eine Klebefolie hat das Ausschneiden der Klebepunkte ohne Durchtrennen der Trägerfolie funktioniert. Die Parameter waren: Druchtrennen 25 % Power, 800 mm/min und 1 Durchgang; Brennen der QR-Codes: 2250 mm/min und 25 %; Bild in Linie mit “Durchreichen” in LaserGRBL erstellt, DPI 300.
