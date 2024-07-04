@@ -16,3 +16,5 @@ Abmessungen des benutzten Eppigestells:
 Abmessungen Platte
   Breite 245,5 mm
   Länge 269,5 mm
+
+Die Plattform wurde aus 5mm-starkem PVC mit Hilfe des Lasercutters geschnitten. Um ein Durchschneiden der darunter liegenden Tischplattte zu verhindern, wurde nur zu zwei Driiteln druchgebrannt und den Rest mit einem Cuttermesser angeritzt bis es leicht abzubrechen war. Ein Abluftsystem war beim Lasercutten nicht vorhanden, ist aber zu empfehlen. 
