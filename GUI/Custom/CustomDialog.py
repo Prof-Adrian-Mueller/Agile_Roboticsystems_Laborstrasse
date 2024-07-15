@@ -1,8 +1,9 @@
 from enum import Enum
 from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel, QScrollArea, QWidget, QHBoxLayout, \
-    QLineEdit
+    QLineEdit, QGraphicsDropShadowEffect
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon, QPixmap, QColor
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QPushButton, QScrollArea, QWidget
 import GUI.resource
 from PyQt6 import sip
 
@@ -16,19 +17,48 @@ class CustomTitleBarForDialogBox(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.layout = QHBoxLayout(self)
-        # self.titleLabel = QLabel("")
-        # self.layout.addWidget(self.titleLabel)
-        self.layout.addStretch()
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
         self._dragging = False
         # Custom Styles
         self.setStyleSheet("""
-            CustomTitleBar {
-                background-color: #808080;  # Gray background
-                color: white;  # White text
+                background-color: #FFFFFF; 
+                color: black;  # White text
                 font-size: 14px;  # Adjust font size as needed
                 font-weight: bold;  # Bold font
+        """)
+
+        self.title = QLabel("")
+        self.layout.addWidget(self.title)
+        self.title.setStyleSheet("background-color:transparent; font-weight: bold;")
+
+        self.layout.addStretch()
+
+        # Close 'X' Icon
+        self.close_icon = QLabel("X", self)
+        self.close_icon.setObjectName('closeIconDialog')  # Use object name for specific styling
+        self.close_icon.setStyleSheet("""
+            QLabel#closeIconDialog {
+                font-size: 12px; /* Larger font size for the 'X' */
+                color: #818181; /* White color for the close icon */
+                margin-right: 10px; /* Spacing from the right edge */
+                cursor: pointer; /* Change cursor to indicate clickable */
+                padding: 5px 8px; /* Padding to make the 'X' look centered and increase clickable area */
+                border-radius: 10px; /* Rounded corners */
+                border: 1px solid #fef2d7; /* White border to match the 'X' */
+                background-color: transparent; /* Transparent background by default */
+            }
+            QLabel#closeIconDialog:hover {
+                background-color: #818181; /* Grey background on hover */
+                color: #FFFFFF;
             }
         """)
+
+        self.close_icon.mouseReleaseEvent = self.closeEvent
+        self.layout.addWidget(self.close_icon, alignment=Qt.AlignmentFlag.AlignRight)
+
+    def closeEvent(self, event):
+        self.parent().close()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -48,7 +78,8 @@ class CustomTitleBarForDialogBox(QWidget):
 
 class ContentType(Enum):
     INPUT = 1,
-    OUTPUT = 2
+    OUTPUT = 2,
+    ERROR=3
 
 
 class CustomDialog(QDialog):
@@ -59,6 +90,7 @@ class CustomDialog(QDialog):
 
     def __init__(self, parent=None, max_percentage=0.75):
         super().__init__(parent, Qt.WindowType.FramelessWindowHint)
+
         self.setMinimumWidth(600)
         self.scroll_area = None
         self.layout = None
@@ -69,16 +101,43 @@ class CustomDialog(QDialog):
 
     def init_ui(self):
         self.layout = QVBoxLayout(self)
+        self.setStyleSheet("background-color: transparent;")
         self.setStyleSheet("""
             QDialog {
-                border: 1px solid #5B5B5B;
                 background-color: #FFFFFF;
+                border-radius: 8px; 
+                border: 1px solid #F2F0EB;
+            }
+            QWidget {
+                background-color: #FFFFF;
+            }
+            QPushButton {
+                border-radius: 15px; 
+                padding: 10px 20px; 
+                font-size: 16px; 
+                margin: 5px; 
+                border: 1px solid #F2F0EB; 
+                background:color: #FFFFFF;
+            }
+            QPushButton#closeButton {
+                background-color: #FF3B30; 
+                color: white;
+            }
+            QPushButton#saveButton {
+                background-color: #34C759; 
+                color: white;
+            }
+            QScrollArea {
+                border: none; /* Remove scroll area border */
             }
         """)
+
         self.row_widgets = []
+
         # Custom Title Bar
         self.titleBar = CustomTitleBarForDialogBox(self)
         self.layout.addWidget(self.titleBar)
+        self.add_titlebar_name("Custom Title Bar")
 
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -88,11 +147,12 @@ class CustomDialog(QDialog):
         self.scroll_area.setWidgetResizable(True)
         self.layout.addWidget(self.scroll_area)
 
-        # Close Button
-        self.close_button = QPushButton("Close", self)
-        self.close_button.clicked.connect(self.hide)
-        self.layout.addWidget(self.close_button, alignment=Qt.AlignmentFlag.AlignRight)
-
+        # Apply shadow effect
+        self.shadow_effect = QGraphicsDropShadowEffect(self)
+        self.shadow_effect.setBlurRadius(20)
+        self.shadow_effect.setColor(QColor(0, 0, 0, 80))
+        self.shadow_effect.setOffset(2, 2)
+        self.setGraphicsEffect(self.shadow_effect)
         # Update the size of the dialog dynamically
         self.update_size()
 
@@ -106,6 +166,9 @@ class CustomDialog(QDialog):
 
             self.scroll_area_layout.removeWidget(row_widget)
             row_widget.deleteLater()
+
+    def add_titlebar_name(self, name):
+        self.titleBar.title.setText(name)
 
     def removeItems(self, row_data):
         """
@@ -124,23 +187,15 @@ class CustomDialog(QDialog):
                     self.row_widgets.remove(row_widget)
 
     def addContent(self, content, content_type=ContentType):
+        global label
         row_widget = QWidget()
         row_box = QHBoxLayout()
-        if content_type == ContentType.OUTPUT:
-            label = QLabel(content)
-            label.setWordWrap(True)
-            row_box.addWidget(label)
+        if content_type == ContentType.ERROR:
+            row_widget.setStyleSheet("QLabel { color: red }")
+            self.content_addition_template(content, row_box)
 
-            # Create and configure the copy button
-            copy_button = QPushButton("")
-            icon1 = QIcon()
-            icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
-            copy_button.setIcon(icon1)
-            copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
-            copy_button.setFixedHeight(30)
-            copy_button.setFixedWidth(30)
-            # Add the copy button to the horizontal layout
-            row_box.addWidget(copy_button)
+        if content_type == ContentType.OUTPUT:
+            self.content_addition_template(content, row_box)
 
         elif content_type == ContentType.INPUT:
             label = QLabel(content, self)
@@ -155,10 +210,33 @@ class CustomDialog(QDialog):
         # Set the layout for the row widget
         row_widget.setLayout(row_box)
 
+
         # Add the row widget to the scroll area's layout
         self.scroll_area_layout.addWidget(row_widget)
         self.row_widgets.append(row_widget)
         return row_widget
+
+    def content_addition_template(self, content, row_box):
+        row_widget = QWidget()
+        if isinstance(content, str):
+            # If the content is a string, create a label and a copy button
+            label = QLabel(content)
+            label.setWordWrap(True)
+            row_box.addWidget(label)
+
+            copy_button = QPushButton("")
+            icon1 = QIcon()
+            icon1.addPixmap(QPixmap(":/icons/img/contentcopy.svg"), QIcon.Mode.Normal, QIcon.State.Off)
+            copy_button.setIcon(icon1)
+            copy_button.clicked.connect(lambda: QApplication.clipboard().setText(content))
+            copy_button.setFixedHeight(30)
+            copy_button.setFixedWidth(30)
+            row_box.addWidget(copy_button)
+        else:
+            row_box.addWidget(content)
+        row_widget.setLayout(row_box)
+        self.scroll_area_layout.addWidget(row_widget)
+        self.row_widgets.append(row_widget)
 
     def emitTextChanged(self, text):
         self.lineEditTextChanged = text

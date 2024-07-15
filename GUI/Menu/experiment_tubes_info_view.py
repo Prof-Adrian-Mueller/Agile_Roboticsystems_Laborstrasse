@@ -1,12 +1,14 @@
-from PyQt6.QtCore import pyqtSignal, Qt, QSize, QTimer
+from PyQt6.QtCore import pyqtSignal, Qt, QTimer
 from PyQt6.QtGui import QColor, QPalette, QIcon, QPixmap, QCursor
 from PyQt6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QAbstractItemView, QHeaderView, QApplication, QMessageBox, QSystemTrayIcon, QToolTip,
+                             QAbstractItemView, QHeaderView, QToolTip,
                              QHBoxLayout)
-from PyQt6.uic.properties import QtGui
 
-from GUI.Storage.BorgSingleton import ExperimentSingleton, CurrentExperimentSingleton
-from GUI.button_back_design_test import CustomBackButton
+from GUI.Storage.BorgSingleton import CurrentExperimentSingleton
+from GUI.Utils.CheckUtils import load_cache
+from GUI.Utils.FileUtils import FileUtils
+from GUI.Custom.button_back_design_test import CustomBackButton
+from PyQt6.QtWidgets import QApplication
 
 
 class ExperimentTubesDetails(QWidget):
@@ -34,7 +36,7 @@ class ExperimentTubesDetails(QWidget):
         self.back_button.setGeometry(50, 20, 100, 50)
         self.back_button.clicked.connect(self.on_back_clicked)
 
-        # layout.addWidget(back_button, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignRight)
 
         layout = QVBoxLayout(self)
         self.title = QLabel('Experiment Details')
@@ -75,7 +77,8 @@ class ExperimentTubesDetails(QWidget):
 
             # Reset the table rows
             self.details_table.setRowCount(10)
-            self.main_window.title_bar.add_back_btn(self.back_button)
+            # self.main_window.title_bar.add_back_btn(self.back_button)
+            self.layout().addWidget(self.back_button)
 
             # Populate the table with the data
             fields = ['Probe Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
@@ -132,11 +135,12 @@ class ExperimentTubesInfoDashboard(QWidget):
         layout = QVBoxLayout(self)
         # Header area
         h_layout = QHBoxLayout()
-        header_label = QLabel('Experiments Overview')
+        header_label = QLabel('Übersicht über das aktuelle Experiment')
         h_layout.addWidget(header_label)
 
         h_layout.addStretch(1)  # This will push the following widgets to the right
 
+        self.create_export_btn(h_layout)
         self.create_refresh_btn(h_layout)
 
         layout.addLayout(h_layout)
@@ -148,7 +152,7 @@ class ExperimentTubesInfoDashboard(QWidget):
         # Creates the experiments table
         self.experiments_table = QTableWidget(row, 10)
         self.experiments_table.setHorizontalHeaderLabels(
-            ['Probe Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
+            ['Tube Nr', 'QR Code', 'Plasmid Nr', 'Vektor', 'Insert', 'Name', 'Vorname', 'Exp ID', 'Datum',
              'Anz Fehler'])
 
         header = self.experiments_table.horizontalHeader()
@@ -158,6 +162,12 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         # Set the last column to resize to contents
         header.setSectionResizeMode(9, QHeaderView.ResizeMode.ResizeToContents)
+
+        self.empty_label = QLabel("Die Tabelle ist leer.")
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty_label.setStyleSheet("color: gray; font-style: italic;font-sze:12px;")
+        self.empty_label.setGeometry(self.experiments_table.geometry())  # Position the label
+        layout.addWidget(self.empty_label)
 
         self.populate_table()
 
@@ -175,6 +185,34 @@ class ExperimentTubesInfoDashboard(QWidget):
 
         # Connect the cell click signal
         self.experiments_table.cellClicked.connect(self.row_selected)
+
+    def create_export_btn(self, h_layout):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/img/file-export.svg"), QIcon.Mode.Normal,
+                       QIcon.State.Off)
+        refresh_btn = QPushButton("")
+        refresh_btn.clicked.connect(self.export_table_data)
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+            }
+            QPushButton:hover {
+                background: #eee;
+            }
+        """)
+        refresh_btn.setToolTip("Export")
+        refresh_btn.setIcon(icon)
+        h_layout.addWidget(refresh_btn)
+
+    def export_table_data(self):
+        self.refresh_data()
+        if not self.experiments_data:
+            return
+        try:
+            FileUtils.save_data_to_excel(self, self.experiments_data,
+                                         "experiment_data_exp_" + self.current_experiment.experiment_id)
+        except Exception as ex:
+            print(ex)
 
     def create_refresh_btn(self, h_layout):
         icon = QIcon()
@@ -196,14 +234,14 @@ class ExperimentTubesInfoDashboard(QWidget):
 
     def refresh_data(self):
         try:
-            self.main_window.cache_data = self.main_window.load_cache()
+            self.main_window.cache_data = load_cache(self.main_window.cache)
             if self.main_window.cache_data or (hasattr(CurrentExperimentSingleton,
                                                        'experiment_id') and self.current_experiment.experiment_id is not None):
                 self.current_experiment.experiment_id = self.main_window.cache_data.experiment_id
-                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(self.current_experiment.experiment_id)
+                self.experiments_data = self.ui_db.experiment_adapter.get_tubes_data_for_experiment(
+                    self.current_experiment.experiment_id)
                 self.populate_table()
-            else:
-                self.current_experiment = self.main_window.cache_data.experiment_id
+
         except Exception as ex:
             self.main_window.removeDialogBoxContents()
             self.main_window.show_message_in_dialog(ex)
@@ -228,11 +266,23 @@ class ExperimentTubesInfoDashboard(QWidget):
                 # Check if the table is empty
                 if self.experiments_table.rowCount() == 0:
                     self.main_window.removeDialogBoxContents()
-                    self.main_window.show_message_in_dialog("Empty Table, No Data!")
+                    self.main_window.show_message_in_dialog("Leere Tabelle, keine Daten!")
         except Exception as ex:
             print(ex)
             print(ex.with_traceback())
 
+        # Initially check if the table is empty and update UI accordingly
+        self.update_ui_based_on_data()
+
     def row_selected(self, row, column):
         experiment_data = self.experiments_data[row]
         self.experiment_selected.emit(experiment_data)
+
+    def update_ui_based_on_data(self):
+        row_count = self.experiments_table.rowCount()
+        if row_count == 0:
+            self.empty_label.show()
+            self.experiments_table.hide()
+        else:
+            self.empty_label.hide()
+            self.experiments_table.show()

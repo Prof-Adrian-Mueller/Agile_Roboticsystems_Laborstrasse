@@ -1,0 +1,9 @@
+QLabel[tableColor] {
+    background-color: qproperty-tableColor;
+}
+QWidget[widgetColor] {
+    background-color: qproperty-widgetColor;
+}
+QPushButton[buttonColor] {
+    background-color: qproperty-buttonColor;
+}

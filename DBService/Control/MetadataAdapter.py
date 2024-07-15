@@ -7,8 +7,7 @@ from DBService.Control.DatabaseConnection import DatabaseConnection
 
 
  # TODO
-    # get metadaten bei Plasmid_nr
-    # zurückgeben=>alle metadaten von Plasmid_nr
+
 class MetadataAdapter:
     def __init__(self,db):
         self.db =db
@@ -28,11 +27,11 @@ class MetadataAdapter:
         # file_path=self.select_file()
         if file_path:
             self.importer=ExcelImporter(self.database_adapter,file_path)
-            self.importer.import_data()
+            return self.importer.import_data()
         else:
-            print("Keine Datei ausgewählt.")
+            return ("Keine Datei ausgewählt.")
 
-
+    
     def select_file(self):
         root = tk.Tk()
         root.withdraw()  # Verstecken Sie das Hauptfenster
@@ -77,13 +76,16 @@ class MetadataAdapter:
                 # Erstellen eines Dictionary mit den Plasmid-Daten
                 plasmid_data_dict = {
                     'plasmid_nr': plasmid_data[0],
-                    'vektor': plasmid_data[1],
-                    'insert': plasmid_data[2],
-                    'sequenz_nr': plasmid_data[3],
-                    'name': plasmid_data[4],
-                    'datum_maxi': plasmid_data[5],
-                    'quelle': plasmid_data[6],
-                    'konstruktion_datum': plasmid_data[7]
+                    'antibiotika': plasmid_data[1],
+                    'vektor': plasmid_data[2],
+                    'insert': plasmid_data[3],
+                    'quelle': plasmid_data[4],
+                    'sequenz_nr': plasmid_data[5],
+                    'konstruktion': plasmid_data[6],
+                    'verdau': plasmid_data[7],
+                    'bemerkung':plasmid_data[8],
+                    'farbecode':plasmid_data[9]
+
                 }
                 return plasmid_data_dict
             else:

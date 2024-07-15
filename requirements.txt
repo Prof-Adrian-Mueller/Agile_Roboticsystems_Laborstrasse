@@ -12,3 +12,5 @@ faker==20.0.3
 qrcode
 openpyxl
 opencv-python
+xlrd
+segno

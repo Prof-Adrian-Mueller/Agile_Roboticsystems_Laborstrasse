@@ -1,5 +1,4 @@
 import os
-import qrcode
 
 from GUI.Custom.CustomDialog import ContentType
 from GUI.Navigation import Ui_MainWindow
@@ -41,7 +40,7 @@ class DisplayPlasmidTubes(QWidget):
         self.plasmid_tubes = {}
         self.tubes_input_fields = []
 
-    def displayPlasmidTubes(self, plasmid_nr_list, plasmid_dict):
+    def displayPlasmidTubes(self, plasmid_nr_list, availiable_tubes_dict, exp_all_info):
 
         for i in reversed(range(self.outputLayout.count())):
             widget = self.outputLayout.itemAt(i).widget().setParent(None)
@@ -49,32 +48,61 @@ class DisplayPlasmidTubes(QWidget):
                 widget.setParent(None)
                 sip.delete(widget)
 
-        print(self.experiment_data)
         starting_info_txt = QLabel(
             f"Experiment Id: {self.experiment_data.experiment_id} | {self.experiment_data.firstname}, {self.experiment_data.lastname}")
+        availiable_tube_list = QLabel(str(availiable_tubes_dict))
+        availiable_tube_label = QLabel("Verfügbare Tubes : ")
         text_widget = QWidget()  # Create a QWidget
         text_layout = QHBoxLayout()  # Create a QHBoxLayout
-        text_layout.addWidget(starting_info_txt)  # Add your QLabel to the QHBoxLayout
+        text_layout.addWidget(starting_info_txt)
+        text_layout.addStretch()
+        text_layout.addWidget(availiable_tube_label)
+        text_layout.addWidget(availiable_tube_list)
         text_widget.setLayout(text_layout)  # Set the layout of the QWidget to your QHBoxLayout
-        self.outputLayout.addWidget(text_widget)  # Add the QWidget to your outputLayout
+        self.outputLayout.addWidget(text_widget)
+
+        mapped_plasmid_tubes = self.map_plasmid_tubes(exp_all_info)
 
         for elem in plasmid_nr_list:
-            # add list here
-            self.appendOutput(elem)
+            self.appendOutput(elem, mapped_plasmid_tubes)
 
-    def appendOutput(self, plasmid_nr):
+    def map_plasmid_tubes(self, data):
+        mapping = {}
+        if not data:
+            return mapping
+        # Loop over the list of dictionaries
+        for item in data:
+            # Get the plasmid number and the probe number from the current item
+            plasmid_nr = item['plasmid_nr']
+            probe_nr = item['probe_nr']
+
+            # Check if the plasmid number is already in the mapping
+            if plasmid_nr in mapping:
+                # If yes, append the probe number to the existing list
+                mapping[plasmid_nr].append(probe_nr)
+            else:
+                # If not, create a new list with the probe number
+                mapping[plasmid_nr] = [probe_nr]
+
+        return mapping
+
+    def appendOutput(self, plasmid_nr, mapped_plasmid_tubes):
         widget = QWidget()
         widget.setObjectName("displayPlasmidTubes")
         self.outputLayout.addWidget(widget)
         # Create the buttons and line edit
         plasmid_nr_label = QLabel(plasmid_nr)
         probe_nr_input = QLineEdit()
+        plasmid_tubes = mapped_plasmid_tubes.get(plasmid_nr)
+        if plasmid_tubes:
+            probe_nr_input.setPlaceholderText(",".join(str(x) for x in plasmid_tubes))
+        else:
+            probe_nr_input.setPlaceholderText("Probe Nr eingeben. Bsp : 1,2,3")
+
         self.tubes_input_fields.append(probe_nr_input)
-        print(plasmid_nr)
         probe_nr_input.editingFinished.connect(
             lambda: self.save_tubes_to_plasmid(probe_nr_input.text(), plasmid_nr))
 
-        probe_nr_input.setPlaceholderText("Probe Nr eingeben. Bsp : 1,3,4,7")
         # probe_nr_input.setFixedWidth(120)
         h_layout = QHBoxLayout(widget)
 

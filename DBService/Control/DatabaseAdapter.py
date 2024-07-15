@@ -1,5 +1,7 @@
 from DBService.Model.Experiment import Experiment
 from DBService.Model.Experimente import Experimente
+import concurrent.futures
+
 import pandas as pd
 
 class DatabaseAdapter:
@@ -79,25 +81,25 @@ class DatabaseAdapter:
             conn.execute("INSERT INTO TubeQrcode (qr_code, datum) VALUES (?, ?)",
                          (tubeQrcode.qr_code, tubeQrcode.datum))
 
-    def get_last_qr_code(self):
-        if not self.does_table_exist("TubeQrcode"):
-            print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
-            self.db.create_table()
-        else:
-            print("Tabelle 'TubeQrcode' existiert bereits.")
-        with self.db as conn:
-            row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
-            return int(row[0]) if row[0] else 0
+    # def get_last_qr_code(self):
+    #     if not self.does_table_exist("TubeQrcode"):
+    #         print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_table()
+    #     else:
+    #         print("Tabelle 'TubeQrcode' existiert bereits.")
+    #     with self.db as conn:
+    #         row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
+    #         return int(row[0]) if row[0] else 0
 
-    def get_last_qr_code(self):
-        if not self.does_table_exist("TubeQrcode"):
-            print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
-            self.db.create_table()
-        else:
-            print("Tabelle 'TubeQrcode' existiert bereits.")
-        with self.db as conn:
-            row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
-            return int(row[0]) if row[0] else 0
+    # def get_last_qr_code(self):
+    #     if not self.does_table_exist("TubeQrcode"):
+    #         print("Tabelle 'TubeQrcode' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_table()
+    #     else:
+    #         print("Tabelle 'TubeQrcode' existiert bereits.")
+    #     with self.db as conn:
+    #         row = conn.execute("SELECT MAX(qr_code) FROM TubeQrcode").fetchone()
+    #         return int(row[0]) if row[0] else 0
 
     def select_all_from_tubeqrcode(self):
         # Überprüfen, ob die Tabelle existiert
@@ -126,30 +128,51 @@ class DatabaseAdapter:
             formatted_qr_codes = [(str(row[0]).zfill(6), row[1]) for row in qr_codes]
             return formatted_qr_codes
 
-    def insert_plasmid(self, plasmid):
-        # Überprüfen, ob die Tabelle existiert
-        if not self.does_table_exist("Plasmid"):
-            print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
-            self.db.create_plasmid_table()
-        else:
-            print("Tabelle 'Plasmid' existiert bereits.")
+    # def insert_plasmid(self, plasmid):
+    #     # Überprüfen, ob die Tabelle existiert
+    #     if not self.does_table_exist("Plasmid"):
+    #         print("Tabelle 'Plasmid' existiert nicht. Sie wird erstellt.")
+    #         self.db.create_plasmid_table()
+    #     else:
+    #         print("Tabelle 'Plasmid' existiert bereits.")
+    #
+    #     with self.db as conn:
+    #         # Überprüfen und konvertieren Sie den Datentyp von plasmid.name
+    #         name = str(plasmid.name) if plasmid.name is not None else None
+    #
+    #         # Konvertiert Datumswerte in Strings
+    #         datum_maxi = plasmid.datum_maxi.strftime('%Y-%m-%d') if plasmid.datum_maxi is not None else None
+    #         konstruktion_datum = plasmid.konstruktion_datum.strftime(
+    #             '%Y-%m-%d') if plasmid.konstruktion_datum is not None else None
+    #
+    #         # Füge das Plasmid in die Datenbank ein
+    #         conn.execute('''
+    #         INSERT INTO Plasmid (plasmid_nr, vektor, "insert", sequenz_nr, name, datum_maxi, quelle, konstruktion_datum)
+    #         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    #         ''', (
+    #         plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
+    #         konstruktion_datum))
 
-        with self.db as conn:
-            # Überprüfen und konvertieren Sie den Datentyp von plasmid.name
-            name = str(plasmid.name) if plasmid.name is not None else None
 
-            # Konvertiert Datumswerte in Strings
-            datum_maxi = plasmid.datum_maxi.strftime('%Y-%m-%d') if plasmid.datum_maxi is not None else None
-            konstruktion_datum = plasmid.konstruktion_datum.strftime(
-                '%Y-%m-%d') if plasmid.konstruktion_datum is not None else None
+    def insert_plasmid(self, plasmids):
+        display_message = []
 
-            # Füge das Plasmid in die Datenbank ein
-            conn.execute('''
-            INSERT INTO Plasmid (plasmid_nr, vektor, "insert", sequenz_nr, name, datum_maxi, quelle, konstruktion_datum)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-            plasmid.plasmid_nr, plasmid.vektor, plasmid.insert, plasmid.sequenz_nr, name, datum_maxi, plasmid.quelle,
-            konstruktion_datum))
+        try:
+            with self.db as conn:
+                for plasmid in plasmids:
+                    quelle_str = str(plasmid.quelle) if plasmid.quelle is not None else None
+                    conn.execute('''
+                            INSERT INTO Plasmid (plasmid_nr, antibiotika, vektor, "insert", quelle, sequenz_nr, konstruktion, verdau, bemerkung, farbecode)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (
+                            plasmid.plasmid_nr, plasmid.antibiotika, plasmid.vektor, plasmid.insert, quelle_str,plasmid.sequenz_nr,
+                            plasmid.konstruktion, plasmid.verdau, plasmid.bemerkung, plasmid.farbecode))
+            display_message.append("Successfully imported Excel file")
+            return display_message
+        except Exception as e:
+            print(f"Error inserting plasmid: {str(e)}")
+            display_message.append(f"Error inserting plasmids: {str(e)}")
+            return display_message
 
     def add_experiment(self, name, vorname, anz_tubes, anz_plasmid, datum, exp_id_param):
         self.add_laborant(name,vorname)

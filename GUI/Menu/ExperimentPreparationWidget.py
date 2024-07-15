@@ -1,10 +1,14 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QComboBox, QSpinBox, \
     QDoubleSpinBox, QDateEdit
 
+from GUI.Custom.CustomDialog import CustomDialog, ContentType
+from GUI.Storage.BorgSingleton import MainWindowSingleton
+
 
 class ExperimentPreparationWidget(QWidget):
     def __init__(self, vorbereitungStackedTab, parent=None):
         super().__init__(parent)
+        self.vorbereitung_index = None
         self.vorbereitungStackedTab = vorbereitungStackedTab
 
         # Make sure the QStackedWidget has an expanding size policy
@@ -25,10 +29,43 @@ class ExperimentPreparationWidget(QWidget):
         vorbereitungStackedTab.update()
 
     def addToMainWindow(self, main_window):
-        if main_window and main_window.tab_widget_home_dashboard:
-            main_window.tab_widget_home_dashboard.addTab(self, "Vorbereitung")
-            vorbereitung_index = main_window.tab_widget_home_dashboard.indexOf(self)
-            main_window.tab_widget_home_dashboard.setCurrentIndex(vorbereitung_index)
+        try:
+            if main_window and main_window.tab_widget_home_dashboard:
+                self.remove_vorbereitung_tab_if_exists(main_window)
+                main_window.tab_widget_home_dashboard.addTab(self, "Vorbereitung")
+                main_window_singleton = MainWindowSingleton(main_window)
+                vorbereitung_index = main_window.tab_widget_home_dashboard.indexOf(self)
+                main_window.tab_widget_home_dashboard.setCurrentIndex(vorbereitung_index)
+                main_window_singleton.add_stacked_tab_index("vorbereitung", vorbereitung_index)
+        except Exception as ex:
+            dialog = CustomDialog(self)
+            dialog.add_titlebar_name("Experiment Preparation Widget")
+            dialog.addContent(ex, ContentType.ERROR)
+            dialog.show()
+
+    def remove_vorbereitung_tab_if_exists(self, main_window):
+        tab_widget = main_window.tab_widget_home_dashboard
+        vorbereitung_tab_title = "Vorbereitung"
+
+        # Iterate over the tabs to find the "Vorbereitung" tab
+        for index in range(tab_widget.count()):
+            if tab_widget.tabText(index) == vorbereitung_tab_title:
+                # "Vorbereitung" tab found, remove it
+                tab_widget.removeTab(index)
+                break  # Exit the loop once the tab is found and removed
+
+    def removeFromMainWindow(self, main_window):
+        try:
+            if main_window and main_window.tab_widget_home_dashboard:
+                # Remove the tab using the stored index
+                main_window_singleton = MainWindowSingleton(main_window)
+                index = main_window_singleton.get_stacked_tab_index("vorbereitung")
+                main_window.tab_widget_home_dashboard.removeTab(index)
+        except Exception as ex:
+            dialog = CustomDialog(self)
+            dialog.add_titlebar_name("Experiment Preparation Widget")
+            dialog.addContent(ex, ContentType.OUTPUT)
+            dialog.show()
 
     def reset_input_of_past_experiments(self):
         for index in range(self.vorbereitungStackedTab.count()):
