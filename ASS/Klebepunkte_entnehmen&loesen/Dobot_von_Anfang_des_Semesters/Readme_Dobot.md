@@ -1,4 +1,4 @@
-Das Abspeichern von Pythondateien über die Genutzte Bedienungsplatform funktioniert nicht. Der Import von Python Files allerdings schon. Daher immer die ersten zwei Zeilen frei lassen und dann den Python Code in einer ordentlichen IDE schreiben. Das erspart auch im Simulationsprogramm dass Code verloren geht, sollte das Programm abstürzen.
+Das Abspeichern von Pythondateien über die genutzte Bedienungsplatform funktioniert nicht. Der Import von Python Files allerdings schon. Daher immer die ersten zwei Zeilen frei lassen und dann den Python Code in einer ordentlichen IDE schreiben. Das erspart auch im Simulationsprogramm dass Code verloren geht, sollte das Programm abstürzen.
 
 Grid.py ist der mathematische Weg zur Entnahme von Tubes aus einem Rack über Numpy Arrays.
 
