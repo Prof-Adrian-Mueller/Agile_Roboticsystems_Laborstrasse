@@ -19,7 +19,7 @@ Kein wirkliches Problem, aber störend: Nach einem Neustart wechselt der Raspber
 Zu den Endeffektoren:
 
 Die Suction Pump wird bei auf dem Wert 0 eingeschaltet und 1 ausgeschaltet.
-Die GPIO-Anschlüsse werden entgegen dem Nutzerhandbuch wie folgt gesteckt: 
+Die GPIO-Anschlüsse werden entgegen dem Nutzerhandbuch wie in der Abbildung gesteckt.
 RPi.GPIO hatte sich aus irgend einem Grund auf der Pythonversion 3.8 installiert, weshalb wir die Version 3.11 vom Raspberry Pi entfernt haben.
 Die Suction Pump muss mit dem Deckel des Tubes einen Formschluss bilden und ordentlich angedrückt werden um den Tube zu halten. Mit dem in wenigen Tagen selbst gebauten Sockel war eine Entsprechende Präzision nicht zu erreichen.
 
